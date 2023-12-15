@@ -1,0 +1,54 @@
+name: MATLAB Tests and Packaging
+on: [push]
+
+jobs:
+
+  test:
+    name: Run MATLAB Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v1.2.5
+        with:
+          release: R2023b
+      - name: Run build tool
+        uses: matlab-actions/run-build@v1.1.2
+      - name: Report results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: MATLAB Test Results
+          path: 'results.xml'
+          working-directory: 'artifacts'
+          reporter: java-junit
+      - name: Report coverage
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: 'artifacts/coverage.xml'
+          minimum_coverage: 80
+          report_name: Coverage Report
+
+  package:
+    name: Package MATLAB Toolbox
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v1.2.5
+        with:
+          release: R2023b
+      - name: Package toolbox
+        if: github.ref == 'refs/heads/main'
+        uses: matlab-actions/run-build@v1.1.2
+        with:
+          tasks: package
+      - name: Upload toolbox
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'MAG Data Visualization.mltbx'
+          path: artifacts
+          if-no-files-found: error
