@@ -6,7 +6,7 @@ This repository contains utilities for processing and visualizing MAG science an
 
 ## Getting Started
 
-The projects adds to the path many functions and classes that can be used for data processing and visualization. These can be found under the `mag` namespace; you can use tab-completion to see what is available:
+The toolbox adds to the path many functions and classes that can be used for data processing and visualization. These can be found under the `mag` namespace; you can use tab-completion to see what is available:
 ``` matlab
 mag.<TAB>
 ```
