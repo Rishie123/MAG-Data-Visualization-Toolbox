@@ -1,1 +1,4 @@
-Initial Release
+- Update README with development information
+- Fix issues with toolbox generation
+- Fix issues in export of `mag.AutomatedAnalysis` results
+- Fix issues with visualizing range cycling data
