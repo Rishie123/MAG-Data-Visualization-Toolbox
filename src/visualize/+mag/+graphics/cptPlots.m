@@ -42,19 +42,13 @@ function figures = cptPlots(analysis, options)
         views(end + 1) = mag.graphics.view.Field(rangeCycling, Event = "Range", Name = "Range Cycling", Title = string.empty());
 
         % Plot ranges without range 0.
-        locNoRangeZero = (rangeCycling.Primary.Range ~= 0) | (rangeCycling.Secondary.Range ~= 0);
+        locNoRangeZero = (rangeCycling.Primary.Range ~= 0) & (rangeCycling.Secondary.Range ~= 0);
 
         if nnz(locNoRangeZero) > 0
 
-            primaryNoRange0Time = rangeCycling.Primary.Time(locNoRangeZero);
-            [primaryStartTime, primaryEndTime] = bounds(primaryNoRange0Time);
-
-            secondaryNoRange0Time = rangeCycling.Secondary.Time(locNoRangeZero);
-            [secondaryStartTime, secondaryEndTime] = bounds(secondaryNoRange0Time);
-
             noRange0Cycling = rangeCycling.copy();
-            noRange0Cycling.crop(timerange(primaryStartTime, primaryEndTime, "closed"), ...
-                timerange(secondaryStartTime, secondaryEndTime, "closed"));
+            noRange0Cycling.crop(timerange(rangeCycling.Primary.Events.Time(1), rangeCycling.Primary.Events.Time(end), "closed"), ...
+                timerange(rangeCycling.Secondary.Events.Time(1), rangeCycling.Secondary.Events.Time(end), "closed"));
 
             views(end + 1) = mag.graphics.view.Field(noRange0Cycling, Event = "Range", Name = "Range Cycling (No Range 0)", Title = string.empty());
         end

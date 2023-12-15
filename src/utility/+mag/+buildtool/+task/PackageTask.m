@@ -58,7 +58,7 @@ classdef (Sealed) PackageTask < matlab.buildtool.Task
             [~, fileName] = fileparts(task.ToolboxProject_);
 
             template = fileread(task.ToolboxTemplate);
-            template = compose(template, task.ToolboxProject_, fileName, version);
+            template = compose(template, task.ToolboxProject_, fileName, version, task.ToolboxProject_);
 
             % Create project file.
             fileId = fopen(task.ToolboxProject_, "w");

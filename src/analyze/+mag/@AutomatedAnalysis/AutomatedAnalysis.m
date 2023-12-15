@@ -215,7 +215,7 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                     data.Secondary.MetaData.DataFrequency = secondaryEvents{p, "DataFrequency"};
                     data.Secondary.MetaData.PacketFrequency = secondaryEvents{p, "PacketFrequency"};
 
-                    modes(p) = data;
+                    modes(end + 1) = data; %#ok<AGROW>
                 end
             end
         end
@@ -266,7 +266,7 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 if isempty(idxRange)
                     period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
                 else
-                    period = timerange(events.Time(idxRange), events.Time(idxRange + 4), "closed");
+                    period = timerange(events.Time(idxRange), events.Time(idxRange + 4) - milliseconds(1), "closed");
                 end
             end
 

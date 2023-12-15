@@ -56,7 +56,7 @@ function export(this, exportStrategy, options)
 
         rangeData = scienceExportFormat.formatForExport({rangeCycling.Primary.Data, rangeCycling.Secondary.Data}, [rangeCycling.Primary.MetaData, rangeCycling.Secondary.MetaData]);
 
-        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s Range Cycling", datestr(primaryRange.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
+        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s Range Cycling", datestr(rangeCycling.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
         exportStrategy.export(rangeData);
     end
 
@@ -67,7 +67,7 @@ function export(this, exportStrategy, options)
 
         rampData = scienceExportFormat.formatForExport({rampMode.Primary.Data, rampMode.Secondary.Data}, [rampMode.Primary.MetaData, rampMode.Secondary.MetaData]);
 
-        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s Ramp Mode", datestr(primaryRamp.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
+        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s Ramp Mode", datestr(rampMode.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
         exportStrategy.export(rampData);
     end
 
