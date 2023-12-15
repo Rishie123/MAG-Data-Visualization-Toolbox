@@ -56,3 +56,9 @@ jobs:
           name: 'MAG Data Visualization.mltbx'
           path: artifacts
           if-no-files-found: error
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ env.VERSION }}
+          artifacts: 'artifacts/MAG Data Visualization.mltbx'
+          bodyFile: 'resources/ReleaseNotes.md'

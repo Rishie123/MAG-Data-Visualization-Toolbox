@@ -1,3 +1,1 @@
-# Release Notes
-
 Initial Release
