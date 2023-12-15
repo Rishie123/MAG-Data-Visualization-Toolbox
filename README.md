@@ -1,5 +1,7 @@
 # MAG Data Visualization Toolbox
 
+[![MATLAB Tests](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/actions/workflows/matlab.yml/badge.svg)](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/actions/workflows/matlab.yml)
+
 This repository contains utilities for processing and visualizing MAG science and HK data.
 
 ## Getting Started
