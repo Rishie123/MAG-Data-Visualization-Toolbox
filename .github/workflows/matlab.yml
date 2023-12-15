@@ -13,8 +13,10 @@ jobs:
         uses: matlab-actions/setup-matlab@v1.2.5
         with:
           release: R2023b
-      - name: Run build tool
+      - name: Run tests
         uses: matlab-actions/run-build@v1.1.2
+        with:
+          tasks: check test
       - name: Report results
         uses: dorny/test-reporter@v1
         if: success() || failure()

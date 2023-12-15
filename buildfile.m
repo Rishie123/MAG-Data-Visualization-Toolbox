@@ -1,6 +1,14 @@
 function plan = buildfile()
 % BUILDFILE File invoked by automated build.
 
+    project = matlab.project.currentProject;
+
+    if isempty(project) || ~isequal(project.Name, "MAG Data Visualization")
+
+        project = matlab.project.loadProject("MAGDataVisualization.prj");
+        restore = onCleanup(@() project.close());
+    end
+
     % Create a plan from task functions.
     plan = buildplan();
 
