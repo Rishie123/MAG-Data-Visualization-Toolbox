@@ -133,21 +133,20 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
         % CROPDATABASEDONSCIENCE Crop meta data, events and HK based on
         % science timestamps.
 
-            startTime = min([this.Primary.Time(1), this.Secondary.Time(1)]);
-            endTime = max([this.Primary.Time(end), this.Secondary.Time(end)]);
+            timeRange = this.TimeRange;
 
             % Filter events.
-            this.Events = this.Events(isbetween([this.Events.CommandTimestamp], startTime, endTime, "closed"));
+            this.Events = this.Events(isbetween([this.Events.CommandTimestamp], timeRange(1), timeRange(2), "closed"));
 
             % Filter HK.
             for i = 1:numel(this.HK)
-                this.HK(i).Data = this.HK(i).Data(timerange(startTime, endTime, "closed"), :);
+                this.HK(i).Data = this.HK(i).Data(timerange(timeRange(1), timeRange(2), "closed"), :);
             end
 
             % Adjust meta data.
-            this.MetaData.Timestamp = startTime;
-            this.Primary.MetaData.Timestamp = startTime;
-            this.Secondary.MetaData.Timestamp = startTime;
+            this.MetaData.Timestamp = timeRange(1);
+            this.Primary.MetaData.Timestamp = timeRange(1);
+            this.Secondary.MetaData.Timestamp = timeRange(1);
         end
     end
 

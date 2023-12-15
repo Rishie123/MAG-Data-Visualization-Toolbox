@@ -34,6 +34,9 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
             sensorEvents = removevars(sensorEvents, "PrimaryRate");
     end
 
+    % Improve timestamp estimates.
+    sensorEvents = updateEventTimestamps(sensorEvents, data);
+
     % Add automatic transitions.
     locTimedCommand = ~ismissing(sensorEvents.Duration) & (sensorEvents.Duration ~= 0);
 
@@ -56,7 +59,6 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     end
 
     sensorEvents = sortrows(sensorEvents);
-    sensorEvents = updateEventTimestamps(sensorEvents, data);
 
     % Extract first automatic range change in the session.
     if contains("Range", sensorEvents.Properties.VariableNames)
@@ -125,8 +127,6 @@ end
 function events = updateEventTimestamps(events, data)
 
     % Improve ramp mode estimate.
-    events = events(events.Reason == "Command", :);
-
     idxRamp = find(contains([events.Label], "Ramp", IgnoreCase = true));
     idxRamp = vertcat(idxRamp, idxRamp + 1);
 
