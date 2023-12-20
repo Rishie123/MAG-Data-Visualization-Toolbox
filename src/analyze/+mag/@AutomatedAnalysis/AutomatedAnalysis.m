@@ -391,52 +391,45 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 loadedObject = object;
             elseif isa(object, "struct")
 
-                if isfield(object, "Version")
-                    version = object.Version;
-                else
-                    version = 1.0;
-                end
-
                 % Recreate object based on version.
-                switch version
-                    case 1.0
+                if isfield(object, "Outboard")
 
-                        % Convert object to version 2.0 and recursively
-                        % dispatch it.
-                        loadedObject = struct();
-                        loadedObject.Version = 2.0;
+                    % Convert object to version 2.0 and recursively
+                    % dispatch it.
+                    loadedObject = struct();
+                    loadedObject.Version = 2.0;
 
-                        for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
-                                "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
-                                "Events", "MetaData", "HK", "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles"]
+                    for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
+                            "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
+                            "Events", "MetaData", "HK", "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles"]
 
-                            loadedObject.(p) = object.(p);
-                        end
+                        loadedObject.(p) = object.(p);
+                    end
 
-                        mapping = dictionary(Outboard = "Primary", Inboard = "Secondary", OutRamp = "PrimaryRamp", InRamp = "SecondaryRamp");
+                    mapping = dictionary(Outboard = "Primary", Inboard = "Secondary", OutRamp = "PrimaryRamp", InRamp = "SecondaryRamp");
 
-                        for k = mapping.keys()'
-                            loadedObject.(mapping(k)) = object.(k);
-                        end
+                    for k = mapping.keys()'
+                        loadedObject.(mapping(k)) = object.(k);
+                    end
 
-                        loadedObject = mag.AutomatedAnalysis.loadobj(loadedObject);
-                    case 2.0
+                    loadedObject = mag.AutomatedAnalysis.loadobj(loadedObject);
+                elseif isfield(object, "PrimaryRamp")
 
-                        % Convert object directly to version 3.0.
-                        loadedObject = mag.AutomatedAnalysis();
-                        loadedObject.Results = mag.Instrument();
+                    % Convert object directly to version 3.0.
+                    loadedObject = mag.AutomatedAnalysis();
+                    loadedObject.Results = mag.Instrument();
 
-                        for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
-                                "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
-                                "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles", ...
-                                "PrimaryRamp", "SecondaryRamp"]
+                    for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
+                            "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
+                            "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles", ...
+                            "PrimaryRamp", "SecondaryRamp"]
 
-                            loadedObject.(p) = object.(p);
-                        end
+                        loadedObject.(p) = object.(p);
+                    end
 
-                        for p = ["Events", "MetaData", "Primary", "Secondary", "HK"]
-                            loadedObject.Results.(p) = object.(p);
-                        end
+                    for p = ["Events", "MetaData", "Primary", "Secondary", "HK"]
+                        loadedObject.Results.(p) = object.(p);
+                    end
                 end
             else
                 error("Cannot retrieve ""mag.AutomatedAnalysis"" from ""%s"".", class(object));
