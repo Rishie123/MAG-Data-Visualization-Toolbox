@@ -99,13 +99,13 @@ function loadEventsData(this)
 
     %% Add Response Times
 
-    responsePattern = "All data =\[\d+, \d+, \d+, \d+, \d+, \d+, \d+, (?<coarse>\d+), \d+, \d+, \d+, \d+, \d+, (?:\d+/\d+/\d+ \d+:\d+:\d+:\w+ :: )?\d+, \d+, \d+, (?<type>\d+), (?<subtype>\d+)\]";
-
     % Identify acknowledge response events.
     locAccepted = matches([rawEvents.command], regexpPattern("MAG_TCA_SUCC"));
     acknowledgeEvents = rawEvents(locAccepted);
 
     if ~isempty(acknowledgeEvents)
+
+        responsePattern = getResponsePattern(acknowledgeEvents(1).details);
 
         acknowledgedId = regexp([acknowledgeEvents.details], responsePattern, "names", "all");
         acknowledgedId = [acknowledgedId{:}];
@@ -127,6 +127,8 @@ function loadEventsData(this)
 
     if ~isempty(completedEvents)
 
+        responsePattern = getResponsePattern(completedEvents(1).details);
+
         completedId = regexp([completedEvents.details], responsePattern, "names", "all");
         completedId = [completedId{:}];
 
@@ -144,34 +146,65 @@ function loadEventsData(this)
     % Assign acknowlegdement and completion times.
     for e = events
 
+        correction = duration.empty();
+
         ae = acknowledgeEvents([acknowledgeEvents.timestamp] >= e.CommandTimestamp);
         ce = completedEvents([completedEvents.timestamp] >= e.CommandTimestamp);
 
-        ae = ae((str2double([ae.type]) == e.Type) & (str2double([ae.subtype]) == e.SubType));
-        ce = ce((str2double([ce.type]) == e.Type) & (str2double([ce.subtype]) == e.SubType));
+        if isfield(ae, "type") && isfield(ae, "subtype")
 
-        correction = duration.empty();
+            ae = ae((str2double([ae.type]) == e.Type) & (str2double([ae.subtype]) == e.SubType));
 
-        if isempty(ae)
-            e.AcknowledgeTimestamp = e.CommandTimestamp;
-        else
+            if isempty(ae)
+                e.AcknowledgeTimestamp = e.CommandTimestamp;
+            else
 
-            e.AcknowledgeTimestamp = ae(1).coarse;
-            correction(end + 1) = ae(1).coarse - ae(1).timestamp; %#ok<AGROW>
+                e.AcknowledgeTimestamp = ae(1).coarse;
+                correction(end + 1) = ae(1).coarse - ae(1).timestamp; %#ok<AGROW>
+            end
         end
 
-        if isempty(ce)
-            e.CompleteTimestamp = e.AcknowledgeTimestamp;
-        else
+        if isfield(ce, "type") && isfield(ce, "subtype")
 
-            e.CompleteTimestamp = ce(1).coarse;
-            correction(end + 1) = ce(1).coarse - ce(1).timestamp; %#ok<AGROW>
+            ce = ce((str2double([ce.type]) == e.Type) & (str2double([ce.subtype]) == e.SubType));
+
+            if isempty(ce)
+                e.CompleteTimestamp = e.AcknowledgeTimestamp;
+            else
+
+                e.CompleteTimestamp = ce(1).coarse;
+                correction(end + 1) = ce(1).coarse - ce(1).timestamp; %#ok<AGROW>
+            end
         end
 
-        e.CommandTimestamp = e.CommandTimestamp + mean(correction);
+        if ~isempty(correction)
+            e.CommandTimestamp = e.CommandTimestamp + mean(correction);
+        end
     end
 
     %% Assign Value
 
     this.Results.Events = sort(events);
+end
+
+function responsePattern = getResponsePattern(response)
+
+    persistent responsePattern14 responsePattern17
+
+    if isempty(responsePattern14) || isempty(responsePattern17)
+
+        responsePattern14 = "All data =\[\d+, \d+, \d+, \d+, \d+, \d+, \d+, (?<coarse>\d+), \d+, \d+, \d+, \d+, \d+, (?:\d+/\d+/\d+ \d+:\d+:\d+:\w+ :: )?\d+, \d+\]";
+        responsePattern17 = "All data =\[\d+, \d+, \d+, \d+, \d+, \d+, \d+, (?<coarse>\d+), \d+, \d+, \d+, \d+, \d+, (?:\d+/\d+/\d+ \d+:\d+:\d+:\w+ :: )?\d+, \d+, \d+, (?<type>\d+), (?<subtype>\d+)\]";
+    end
+
+    commaCount = count(response, ",");
+
+    switch commaCount
+        case 14
+            responsePattern = responsePattern14;
+        case 17
+            responsePattern = responsePattern17;
+        otherwise
+            error("Unrecognized number of commas in response message.");
+    end
 end
