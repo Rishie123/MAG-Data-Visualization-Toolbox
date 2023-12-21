@@ -13,11 +13,11 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
     properties
         % COMMANDTIMESTAMP Timestamp of command.
-        CommandTimestamp (1, 1) datetime = NaT
+        CommandTimestamp (1, 1) datetime = NaT(TimeZone = "UTC")
         % ACKNOWLEDGETIMESTAMP Timestamp of acknowledge.
-        AcknowledgeTimestamp (1, 1) datetime = NaT
+        AcknowledgeTimestamp (1, 1) datetime = NaT(TimeZone = "UTC")
         % COMPLETETIMESTAMP Timestamp of completion.
-        CompleteTimestamp (1, 1) datetime = NaT
+        CompleteTimestamp (1, 1) datetime = NaT(TimeZone = "UTC")
         % TYPE Packet type.
         Type (1, 1) double
         % SUBTYPE Packet subtype.
@@ -70,5 +70,24 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
         % CONVERTTOTIMETABLE Convert event to timetable.
         tableThis = convertToTimeTable(this)
+    end
+
+    methods (Access = protected)
+
+        function timestamps = getTimestamps(this)
+
+            timestamps = [this.CompleteTimestamp];
+            locMissing = ismissing(timestamps);
+
+            if any(locMissing)
+
+                timestamps(locMissing) = [this(locMissing).AcknowledgeTimestamp];
+                locMissing = ismissing(timestamps);
+            
+                if any(locMissing)
+                    timestamps(locMissing) = this(locMissing).CommandTimestamp;
+                end
+            end
+        end
     end
 end

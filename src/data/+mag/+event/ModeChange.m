@@ -37,7 +37,7 @@ classdef ModeChange < mag.event.Event
             labels = compose("%s (%d, %d)", [this.Mode]', [this.PrimaryRate]', [this.SecondaryRate]');
 
             tableThis = timetable([this.Mode], [this.PrimaryRate], [this.SecondaryRate], [this.PacketFrequency], [this.Duration], labels, ...
-                RowTimes = [this.CompleteTimestamp], VariableNames = ["Mode", "PrimaryRate", "SecondaryRate", "PacketFrequency", "Duration", "Label"]);
+                RowTimes = this.getTimestamps(), VariableNames = ["Mode", "PrimaryRate", "SecondaryRate", "PacketFrequency", "Duration", "Label"]);
         end
     end
 end

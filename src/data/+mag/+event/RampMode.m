@@ -27,7 +27,7 @@ classdef RampMode < mag.event.Event
         function tableThis = convertToTimeTable(this)
 
             labels = compose("%s Ramp", [this.Sensor]');
-            tableThis = timetable(string([this.Sensor]), labels, RowTimes = [this.CompleteTimestamp], VariableNames = ["Sensor", "Label"]);
+            tableThis = timetable(string([this.Sensor]), labels, RowTimes = this.getTimestamps(), VariableNames = ["Sensor", "Label"]);
         end
     end
 end

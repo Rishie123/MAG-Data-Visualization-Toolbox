@@ -98,9 +98,6 @@ classdef Filter < mag.process.Step
             locCombine = ([NaN; diff(modeEvents.DataFrequency)] == 0);
             modeEvents(locCombine, :) = [];
 
-            % Get sequence values.
-
-            % Separate data by data frequency.
             for e = 1:height(modeEvents)
 
                 if e == height(modeEvents)

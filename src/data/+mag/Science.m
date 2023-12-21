@@ -8,6 +8,8 @@ classdef Science < mag.TimeSeries
         Y (:, 1) double
         % Z z-axis component of the magnetic field.
         Z (:, 1) double
+        % XYZ x-, y- and z-axis components of the magnetic field.
+        XYZ (:, 3) double
         % B Magnitude of the magnetic field.
         B (:, 1) double
         % RANGE Range values of sensor.
@@ -41,6 +43,10 @@ classdef Science < mag.TimeSeries
 
         function z = get.Z(this)
             z = this.Data.z;
+        end
+
+        function xyz = get.XYZ(this)
+            xyz = this.Data{:, ["x", "y", "z"]};
         end
 
         function b = get.B(this)
