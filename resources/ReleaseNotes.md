@@ -1,1 +1,2 @@
 - Add utility method to retrieve specific HK type from vector of HK
+- Fix issue with app icons not founds
