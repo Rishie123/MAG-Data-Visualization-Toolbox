@@ -67,6 +67,25 @@ classdef Calibration < mag.process.Step
         end
     end
 
+    methods (Hidden)
+
+        function calibratedData = applyCalibration(this, uncalibratedData, calibrationFile)
+
+            arguments (Input)
+                this
+                uncalibratedData (:, 3) double
+                calibrationFile (1, 1) string {mustBeFile} = this.DefaultCalibrationFile
+            end
+
+            arguments (Output)
+                calibratedData (:, 3) double
+            end
+
+            [scale, misalignment, offset] = this.readCalibrationData(calibrationFile);
+            calibratedData = ((scale .* uncalibratedData) * misalignment) + offset;
+        end
+    end
+
     methods (Access = private)
 
         function fileName = getFileName(this, range, modelName)
@@ -76,12 +95,6 @@ classdef Calibration < mag.process.Step
             if ~isfile(fileName)
                 fileName = this.DefaultCalibrationFile;
             end
-        end
-
-        function calibratedData = applyCalibration(this, uncalibratedData, calibrationFile)
-
-            [scale, misalignment, offset] = this.readCalibrationData(calibrationFile);
-            calibratedData = ((scale .* uncalibratedData) * misalignment) + offset;
         end
     end
 
