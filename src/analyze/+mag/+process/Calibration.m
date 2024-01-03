@@ -2,9 +2,9 @@ classdef Calibration < mag.process.Step
 % CALIBRATION Correct data by applying scale factor, misalignment and
 % offset.
 
-    properties (Constant, Access = private)
+    properties (Constant, Hidden)
         % FILELOCATION Location of calibration files.
-        FileLocation (1, 1) string = fullfile(fileparts(mfilename("fullpath")), "../../calibration/")
+        FileLocation (1, 1) string = fullfile(fileparts(mfilename("fullpath")), "../../calibration")
     end
 
     properties (Dependent)
