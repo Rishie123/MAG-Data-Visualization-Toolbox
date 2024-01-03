@@ -46,15 +46,7 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
                 type (1, 1) string {mustBeMember(type, ["PW", "SID15", "STATUS"])} = "PW"
             end
 
-            hk = this.Results.HK;
-
-            if ~isempty(hk)
-
-                hkMetaData = [hk.MetaData];
-                hkType = hk([hkMetaData.Type] == type);
-            else
-                hkType = mag.HK.empty();
-            end
+            hkType = this.Results.HK.getHKType(type);
         end
     end
 end
