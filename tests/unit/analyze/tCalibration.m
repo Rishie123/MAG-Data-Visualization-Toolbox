@@ -16,6 +16,22 @@ classdef tCalibration < MAGAnalysisTestCase
             end
         end
 
+        % Verify that default calibration is selected, if sensor model is
+        % empty.
+        function default_emptyModel(testCase)
+
+            % Set up.
+            uncalibratedData = testCase.createTestData();
+            metaData = mag.meta.Science(Model = string.empty());
+
+            % Exercise.
+            calibrationStep = mag.process.Calibration();
+            calibratedData = calibrationStep.apply(uncalibratedData, metaData);
+
+            % Verify.
+            testCase.verifyEqual(calibratedData, uncalibratedData, "Calibrated value should match expectation.");
+        end
+
         % Verify that default calibration is selected, if sensor model does
         % not have specific calibration data.
         function default_unknownModel(testCase)
