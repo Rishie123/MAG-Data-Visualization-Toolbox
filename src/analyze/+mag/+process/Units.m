@@ -69,8 +69,16 @@ classdef Units < mag.process.Step
             end
 
             switch metaData.Type
-                case {"PW", "SID15"}
+                case "PW"
                     data = this.convertPowerEngineeringUnits(data);
+                case "SID15"
+
+                    data = this.convertPowerEngineeringUnits(data);
+
+                    for drt = ["ISV_FOB_DTRDYTM", "ISV_FIB_DTRDYTM"]
+                        data{:, drt} = this.convertDataReadyTime(data{:, drt});
+                    end
+
                 case {"PROCSTAT", "STATUS"}
                     % nothing to do
                 otherwise
@@ -92,6 +100,21 @@ classdef Units < mag.process.Step
                 vn = variableNames(matches(variableNames, regexpPattern(k)));
                 data{:, vn} = (data{:, vn} * this.ScaleFactors(k)) + this.Offsets(k);
             end
+        end
+    end
+
+    methods (Static, Access = private)
+
+        function readyTime = convertDataReadyTime(readyTime)
+        % CONVERTDATAREADYTIME Convert data ready time to pseudo-timestamp.
+
+            binRT = dec2bin(readyTime);
+
+            fineTime = bin2dec(binRT(:, end-23:end));
+            fineTime = fineTime / (2^24-1);
+
+            coarseTime = bin2dec(binRT(:, 1:end-24));
+            readyTime = coarseTime + fineTime;
         end
     end
 end
