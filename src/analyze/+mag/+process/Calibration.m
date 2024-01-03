@@ -2,6 +2,11 @@ classdef Calibration < mag.process.Step
 % CALIBRATION Correct data by applying scale factor, misalignment and
 % offset.
 
+    properties (Constant, Access = private)
+        % FILELOCATION Location of calibration files.
+        FileLocation (1, 1) string = fullfile(fileparts(mfilename("fullpath")), "../../calibration/")
+    end
+
     properties (Dependent)
         Name
         Description
@@ -13,7 +18,7 @@ classdef Calibration < mag.process.Step
         Temperature (1, 1) string {mustBeMember(Temperature, ["Cold", "Cool", "Room"])} = "Room"
         % DEFAULTCALIBRATIONFILE Default file containing scale factor,
         % misalignment and offset information.
-        DefaultCalibrationFile (1, 1) string {mustBeFile} = fullfile(fileparts(mfilename("fullpath")), "../../calibration/default.txt")
+        DefaultCalibrationFile (1, 1) string {mustBeFile} = fullfile(mag.process.Calibration.FileLocation, "default.txt")
     end
 
     methods
@@ -44,36 +49,39 @@ classdef Calibration < mag.process.Step
 
         function data = apply(this, data, metaData)
 
-            calibrationFile = this.getFileName(data, metaData);
-
-            data{:, ["x", "y", "z"]} = this.applyCalibration(data{:, ["x", "y", "z"]}, calibrationFile);
-        end
-    end
-
-    methods (Hidden)
-
-        function calibratedData = applyCalibration(this, uncalibratedData, calibrationFile)
-
-            arguments (Input)
+            arguments
                 this
-                uncalibratedData (:, 3) double
-                calibrationFile (1, 1) string {mustBeFile} = this.DefaultCalibrationFile
+                data timetable
+                metaData (1, 1) mag.meta.Science
             end
 
-            arguments (Output)
-                calibratedData (:, 3) double
-            end
+            ranges = unique(data.range);
 
-            [scale, misalignment, offset] = this.readCalibrationData(calibrationFile);
-            calibratedData = ((scale .* uncalibratedData) * misalignment) + offset;
+            for r = ranges'
+
+                locRange = data.range == r;
+
+                calibrationFile = this.getFileName(r, metaData.Model);
+                data{locRange, ["x", "y", "z"]} = this.applyCalibration(data{locRange, ["x", "y", "z"]}, calibrationFile);
+            end
         end
     end
 
     methods (Access = private)
 
-        function fileName = getFileName(this, data, metaData)
+        function fileName = getFileName(this, range, modelName)
 
+            fileName = fullfile(this.FileLocation, compose("%s_r%d_t%s.txt", lower(modelName), range, lower(this.Temperature)));
 
+            if ~isfile(fileName)
+                fileName = this.DefaultCalibrationFile;
+            end
+        end
+
+        function calibratedData = applyCalibration(this, uncalibratedData, calibrationFile)
+
+            [scale, misalignment, offset] = this.readCalibrationData(calibrationFile);
+            calibratedData = ((scale .* uncalibratedData) * misalignment) + offset;
         end
     end
 
