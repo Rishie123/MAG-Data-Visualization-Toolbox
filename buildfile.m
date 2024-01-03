@@ -1,7 +1,7 @@
 function plan = buildfile()
 % BUILDFILE File invoked by automated build.
 
-    project = matlab.project.currentProject;
+    project = matlab.project.currentProject();
 
     if isempty(project) || ~isequal(project.Name, "MAG Data Visualization")
 

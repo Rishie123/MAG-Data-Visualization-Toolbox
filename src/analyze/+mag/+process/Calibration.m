@@ -92,7 +92,7 @@ classdef Calibration < mag.process.Step
 
             fileName = fullfile(this.FileLocation, compose("%s_r%d_t%s.txt", lower(modelName), range, lower(this.Temperature)));
 
-            if ~isfile(fileName)
+            if isempty(fileName) || ~isfile(fileName)
                 fileName = this.DefaultCalibrationFile;
             end
         end
