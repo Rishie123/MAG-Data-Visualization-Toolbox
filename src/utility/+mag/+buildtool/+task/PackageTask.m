@@ -9,7 +9,7 @@ classdef (Sealed) PackageTask < matlab.buildtool.Task
         % TOOLBOXTEMPLATE Toolbox configuration project template.
         ToolboxTemplate string {mustBeScalarOrEmpty, mustBeFile}
         % TOOLBOXVERSION Toolbox configuration project template.
-        ToolboxVersion (1, 1) string = "1.0"
+        ToolboxVersion (1, 1) string = mag.version()
         % TOOLBOXPATH Full path to toolbox to package into.
         ToolboxPath string {mustBeScalarOrEmpty}
     end

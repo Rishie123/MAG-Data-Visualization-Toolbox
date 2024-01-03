@@ -40,6 +40,10 @@ classdef Units < mag.process.Step
             P8VI = -9.5705, ...
             N8VI = -8.3906, ...
             ICU_TEMP = -273.15)
+        % FOBTEMPERATUREFIT FOB temperature fit function.
+        FOBTemperatureFit (1, 1) function_handle = mag.process.Units.fitFOBTemperature()
+        % FIBTEMPERATUREFIT FIB temperature fit function.
+        FIBTemperatureFit (1, 1) function_handle = mag.process.Units.fitFIBTemperature()
     end
 
     methods
@@ -99,16 +103,38 @@ classdef Units < mag.process.Step
             end
 
             % Convert FOB temperature.
-            fobTemp = data{:, "FOB_TEMP"};
-            data{:, "FOB_TEMP"} = -6e-5 * (fobTemp .^ 3) - 0.0109 * (fobTemp .^ 2) + 9.2216 * fobTemp + 2519.5;
+            locFOB = regexpPattern("(ISV_)?FOB_TEMP");
+            data{:, locFOB} = this.FOBTemperatureFit(data{:, locFOB});
 
             % Convert FIB temperature.
-            fibTemp = data{:, "FIB_TEMP"};
-            data{:, "FIB_TEMP"} = -7e-5 * (fibTemp .^ 3) - 0.0135 * (fibTemp .^ 2) + 8.9171 * fibTemp + 2508.8;
+            locFIB = regexpPattern("(ISV_)?FIB_TEMP");
+            data{:, locFIB} = this.FOBTemperatureFit(data{:, locFIB});
         end
     end
 
     methods (Static, Access = private)
+
+        function f = fitFOBTemperature()
+        % FITFOBTEMPERATURE Fit FOB temperature with a 3rd degree
+        % polynomial.
+
+            x = [1950; 1999; 2044; 2085; 2143; 2193; 2247; 2262; 2354; 2407; 2463; 2510; 2560; 2629; 2677; 2692; 2804; 2856; 2910; 2919; 2975; 3034];
+            y = [-59.1; -54.1; -49.5; -45.2; -39.4; -34.4; -28.8; -27; -17.6; -12; -6.1; -1.3; 4.6; 12; 17.7; 18.7; 32.7; 38.9; 45.6; 46.1; 53.9; 62];
+
+            p = polyfit(x, y, 3);
+            f = @(x) p(1) * x.^3 + p(2) * x.^2 + p(3) * x + p(4);
+        end
+
+        function f = fitFIBTemperature()
+        % FITFIBTEMPERATURE Fit FIB temperature with a 3rd degree
+        % polynomial.
+
+            x = [1949; 1997; 2042; 2083; 2141; 2190; 2243; 2257; 2348; 2400; 2454; 2499; 2548; 2614; 2660; 2675; 2780; 2830; 2879; 2888; 2940; 2994];
+            y = [-59.1; -54.1; -49.5; -45.5; -39.4; -34.4; -28.8; -27; -17.6; -12; -5.9; -1.3; 4.6; 12; 17.4; 18.7; 32.7; 38.9; 45.6; 46.1; 53.9; 62];
+
+            p = polyfit(x, y, 3);
+            f = @(x) p(1) * x.^3 + p(2) * x.^2 + p(3) * x + p(4);
+        end
 
         function readyTime = convertDataReadyTime(readyTime)
         % CONVERTDATAREADYTIME Convert data ready time to pseudo-timestamp.
