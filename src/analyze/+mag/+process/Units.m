@@ -71,7 +71,7 @@ classdef Units < mag.process.Step
             switch metaData.Type
                 case {"PW", "SID15"}
                     data = this.convertPowerEngineeringUnits(data);
-                case "STATUS"
+                case {"PROCSTAT", "STATUS"}
                     % nothing to do
                 otherwise
                     error("Unrecognized HK type ""%s"".", metaData.Type);

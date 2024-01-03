@@ -7,7 +7,7 @@ classdef HK < mag.meta.Data
 
     properties
         % TYPE Type of HK data.
-        Type string {mustBeScalarOrEmpty, mustBeMember(Type, ["PW", "SID15", "STATUS"])}
+        Type string {mustBeScalarOrEmpty, mustBeMember(Type, ["PROCSTAT", "PW", "SID15", "STATUS"])}
     end
 
     methods
