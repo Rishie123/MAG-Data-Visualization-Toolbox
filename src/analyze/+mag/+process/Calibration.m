@@ -82,7 +82,7 @@ classdef Calibration < mag.process.Step
             end
 
             [scale, misalignment, offset] = this.readCalibrationData(calibrationFile);
-            calibratedData = ((scale .* uncalibratedData) * misalignment) + offset;
+            calibratedData = (misalignment * (scale .* uncalibratedData)')' + offset;
         end
     end
 

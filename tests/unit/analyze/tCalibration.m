@@ -40,9 +40,9 @@ classdef tCalibration < MAGAnalysisTestCase
             metaData = mag.meta.Science(Model = "FM5");
 
             expectedData = uncalibratedData;
-            expectedData{:, "x"} = 1.075387 + 0.001632 - 0.001174;
-            expectedData{:, "y"} = 1.047678 - 0.004159;
-            expectedData{:, "z"} = 1.053048;
+            expectedData{:, "x"} = 1.075387;
+            expectedData{:, "y"} = 0.001632 + 1.047678;
+            expectedData{:, "z"} = -0.001174 - 0.004159 + 1.053048;
 
             % Exercise.
             calibrationStep = mag.process.Calibration();
@@ -61,9 +61,9 @@ classdef tCalibration < MAGAnalysisTestCase
             metaData = mag.meta.Science(Model = "FM5");
 
             expectedData = uncalibratedData;
-            expectedData{:, "x"} = 1.014961 + 0.001110 + 0.000553;
-            expectedData{:, "y"} = 0.995020 - 0.005064;
-            expectedData{:, "z"} = 0.995464;
+            expectedData{:, "x"} = 1.014961;
+            expectedData{:, "y"} = 0.001110 + 0.995020;
+            expectedData{:, "z"} = 0.000553 - 0.005064 + 0.995464;
 
             % Exercise.
             calibrationStep = mag.process.Calibration();
@@ -82,9 +82,9 @@ classdef tCalibration < MAGAnalysisTestCase
             metaData = mag.meta.Science(Model = "FM5");
 
             expectedData = uncalibratedData;
-            expectedData{:, "x"} = 1.075432 + 0.001009 - 0.001196;
-            expectedData{:, "y"} = 1.047721 - 0.003928;
-            expectedData{:, "z"} = 1.053087;
+            expectedData{:, "x"} = 1.075432;
+            expectedData{:, "y"} = 0.001009 + 1.047721;
+            expectedData{:, "z"} = -0.001196 - 0.003928 + 1.053087;
 
             % Exercise.
             calibrationStep = mag.process.Calibration(Temperature = "Cool");
@@ -104,9 +104,9 @@ classdef tCalibration < MAGAnalysisTestCase
             metaData = mag.meta.Science(Model = "FM4");
 
             expectedData = uncalibratedData;
-            expectedData{:, "x"} = 1.016675 - 0.001415 + 0.001770;
-            expectedData{:, "y"} = 0.996880 - 0.004966;
-            expectedData{:, "z"} = 0.997683;
+            expectedData{:, "x"} = 1.016675;
+            expectedData{:, "y"} = -0.001415 + 0.996880;
+            expectedData{:, "z"} = 0.001770 - 0.004966 + 0.997683;
 
             % Exercise.
             calibrationStep = mag.process.Calibration(Temperature = "Cold");
