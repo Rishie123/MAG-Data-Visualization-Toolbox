@@ -1,7 +1,7 @@
 classdef tApplyCalibration < MAGAnalysisTestCase
 % TAPPLYCALIBRATION Unit tests for "applyCalibration" function.
 
-    methods (Test, ParameterCombination = "sequential")
+    methods (Test)
 
         function noCalibration(testCase)
 
@@ -9,10 +9,10 @@ classdef tApplyCalibration < MAGAnalysisTestCase
             uncalibratedValue = [1, 2, 3; 4, 5, 6];
 
             calibrationStep = mag.process.Calibration();
-            calibrationStep.CalibrationFile = testCase.createCalibrationFile();
+            calibrationFile = testCase.createCalibrationFile();
 
             % Exercise.
-            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue);
+            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue, calibrationFile);
 
             % Verify.
             testCase.verifyEqual(calibratedValue, uncalibratedValue, "Calibrated value should match expectation.");
@@ -25,10 +25,10 @@ classdef tApplyCalibration < MAGAnalysisTestCase
             expectedValue = [2, 6, 3; 8, 15, 6];
 
             calibrationStep = mag.process.Calibration();
-            calibrationStep.CalibrationFile = testCase.createCalibrationFile(Scale = [2, 3, 1]);
+            calibrationFile = testCase.createCalibrationFile(Scale = [2, 3, 1]);
 
             % Exercise.
-            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue);
+            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue, calibrationFile);
 
             % Verify.
             testCase.verifyEqual(calibratedValue, expectedValue, "Calibrated value should match expectation.");
@@ -41,10 +41,10 @@ classdef tApplyCalibration < MAGAnalysisTestCase
             expectedValue = [2, 1, -3; 5, 4, -6];
 
             calibrationStep = mag.process.Calibration();
-            calibrationStep.CalibrationFile = testCase.createCalibrationFile(Misalignment = [0, 1, 0; 1, 0, 0; 0, 0, -1]);
+            calibrationFile = testCase.createCalibrationFile(Misalignment = [0, 1, 0; 1, 0, 0; 0, 0, -1]);
 
             % Exercise.
-            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue);
+            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue, calibrationFile);
 
             % Verify.
             testCase.verifyEqual(calibratedValue, expectedValue, "Calibrated value should match expectation.");
@@ -57,10 +57,10 @@ classdef tApplyCalibration < MAGAnalysisTestCase
             expectedValue = [3, -1, 4; 6, 2, 7];
 
             calibrationStep = mag.process.Calibration();
-            calibrationStep.CalibrationFile = testCase.createCalibrationFile(Offset = [2, -3, 1]);
+            calibrationFile = testCase.createCalibrationFile(Offset = [2, -3, 1]);
 
             % Exercise.
-            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue);
+            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue, calibrationFile);
 
             % Verify.
             testCase.verifyEqual(calibratedValue, expectedValue, "Calibrated value should match expectation.");
@@ -73,10 +73,10 @@ classdef tApplyCalibration < MAGAnalysisTestCase
             expectedValue = [8, -1, -2; 17, 5, -5];
 
             calibrationStep = mag.process.Calibration();
-            calibrationStep.CalibrationFile = testCase.createCalibrationFile(Scale = [2, 3, 1], Misalignment = [0, 1, 0; 1, 0, 0; 0, 0, -1], Offset = [2, -3, 1]);
+            calibrationFile = testCase.createCalibrationFile(Scale = [2, 3, 1], Misalignment = [0, 1, 0; 1, 0, 0; 0, 0, -1], Offset = [2, -3, 1]);
 
             % Exercise.
-            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue);
+            calibratedValue = calibrationStep.applyCalibration(uncalibratedValue, calibrationFile);
 
             % Verify.
             testCase.verifyEqual(calibratedValue, expectedValue, "Calibrated value should match expectation.");
