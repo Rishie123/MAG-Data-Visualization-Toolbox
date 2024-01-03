@@ -43,7 +43,7 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
             arguments
                 this
-                type (1, 1) string {mustBeMember(type, ["PW", "SID15", "STATUS"])} = "PW"
+                type (1, 1) string {mustBeMember(type, ["PROCSTAT", "PW", "SID15", "STATUS"])} = "PW"
             end
 
             hkType = this.Results.HK.getHKType(type);
