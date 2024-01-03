@@ -1,2 +1,3 @@
 - Convert data ready time to pseudo-timestamp
+- Correct FOB and FIB temperature conversion, based on latest sensor calibration
 - Fix issue in calibration data load when sensor model is empty

@@ -23,9 +23,7 @@ classdef Units < mag.process.Step
             P2V5I = 0.052732405, ...
             P8VI = 0.1193, ...
             N8VI = 0.1178, ...
-            ICU_TEMP = 0.1235727, ...
-            FIB_TEMP = 0.1171337327, ...
-            FOB_TEMP = 0.1171337327)
+            ICU_TEMP = 0.1235727)
         % OFFSETS Offsets for engineering unit conversions.
         Offsets (1, 1) dictionary = dictionary( ...
             P1V5V = 0, ...
@@ -41,9 +39,7 @@ classdef Units < mag.process.Step
             P2V5I = -9.8261, ...
             P8VI = -9.5705, ...
             N8VI = -8.3906, ...
-            ICU_TEMP = -273.15, ...
-            FIB_TEMP = -293.187, ...
-            FOB_TEMP = -293.187)
+            ICU_TEMP = -273.15)
     end
 
     methods
@@ -93,6 +89,7 @@ classdef Units < mag.process.Step
         % CONVERTPOWERENGINEERINGUNITS Convert power data from engineering
         % units to scientific units.
 
+            % Convert currents and voltages.
             variableNames = string(data.Properties.VariableNames);
 
             for k = keys(this.ScaleFactors)'
@@ -100,6 +97,14 @@ classdef Units < mag.process.Step
                 vn = variableNames(matches(variableNames, regexpPattern(k)));
                 data{:, vn} = (data{:, vn} * this.ScaleFactors(k)) + this.Offsets(k);
             end
+
+            % Convert FOB temperature.
+            fobTemp = data{:, "FOB_TEMP"};
+            data{:, "FOB_TEMP"} = -6e-5 * (fobTemp .^ 3) - 0.0109 * (fobTemp .^ 2) + 9.2216 * fobTemp + 2519.5;
+
+            % Convert FIB temperature.
+            fibTemp = data{:, "FIB_TEMP"};
+            data{:, "FIB_TEMP"} = -7e-5 * (fibTemp .^ 3) - 0.0135 * (fibTemp .^ 2) + 8.9171 * fibTemp + 2508.8;
         end
     end
 
