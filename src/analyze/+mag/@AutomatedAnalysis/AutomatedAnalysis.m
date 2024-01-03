@@ -3,7 +3,7 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
     properties (Constant, Hidden)
         % VERSION Version number.
-        Version (1, 1) double = 3.0
+        Version (1, 1) string = mag.version()
     end
 
     properties

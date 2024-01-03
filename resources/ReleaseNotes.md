@@ -1,1 +1,3 @@
 - Rename toolbox template file
+- Show version number in app
+- Include version number in generated results folder
