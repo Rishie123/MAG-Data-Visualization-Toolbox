@@ -1,1 +1,1 @@
-- Fix issue with misalignment applied to wrong axis
+- Fix issue in calibration data load when sensor model is empty
