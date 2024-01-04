@@ -38,14 +38,14 @@ classdef Field < mag.graphics.view.View
                 case "Mode"
 
                     numEvents = 1;
-                    eventData = {primary, mag.graphics.style.Default(Title = compose("%s Modes", primarySensor), YLabel = "mode [-]", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency")), ...
-                        secondary, mag.graphics.style.Default(Title = compose("%s Modes", secondarySensor), YLabel = "mode [-]", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency"))};
+                    eventData = {primary, mag.graphics.style.Default(Title = compose("%s Modes", primarySensor), YLabel = "mode [-]", YLimits = "padded", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency")), ...
+                        secondary, mag.graphics.style.Default(Title = compose("%s Modes", secondarySensor), YLabel = "mode [-]", YLimits = "padded", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency"))};
 
                 case "Range"
 
                     numEvents = 1;
-                    eventData = {primary, mag.graphics.style.Default(Title = compose("%s Ranges", primarySensor), YLabel = "range [-]", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1)), ...
-                        secondary, mag.graphics.style.Default(Title = compose("%s Ranges", secondarySensor), YLabel = "range [-]", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1))};
+                    eventData = {primary, mag.graphics.style.Default(Title = compose("%s Ranges", primarySensor), YLabel = "range [-]", YLimits = "padded", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1)), ...
+                        secondary, mag.graphics.style.Default(Title = compose("%s Ranges", secondarySensor), YLabel = "range [-]", YLimits = "padded", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1))};
 
                 otherwise
                     [numEvents, eventData] = deal(0, {});
