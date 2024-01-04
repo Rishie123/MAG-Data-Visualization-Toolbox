@@ -1,5 +1,5 @@
 classdef Filter < mag.process.Step
-% FILTER Remove some data points at the beginning of the sample.
+% FILTER Remove data points at events, such as mode and range changes.
 
     properties (Dependent)
         Name
@@ -16,7 +16,7 @@ classdef Filter < mag.process.Step
         % ONRANGECHANGE How long to remove when range changes.
         OnRangeChange (1, 2) duration
         % ONMODECHANGE How many vectors to remove when mode changes.
-        OnModeChange (1, 2) double
+        OnModeChange (1, 2) double = zeros(1, 2)
     end
 
     methods
@@ -60,17 +60,21 @@ classdef Filter < mag.process.Step
             events = data.Properties.Events;
             events = events(timerange(startTime, endTime, "closed"), :);
 
-            locMode = [true; diff(events.DataFrequency) ~= 0];
-            locRange = [true; diff(events.Range) ~= 0];
-
             % Filter data points at mode changes.
-            for t = events.Time(locMode)'
+            if ~isequal(this.OnModeChange, zeros(1, 2))
 
-                idxTime = find(events.Time == t);
-                data(idxTime + (this.OnModeChange(1):this.OnModeChange(2)), :) = [];
+                locMode = [true; diff(events.DataFrequency) ~= 0];
+
+                for t = events.Time(locMode)'
+
+                    idxTime = find(events.Time == t);
+                    data(idxTime + (this.OnModeChange(1):this.OnModeChange(2)), :) = [];
+                end
             end
 
             % Filter duration at range changes.
+            locRange = [true; diff(events.Range) ~= 0];
+
             for t = events.Time(locRange)'
                 data(timerange(t + this.OnRangeChange(1), t + this.OnRangeChange(2), "closed"), :) = [];
             end
