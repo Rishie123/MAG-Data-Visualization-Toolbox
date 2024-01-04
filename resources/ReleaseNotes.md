@@ -1,3 +1,6 @@
-- Rename toolbox template file
-- Show version number in app
-- Include version number in generated results folder
+- Add cropping of one vector at beginning of each file
+- Add more options for sorting processing step
+- Hide unnecessary constants in meta data classes
+- Make sure custom events have padded y-axis limits
+- Fix issue with consecutive figures not opening maximized
+- Fix issue with saving figures in folder names with dots

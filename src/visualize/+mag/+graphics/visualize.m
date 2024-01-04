@@ -21,6 +21,10 @@ function f = visualize(data, styles, options)
         f (1, 1) matlab.ui.Figure
     end
 
+    % Force MATLAB to finish opening any previous figure.
+    drawnow();
+
+    % Create and populate figure.
     f = figure(Name = options.Name, NumberTitle = "off", WindowState = options.WindowState, Visible = matlab.lang.OnOffSwitchState(options.Visible));
 
     if isequal(options.Arrangement, zeros(1, 2))
@@ -50,8 +54,8 @@ function f = visualize(data, styles, options)
 end
 
 function axes = doVisualize(t, data, styles)
-% DOVISUALIZE Internal plotting function to handle different chart
-% option types.
+% DOVISUALIZE Internal plotting function to handle different chart option
+% types.
 
     arguments (Input)
         t (1, 1) matlab.graphics.layout.TiledChartLayout
