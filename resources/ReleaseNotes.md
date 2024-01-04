@@ -1,3 +1,3 @@
-- Rename toolbox template file
-- Show version number in app
-- Include version number in generated results folder
+- Hide unnecessary constants in meta data classes
+- Make sure custom events have padded y-axis limits
+- Fix issue with saving figures in folder names with dots
