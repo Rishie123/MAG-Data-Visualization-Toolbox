@@ -7,7 +7,23 @@ classdef Sort < mag.process.Step
         DetailedDescription
     end
 
+    properties
+        % VARIABLES Variables to sort by.
+        Variables (1, :) string = string.empty()
+        % DIRECTION Sort direction.
+        Direction (1, 1) string {mustBeMember(Direction, ["ascend", "descend"])} = "ascend"
+    end
+
     methods
+
+        function this = Sort(options)
+
+            arguments
+                options.?mag.process.Sort
+            end
+
+            this.assignProperties(options);
+        end
 
         function value = get.Name(~)
             value = "Sort Data";
@@ -23,15 +39,19 @@ classdef Sort < mag.process.Step
                 "be loaded chronologically. This step ensures data is chronological.";
         end
 
-        function data = apply(~, data, ~)
+        function data = apply(this, data, ~)
 
             arguments
-                ~
-                data timetable
+                this
+                data tabular
                 ~
             end
 
-            data = sortrows(data, data.Properties.DimensionNames{1});
+            if isempty(this.Variables)
+                data = sortrows(data, data.Properties.DimensionNames{1}, this.Direction);
+            else
+                data = sortrows(data, this.Variables, this.Direction);
+            end
         end
     end
 end

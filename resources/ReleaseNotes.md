@@ -1,3 +1,7 @@
-- Rename toolbox template file
-- Show version number in app
-- Include version number in generated results folder
+- Improve time estimates of mode change events
+- Add more options for sorting processing step
+- Only filter one vector for mode changes, and one second for range changes
+- Hide unnecessary constants in meta data classes
+- Make sure custom events have padded y-axis limits
+- Fix issue with consecutive figures not opening maximized
+- Fix issue with saving figures in folder names with dots

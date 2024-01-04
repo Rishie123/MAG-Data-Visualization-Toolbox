@@ -1,7 +1,7 @@
 classdef Science < mag.meta.Data
 % SCIENCE Description of MAG science data.
 
-    properties (Constant)
+    properties (Constant, Hidden)
         MetaDataFilePattern (1, 1) string = "MAGScience-(?<mode>\w+)-\((?<primaryFrequency>\d+),(?<secondaryFrequency>\d+)\)-(?<packetFrequency>\d+)s-(?<date>\d+)-(?<time>\w+).(?<extension>\w+)"
     end
 

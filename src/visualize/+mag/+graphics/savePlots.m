@@ -11,7 +11,7 @@ function savePlots(figures, location, options)
 
         if isvalid(f)
 
-            name = replace(fullfile(location, f.Name), ".", options.DotReplacement);
+            name = fullfile(location, replace(f.Name, ".", options.DotReplacement));
 
             savefig(f, name);
             exportgraphics(f, fullfile(name + ".png"), Resolution = 300);

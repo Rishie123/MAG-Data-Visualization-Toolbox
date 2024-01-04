@@ -1,5 +1,5 @@
 classdef Filter < mag.process.Step
-% FILTER Remove some data points at the beginning of the sample.
+% FILTER Remove data points at events, such as mode and range changes.
 
     properties (Dependent)
         Name
@@ -15,8 +15,8 @@ classdef Filter < mag.process.Step
     properties
         % ONRANGECHANGE How long to remove when range changes.
         OnRangeChange (1, 2) duration
-        % ONMODECHANGE How many sequences to remove when mode changes.
-        OnModeChange (1, 2) duration
+        % ONMODECHANGE How many vectors to remove when mode changes.
+        OnModeChange (1, 2) double = zeros(1, 2)
     end
 
     methods
@@ -43,8 +43,8 @@ classdef Filter < mag.process.Step
             value = this.Description + " After said events, onboard filtering " + ...
                 "needs time to adjust, thus some data points are dropped for display purposes. " + ...
                 "For range changes, " + string(this.OnRangeChange(1)) + "-worth before and " + string(this.OnRangeChange(2)) + ...
-                "-worth after are dropped, and for mode changes, " + string(this.OnModeChange(1)) + "-worth before and " + ...
-                string(this.OnModeChange(2)) + "-worth after are dropped.";
+                "-worth after are dropped, and for mode changes, " + string(this.OnModeChange(1)) + " vector before and " + ...
+                string(this.OnModeChange(2)) + " after are dropped.";
         end
 
         function data = apply(this, data, ~)
@@ -60,15 +60,21 @@ classdef Filter < mag.process.Step
             events = data.Properties.Events;
             events = events(timerange(startTime, endTime, "closed"), :);
 
-            locMode = [true; diff(events.DataFrequency) ~= 0];
-            locRange = [true; diff(events.Range) ~= 0];
-
             % Filter data points at mode changes.
-            for t = events.Time(locMode)'
-                data(timerange(t + this.OnModeChange(1), t + this.OnModeChange(2), "closed"), :) = [];
+            if ~isequal(this.OnModeChange, zeros(1, 2))
+
+                locMode = [true; diff(events.DataFrequency) ~= 0];
+
+                for t = events.Time(locMode)'
+
+                    idxTime = find(events.Time == t);
+                    data(idxTime + (this.OnModeChange(1):this.OnModeChange(2)), :) = [];
+                end
             end
 
             % Filter duration at range changes.
+            locRange = [true; diff(events.Range) ~= 0];
+
             for t = events.Time(locRange)'
                 data(timerange(t + this.OnRangeChange(1), t + this.OnRangeChange(2), "closed"), :) = [];
             end
@@ -84,7 +90,7 @@ classdef Filter < mag.process.Step
             end
 
             % Make sure no sliced packets remain.
-            data = this.removeSlicedSequences(data);
+            % data = this.removeSlicedSequences(data);
         end
     end
 
