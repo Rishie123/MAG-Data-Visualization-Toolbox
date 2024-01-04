@@ -1,3 +1,4 @@
 - Hide unnecessary constants in meta data classes
 - Make sure custom events have padded y-axis limits
+- Fix issue with consecutive figures not opening maximized
 - Fix issue with saving figures in folder names with dots
