@@ -11,6 +11,8 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
         eventTable eventtable
     end
 
+    ranges = sortrows(data(:, "range"));
+
     % Select sensor.
     sensor = string(this.Results.getSensor(primaryOrSecondary));
 
@@ -33,8 +35,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     end
 
     % Improve timestamp estimates.
-    sensorEvents = updateModeChangeTimestamps(sensorEvents, data);
-    sensorEvents = updateRampTimestamps(sensorEvents, data);
+    sensorEvents = updateEventTimestamps(sensorEvents, data);
 
     % Add automatic transitions.
     locTimedCommand = ~ismissing(sensorEvents.Duration) & (sensorEvents.Duration ~= 0);
@@ -58,12 +59,8 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     end
 
     sensorEvents = sortrows(sensorEvents);
-    sensorEvents = updateModeChangeTimestamps(sensorEvents, data);
 
     % Extract first automatic range change in the session.
-    ranges = sortrows(data, ["coarse", "fine"]);
-    ranges = ranges(:, "range");
-
     if contains("Range", sensorEvents.Properties.VariableNames)
 
         firstRangeChange = sensorEvents(find(~ismissing([sensorEvents.Range]), 1), :).Time;
@@ -113,13 +110,6 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
         eventTable = outerjoin(eventTable, sensorEvents, MergeKeys = true, Keys = ["Time", intersect(eventTable.Properties.VariableNames, sensorEvents.Properties.VariableNames)]);
     end
 
-    % Remove simultaneous events.
-    locDuplicates = diff(eventTable.Time) == 0;
-
-    if any(locDuplicates)
-        eventTable(locDuplicates, :) = [];
-    end
-
     % Process variables.
     fillVariables = ["Mode", "DataFrequency", "PacketFrequency", "Range"];
     eventTable(:, fillVariables) = fillmissing(eventTable(:, fillVariables), "previous");
@@ -134,32 +124,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     eventTable = eventtable(eventTable, EventLabelsVariable = "Label");
 end
 
-function events = updateModeChangeTimestamps(events, data)
-
-    % Improve mode change estimates.
-    % Find where there are changes in how many vectors there are per
-    % packet. In a packet each vector has the same sequence number.
-    data = sortrows(data, ["coarse", "fine"]);
-
-    locSeq = diff(data.sequence) ~= 0;
-    idxSeq = find(locSeq);
-
-    locChange = ischange(diff(idxSeq));
-    modeChanges = data(idxSeq(locChange), :);
-
-    for i = 1:height(events)
-
-        matches = modeChanges(withtol(events.Time(i), minutes(1)), :).t;
-
-        if ~isempty(matches)
-
-            [~, idxMin] = min(abs(matches - events.Time(i)));
-            events.Time(i) = matches(idxMin);
-        end
-    end
-end
-
-function events = updateRampTimestamps(events, data)
+function events = updateEventTimestamps(events, data)
 
     % Improve ramp mode estimate.
     idxRamp = find(contains([events.Label], "Ramp", IgnoreCase = true));
