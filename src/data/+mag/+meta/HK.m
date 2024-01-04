@@ -1,7 +1,7 @@
 classdef HK < mag.meta.Data
 % HK Description of MAG housekeeping data.
 
-    properties (Constant)
+    properties (Constant, Hidden)
         MetaDataFilePattern (1, 1) string = "idle_export_\w+.MAG_HSK_(?<type>\w+)_(?<date>\d+)_(?<time>\w+).(?<extension>\w+)"
     end
 
