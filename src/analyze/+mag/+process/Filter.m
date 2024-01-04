@@ -15,8 +15,8 @@ classdef Filter < mag.process.Step
     properties
         % ONRANGECHANGE How long to remove when range changes.
         OnRangeChange (1, 2) duration
-        % ONMODECHANGE How many sequences to remove when mode changes.
-        OnModeChange (1, 2) duration
+        % ONMODECHANGE How many vectors to remove when mode changes.
+        OnModeChange (1, 2) double
     end
 
     methods
@@ -43,8 +43,8 @@ classdef Filter < mag.process.Step
             value = this.Description + " After said events, onboard filtering " + ...
                 "needs time to adjust, thus some data points are dropped for display purposes. " + ...
                 "For range changes, " + string(this.OnRangeChange(1)) + "-worth before and " + string(this.OnRangeChange(2)) + ...
-                "-worth after are dropped, and for mode changes, " + string(this.OnModeChange(1)) + "-worth before and " + ...
-                string(this.OnModeChange(2)) + "-worth after are dropped.";
+                "-worth after are dropped, and for mode changes, " + string(this.OnModeChange(1)) + " vector before and " + ...
+                string(this.OnModeChange(2)) + " after are dropped.";
         end
 
         function data = apply(this, data, ~)
@@ -65,7 +65,9 @@ classdef Filter < mag.process.Step
 
             % Filter data points at mode changes.
             for t = events.Time(locMode)'
-                data(timerange(t + this.OnModeChange(1), t + this.OnModeChange(2), "closed"), :) = [];
+
+                idxTime = find(events.Time == t);
+                data(idxTime + (this.OnModeChange(1):this.OnModeChange(2)), :) = [];
             end
 
             % Filter duration at range changes.
@@ -84,7 +86,7 @@ classdef Filter < mag.process.Step
             end
 
             % Make sure no sliced packets remain.
-            data = this.removeSlicedSequences(data);
+            % data = this.removeSlicedSequences(data);
         end
     end
 
