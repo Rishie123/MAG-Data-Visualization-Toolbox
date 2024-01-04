@@ -1,4 +1,5 @@
 - Improve time estimates of mode change events
+- Add more options for sorting processing step
 - Hide unnecessary constants in meta data classes
 - Make sure custom events have padded y-axis limits
 - Fix issue with consecutive figures not opening maximized
