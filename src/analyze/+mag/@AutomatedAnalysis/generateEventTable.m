@@ -11,8 +11,6 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
         eventTable eventtable
     end
 
-    ranges = sortrows(data(:, "range"));
-
     % Select sensor.
     sensor = string(this.Results.getSensor(primaryOrSecondary));
 
@@ -59,6 +57,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     end
 
     sensorEvents = sortrows(sensorEvents);
+    ranges = sortrows(data(:, "range"));
 
     % Extract first automatic range change in the session.
     if contains("Range", sensorEvents.Properties.VariableNames)
@@ -125,6 +124,28 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
 end
 
 function events = updateEventTimestamps(events, data)
+
+    % Improve mode change estimates.
+    % Find where there are changes in how many vectors there are per
+    % packet. In a packet each vector has the same sequence number.
+    data = sortrows(data, ["coarse", "fine"]);
+
+    locSeq = diff(data.sequence) ~= 0;
+    idxSeq = find(locSeq);
+
+    idxSeq = idxSeq(diff(idxSeq, 2) ~= 0);
+    modeChanges = data(idxSeq, :);
+
+    for i = 1:height(events)
+
+        matches = modeChanges.t(withtol(events.Time(i), minutes(1)));
+
+        if ~isempty(matches)
+
+            [~, idxMin] = min(abs(matches - events.Time(i)));
+            events.Time(i) = matches(idxMin);
+        end
+    end
 
     % Improve ramp mode estimate.
     idxRamp = find(contains([events.Label], "Ramp", IgnoreCase = true));
