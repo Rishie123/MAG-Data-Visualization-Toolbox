@@ -25,7 +25,7 @@ function loadHKData(this, hkMetaData)
     end
 
     % Concentrate on recorded timerange.
-    if ~isempty(this.Results.Primary)
+    if ~isempty(this.Results.MetaData)
 
         for i = 1:numel(this.Results.HK)
             this.Results.HK(i).Data = this.Results.HK(i).Data(timerange(this.Results.MetaData.Timestamp, this.Results.HK(i).Time(end), "closed"), :);

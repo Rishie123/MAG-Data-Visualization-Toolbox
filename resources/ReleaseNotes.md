@@ -1,7 +1,9 @@
 - Improve time estimates of mode change events
 - Add more options for sorting processing step
+- Add sound when progress bar finishes in app
 - Only filter one vector for mode changes, and one second for range changes
 - Hide unnecessary constants in meta data classes
 - Make sure custom events have padded y-axis limits
 - Fix issue with consecutive figures not opening maximized
 - Fix issue with saving figures in folder names with dots
+- Fix small typo in HK data loading
