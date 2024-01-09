@@ -32,25 +32,27 @@ classdef Timestamp < mag.process.Step
         end
 
         function data = apply(this, data, metaData)
-            data.t = this.computeTimeStamp(data{:, ["coarse", "fine"]}, data.sequence, metaData.DataFrequency, metaData.PacketFrequency);
+            data = this.computeTimeStamp(data, metaData.DataFrequency, metaData.PacketFrequency);
         end
     end
 
     methods (Hidden)
 
-        function time = computeTimeStamp(this, coarseAndFineTime, sequence, dataFrequency, packetFrequency)
+        function data = computeTimeStamp(this, data, dataFrequency, packetFrequency)
 
             arguments (Input)
                 this
-                coarseAndFineTime (:, 2) double
-                sequence (:, 1) double
+                data
                 dataFrequency (1, 1) double
                 packetFrequency (1, 1) double
             end
 
             arguments (Output)
-                time (:, 1) double %{mustBeIncreasing}
+                data %{mustBeIncreasing}
             end
+
+            coarseAndFineTime = data{:, ["coarse", "fine"]};
+            sequence = data.sequence;
 
             % Remove discontinuities in sequence number.
             sequence = this.correctSequence(sequence);
@@ -60,7 +62,11 @@ classdef Timestamp < mag.process.Step
             if any(diff(idxSequence) ~= vectorsPerPacket)
 
                 corruptPackets = uniqueSequence(diff(idxSequence) ~= vectorsPerPacket);
-                error("The following packets do not contain %d elements:\n    %s", vectorsPerPacket, join(compose("%d, ", corruptPackets)));
+                % error("The following packets do not contain %d elements:\n    %s", vectorsPerPacket, join(compose("%d, ", corruptPackets)));
+                data(ismember(sequence, corruptPackets), :) = [];
+
+                coarseAndFineTime = data{:, ["coarse", "fine"]};
+                sequence = this.correctSequence(data.sequence);
             end
 
             % Correct coarse time if incorrect.
@@ -90,7 +96,7 @@ classdef Timestamp < mag.process.Step
 
             % Add time offset to all timestamps.
             timeStamp = coarseAndFineTime(:, 1) + (coarseAndFineTime(:, 2) / double(intmax("uint16")));
-            time = timeStamp + timeOffset;
+            data.t = timeStamp + timeOffset;
         end
     end
 end
