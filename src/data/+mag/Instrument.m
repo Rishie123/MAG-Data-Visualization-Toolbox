@@ -151,19 +151,35 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
             this.Secondary.MetaData.Timestamp = timeRange(1);
         end
 
-        function downsample(this, frequency)
+        function downsample(this, targetFrequency)
         % DOWNSAMPLE Downsample primary and secondary data to specified
         % frequency.
 
             arguments
                 this mag.Instrument
-                frequency (1, 1) double
+                targetFrequency (1, 1) double
             end
 
-            data = this.Primary.Data;
-            this.Primary.MetaData.DataFrequency = frequency;
+            for s = ["Primary", "Secondary"]
 
-            
+                actualFrequency = 1 / mode(seconds(diff(this.(s).Time)));
+                decimationFactor = actualFrequency / targetFrequency;
+
+                if round(decimationFactor) ~= decimationFactor
+                    error("Calculated decimation factor (%.3f) must be an integer.", decimationFactor);
+                end
+
+                a = ones(1, decimationFactor) / decimationFactor;
+                b = conv(a, a);
+
+                data = this.(s).Data;
+                data{:, ["x", "y", "z"]} = filter(b, 1, data{:, ["x", "y", "z"]});
+
+                data(1:numel(b), :) = [];
+
+                this.(s).Data = downsample(data, decimationFactor);
+                this.(s).MetaData.DataFrequency = targetFrequency;
+            end
         end
     end
 

@@ -1,4 +1,5 @@
 - Improve time estimates of mode change events
+- Add method to downsample science data
 - Add method to split analysis by time gap
 - Add sound when progress bar finishes in app
 - Add data ready time difference in processor stats plot

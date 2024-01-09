@@ -54,7 +54,7 @@ classdef Downsample < mag.process.Step
             end
 
             % Determine filter coefficients.
-            actualFrequency = 1 / median(seconds(diff(data.(data.Properties.DimensionNames{1}))));
+            actualFrequency = 1 / mode(seconds(diff(data.(data.Properties.DimensionNames{1}))));
 
             decimationFactor = actualFrequency / this.TargetFrequency;
             assert(round(decimationFactor) == decimationFactor, "Calculated decimation factor (%.3f) must be an integer.", decimationFactor);
