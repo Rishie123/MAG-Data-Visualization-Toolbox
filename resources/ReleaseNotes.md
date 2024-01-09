@@ -2,6 +2,7 @@
 - Add method to split analysis by time gap
 - Add more options for sorting processing step
 - Add sound when progress bar finishes in app
+- Allow cropping instrument data with `withtol`
 - Only filter one vector for mode changes, and one second for range changes
 - Hide unnecessary constants in meta data classes
 - Make sure custom events have padded y-axis limits

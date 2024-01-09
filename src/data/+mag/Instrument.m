@@ -110,16 +110,16 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
 
             arguments
                 this
-                primaryFilter (1, 1) {mustBeA(primaryFilter, ["timerange", "duration"])}
-                secondaryFilter (1, 1) {mustBeA(secondaryFilter, ["timerange", "duration"])} = primaryFilter
+                primaryFilter (1, 1) {mustBeA(primaryFilter, ["duration", "timerange", "withtol"])}
+                secondaryFilter (1, 1) {mustBeA(secondaryFilter, ["duration", "timerange", "withtol"])} = primaryFilter
             end
 
-            if isa(primaryFilter, "timerange")
-                [primaryPeriod, secondaryPeriod] = deal(primaryFilter, secondaryFilter);
-            elseif isa(primaryFilter, "duration")
+            if isa(primaryFilter, "duration")
 
                 primaryPeriod = timerange(this.Primary.Time(1) + primaryFilter, this.Primary.Time(end), "openleft");
                 secondaryPeriod = timerange(this.Secondary.Time(1) + secondaryFilter, this.Secondary.Time(end), "openleft");
+            elseif isa(primaryFilter, "timerange") || isa(primaryFilter, "withtol")
+                [primaryPeriod, secondaryPeriod] = deal(primaryFilter, secondaryFilter);
             end
 
             this.Primary.Data = this.Primary.Data(primaryPeriod, :);
@@ -136,7 +136,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
             timeRange = this.TimeRange;
 
             % Filter events.
-            this.Events = this.Events(isbetween([this.Events.CommandTimestamp], timeRange(1), timeRange(2), "closed"));
+            if ~isempty(this.Events)
+                this.Events = this.Events(isbetween([this.Events.CommandTimestamp], timeRange(1), timeRange(2), "closed"));
+            end
 
             % Filter HK.
             for i = 1:numel(this.HK)
@@ -147,6 +149,21 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
             this.MetaData.Timestamp = timeRange(1);
             this.Primary.MetaData.Timestamp = timeRange(1);
             this.Secondary.MetaData.Timestamp = timeRange(1);
+        end
+
+        function downsample(this, frequency)
+        % DOWNSAMPLE Downsample primary and secondary data to specified
+        % frequency.
+
+            arguments
+                this mag.Instrument
+                frequency (1, 1) double
+            end
+
+            data = this.Primary.Data;
+            this.Primary.MetaData.DataFrequency = frequency;
+
+            
         end
     end
 
