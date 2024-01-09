@@ -103,7 +103,12 @@ classdef Field < mag.graphics.view.View
     methods (Static, Access = private)
 
         function value = getFieldTitle(data)
-            value = sprintf("%s (%s - %s - %s)", data.MetaData.getDisplay("Sensor"), data.MetaData.getDisplay("FEE"), data.MetaData.getDisplay("Model"), data.MetaData.getDisplay("Can"));
+
+            if isempty(data.MetaData.FEE) || isempty(data.MetaData.Model) || isempty(data.MetaData.Can)
+                value = data.MetaData.getDisplay("Sensor");
+            else
+                value = sprintf("%s (%s - %s - %s)", data.MetaData.getDisplay("Sensor"), data.MetaData.getDisplay("FEE"), data.MetaData.getDisplay("Model"), data.MetaData.getDisplay("Can"));
+            end
         end
     end
 end
