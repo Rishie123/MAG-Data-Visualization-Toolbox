@@ -2,6 +2,7 @@
 - Add method to split analysis by time gap
 - Add more options for sorting processing step
 - Add sound when progress bar finishes in app
+- Add data ready time difference in processor stats plot
 - Allow cropping instrument data with `withtol`
 - Only filter one vector for mode changes, and one second for range changes
 - Hide unnecessary constants in meta data classes
