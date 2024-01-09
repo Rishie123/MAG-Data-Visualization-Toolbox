@@ -1,15 +1,10 @@
 - Improve time estimates of mode change events
 - Add method to split analysis by time gap
-- Add more options for sorting processing step
 - Add sound when progress bar finishes in app
 - Add data ready time difference in processor stats plot
 - Allow cropping instrument data with `withtol`
 - Only filter one vector for mode changes, and one second for range changes
-- Hide unnecessary constants in meta data classes
-- Make sure custom events have padded y-axis limits
 - Do not show sensor meta data in title when no meta data is detected
-- Fix issue with saving data with colon in name
+- Fix issue with saving figures with colons in name
 - Fix issue with saving too large figures causing an error
-- Fix issue with consecutive figures not opening maximized
-- Fix issue with saving figures in folder names with dots
 - Fix small typo in HK data loading
