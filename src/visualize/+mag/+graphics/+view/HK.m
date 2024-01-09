@@ -90,13 +90,19 @@ classdef HK < mag.graphics.view.View
             end
 
             % Processor HK.
+            sid15 = this.getHKType("SID15");
             procstat = this.getHKType("PROCSTAT");
 
-            if ~isempty(procstat)
+            if ~isempty(sid15) && ~isempty(procstat)
+
+                drt = sid15.Data(:, ["ISV_FOB_DTRDYTM", "ISV_FIB_DTRDYTM"]);
+                drt.DIFF = 1000 * (drt.ISV_FOB_DTRDYTM - drt.ISV_FIB_DTRDYTM);
 
                 this.Figures(4) = mag.graphics.visualize( ...
                     procstat, mag.graphics.style.Default(Title = "Messages in Queue", YLabel = "n [-]", Legend = ["FOB", "FIB"], Charts = [mag.graphics.chart.Plot(YVariables = "OBNQ_NUM_MSG"), mag.graphics.chart.Plot(YVariables = "IBNQ_NUM_MSG")]), ...
+                    drt, mag.graphics.style.Default(Title = "Data Ready Time", YLabel = "\Delta Data Ready Time [ms]", Charts = mag.graphics.chart.Plot(YVariables = "DIFF")), ...
                     Name = "Processor Stats", ...
+                    Arrangement = [2, 1], ...
                     LinkXAxes = true);
             end
         end
