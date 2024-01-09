@@ -1,4 +1,5 @@
 - Improve time estimates of mode change events
+- Add method to split analysis by time gap
 - Add more options for sorting processing step
 - Add sound when progress bar finishes in app
 - Only filter one vector for mode changes, and one second for range changes
