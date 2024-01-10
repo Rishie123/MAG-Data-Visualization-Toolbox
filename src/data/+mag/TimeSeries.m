@@ -28,7 +28,7 @@ classdef (Abstract) TimeSeries < mag.Data
         end
     end
 
-    methods (Sealed)
+    methods (Hidden, Sealed)
 
         function tabularThis = tabular(this)
         % TABULAR Convert data to tabular.

@@ -10,7 +10,7 @@ classdef Timestamp < mag.process.Step
     properties (SetAccess = private)
         % MISTIMEDPACKETS Counter for number of packets with wrong
         % timestamp.
-        MistimedPackets (1, 1) double
+        MistimedPackets (1, 1) double = 0
     end
 
     methods
@@ -69,8 +69,8 @@ classdef Timestamp < mag.process.Step
 
             if any(locMistimed)
 
-                this.MistimedPackets = nnz(locMistimed);
-                warning("%d packets with wrong timestamp.", this.MistimedPackets);
+                this.MistimedPackets = this.MistimedPackets + nnz(locMistimed);
+                warning("%d packets with wrong timestamp.", nnz(locMistimed));
             end
 
             % Determine time offset to add.
