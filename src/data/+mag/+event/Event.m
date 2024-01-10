@@ -32,6 +32,9 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
             [~, idxSort] = sort([this.CompleteTimestamp], varargin{:});
             sortedThis = this(idxSort);
         end
+    end
+
+    methods (Hidden, Sealed)
 
         function tableThis = timetable(this)
         % TIMETABLE Convert events to timetable.
