@@ -1,11 +1,4 @@
-- Improve time estimates of mode change events
-- Add method to downsample science data
-- Add method to split analysis by time gap
-- Add sound when progress bar finishes in app
-- Add data ready time difference in processor stats plot
-- Allow cropping instrument data with `withtol`
-- Only filter one vector for mode changes, and one second for range changes
-- Do not show sensor meta data in title when no meta data is detected
-- Fix issue with saving figures with colons in name
-- Fix issue with saving too large figures causing an error
-- Fix small typo in HK data loading
+- Make error counts in processing steps cumulative
+- Hide implicit conversion methods
+- Fix bug in FIB temperature calibration
+- Fix issue with cropping science with no events
