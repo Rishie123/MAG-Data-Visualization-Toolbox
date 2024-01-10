@@ -108,7 +108,7 @@ classdef Units < mag.process.Step
 
             % Convert FIB temperature.
             locFIB = regexpPattern("(ISV_)?FIB_TEMP");
-            data{:, locFIB} = this.FOBTemperatureFit(data{:, locFIB});
+            data{:, locFIB} = this.FIBTemperatureFit(data{:, locFIB});
         end
     end
 
