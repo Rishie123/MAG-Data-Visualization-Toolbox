@@ -9,7 +9,7 @@ classdef Duplicates < mag.process.Step
 
     properties (SetAccess = private)
         % DUPLICATETIMESTAMPS Counter for number of duplicate timestamps.
-        DuplicateTimeStamps (1, 1) double
+        DuplicateTimeStamps (1, 1) double = 0
     end
 
     methods
@@ -41,8 +41,8 @@ classdef Duplicates < mag.process.Step
 
             if any(locDuplicates)
 
-                this.DuplicateTimeStamps = nnz(locDuplicates);
-                warning("%d duplicate timestamps.", this.DuplicateTimeStamps);
+                this.DuplicateTimeStamps = this.DuplicateTimeStamps + nnz(locDuplicates);
+                warning("%d duplicate timestamps.", nnz(locDuplicates));
 
                 data(locDuplicates, :) = [];
             end

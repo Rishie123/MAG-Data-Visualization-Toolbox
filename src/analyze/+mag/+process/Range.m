@@ -8,6 +8,7 @@ classdef Range < mag.process.Step
     end
 
     properties (Constant)
+        % SCALEFACTORS Scale factor for each supported range.
         ScaleFactors (1, 4) double = [2.13618, 0.072, 0.01854, 0.00453]
     end
 
