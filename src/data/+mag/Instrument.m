@@ -123,10 +123,16 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
             end
 
             this.Primary.Data = this.Primary.Data(primaryPeriod, :);
-            this.Primary.Data.Properties.Events = this.Primary.Data.Properties.Events(primaryPeriod, :);
+
+            if ~isempty(this.Primary.Data.Properties.Events)
+                this.Primary.Data.Properties.Events = this.Primary.Data.Properties.Events(primaryPeriod, :);
+            end
 
             this.Secondary.Data = this.Secondary.Data(secondaryPeriod, :);
-            this.Secondary.Data.Properties.Events = this.Secondary.Data.Properties.Events(secondaryPeriod, :);
+
+            if ~isempty(this.Secondary.Data.Properties.Events)
+                this.Secondary.Data.Properties.Events = this.Secondary.Data.Properties.Events(secondaryPeriod, :);
+            end
         end
 
         function cropDataBasedOnScience(this)
@@ -151,12 +157,35 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
             this.Secondary.MetaData.Timestamp = timeRange(1);
         end
 
-        function downsample(this, targetFrequency)
-        % DOWNSAMPLE Downsample primary and secondary data to specified
+        function resample(this, targetFrequency)
+        % RESAMPLE Resample primary and secondary data to the specified
         % frequency.
 
             arguments
-                this mag.Instrument
+                this
+                targetFrequency (1, 1) double
+            end
+
+            for s = ["Primary", "Secondary"]
+
+                originalData = this.(s).Data;
+
+                xyz = resample(originalData(:, ["x", "y", "z"]), targetFrequency);
+
+                resampledData = retime(originalData, xyz.Time, "nearest");
+                resampledData(:, ["x", "y", "z"]) = xyz;
+
+                this.(s).Data = resampledData;
+                this.(s).MetaData.DataFrequency = targetFrequency;
+            end
+        end
+
+        function downsample(this, targetFrequency)
+        % DOWNSAMPLE Downsample primary and secondary data to the specified
+        % frequency.
+
+            arguments
+                this
                 targetFrequency (1, 1) double
             end
 
