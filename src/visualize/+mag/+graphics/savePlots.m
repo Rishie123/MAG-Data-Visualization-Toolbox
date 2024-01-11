@@ -15,13 +15,13 @@ function savePlots(figures, location, options)
             name = replace(f.Name, [".", ":"], [options.DotReplacement, options.ColonReplacement]);
             name = fullfile(location, name);
 
+            exportgraphics(f, fullfile(name + ".png"), Resolution = 300);
+
             try
                 savefig(f, name);
             catch exception
                 warning("Could not save figure ""%s"":\n%s", f.Name, exception.message);
             end
-
-            exportgraphics(f, fullfile(name + ".png"), Resolution = 300);
         end
     end
 end
