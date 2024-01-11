@@ -1,4 +1,2 @@
-- Make error counts in processing steps cumulative
-- Hide implicit conversion methods
-- Fix bug in FIB temperature calibration
-- Fix issue with cropping science with no events
+- Move PNG export before FIG save
+- Fix multiple small issues with HK view
