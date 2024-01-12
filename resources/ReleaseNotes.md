@@ -1,2 +1,3 @@
+- Customize display of "mag.Instrument" class
 - Move PNG export before FIG save
 - Fix multiple small issues with HK view

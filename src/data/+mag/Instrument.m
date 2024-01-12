@@ -1,4 +1,4 @@
-classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
+classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & mag.mixin.SetGet
 % INSTRUMENT Class containing MAG instrument data.
 
     properties
@@ -222,6 +222,39 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & mag.mixin.SetGet
             copiedThis.Primary = copy(this.Primary);
             copiedThis.Secondary = copy(this.Secondary);
             copiedThis.HK = copy(this.HK);
+        end
+
+        function header = getHeader(this)
+
+            if isscalar(this)
+
+                if this.HasScience && this.HasMetaData && ...
+                        ~isempty(this.Primary.MetaData) && ~ismissing(this.Primary.MetaData.DataFrequency) && ~isequal(this.Primary.MetaData.Mode, "Hybrid") && ...
+                        ~isempty(this.Secondary.MetaData) && ~ismissing(this.Secondary.MetaData.DataFrequency) && ~isequal(this.Secondary.MetaData.Mode, "Hybrid")
+
+                    tag = char(compose(" in %s (%d, %d)", this.Primary.MetaData.Mode, this.Primary.MetaData.DataFrequency, this.Secondary.MetaData.DataFrequency));
+                else
+                    tag = char.empty();
+                end
+
+                className = matlab.mixin.CustomDisplay.getClassNameForHeader(this);
+                header = ['  ', className, tag, ' with properties:'];
+            else
+                header = getHeader@matlab.mixin.CustomDisplay(this);
+            end
+        end
+
+        function groups = getPropertyGroups(this)
+
+            if isscalar(this)
+
+                propertyList = ["HasData", "HasMetaData", "HasScience", "HasHK", "TimeRange", ...
+                    "Primary", "Secondary", ...
+                    "MetaData", "Events", "HK"];
+                groups = matlab.mixin.util.PropertyGroup(propertyList, "");
+            else
+                groups = getPropertyGroups@matlab.mixin.CustomDisplay(this);
+            end
         end
     end
 end
