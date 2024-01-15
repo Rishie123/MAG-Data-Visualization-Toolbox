@@ -1,4 +1,5 @@
 - Allow visualizing events in stackedplot
 - Customize display of "mag.Instrument" class
 - Move PNG export before FIG save
+- Do not restrict value of line to "double" only
 - Fix multiple small issues with HK view
