@@ -437,7 +437,9 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                             "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
                             "Events", "MetaData", "HK", "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles"]
 
-                        loadedObject.(p) = object.(p);
+                        if isfield(object, p)
+                            loadedObject.(p) = object.(p);
+                        end
                     end
 
                     mapping = dictionary(Outboard = "Primary", Inboard = "Secondary", OutRamp = "PrimaryRamp", InRamp = "SecondaryRamp");

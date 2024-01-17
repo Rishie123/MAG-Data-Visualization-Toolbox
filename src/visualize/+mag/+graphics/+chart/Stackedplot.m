@@ -1,9 +1,10 @@
-classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport
+classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag.graphics.mixin.MarkerSupport
 % STACKEDPLOT Definition of chart of "stackedplot" type.
 
     properties
-        % MARKER Marker symbol.
-        Marker (1, 1) string = "none"
+        % EVENTSVISIBLE Display timetable events as vertical lines in the
+        % plot.
+        EventsVisible string {mustBeScalarOrEmpty} = string.empty()
     end
 
     methods
@@ -50,7 +51,27 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
             for y = 1:Ny
 
                 ax = nexttile(stackLayout);
-                graph(y) = plot(ax, xData, filteredData.(this.YVariables(y)), Marker = this.Marker, Color = this.Colors(y, :));
+                graph(y) = plot(ax, xData, filteredData.(this.YVariables(y)), this.MarkerStyle{:}, Color = this.Colors(y, :));
+
+                if ~isempty(this.EventsVisible) && ~isempty(data.Properties.Events)
+                    this.addEventsData(ax, data);
+                end
+            end
+        end
+    end
+
+    methods (Access = private)
+
+        function addEventsData(this, ax, data)
+
+            hold(ax, "on");
+            resetAxesHold = onCleanup(@() hold(ax, "off"));
+
+            eventTimes = data.Properties.Events.Properties.RowTimes;
+            eventLabels = data.Properties.Events.(this.EventsVisible);
+
+            for e = 1:height(data.Properties.Events)
+                xline(ax, eventTimes(e), "-", eventLabels(e));
             end
         end
     end

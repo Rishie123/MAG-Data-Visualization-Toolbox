@@ -28,6 +28,13 @@ classdef (Abstract) TimeSeries < mag.Data
         end
     end
 
+    methods (Abstract)
+
+        % RESAMPLE Resample primary and secondary data to the specified
+        % frequency.
+        resample(this, targetFrequency)
+    end
+
     methods (Hidden, Sealed)
 
         function tabularThis = tabular(this)

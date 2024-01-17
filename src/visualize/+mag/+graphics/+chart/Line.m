@@ -5,7 +5,7 @@ classdef Line < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport
         % AXIS Axis along which to plot.
         Axis (1, 1) string {mustBeMember(Axis, ["x", "y"])} = "y"
         % VALUE Line value.
-        Value (1, 1) double
+        Value (1, 1)
         % STYLE Line style.
         Style (1, 1) string = "-"
         % LABEL Line label.
