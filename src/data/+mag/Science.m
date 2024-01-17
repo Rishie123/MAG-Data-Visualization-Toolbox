@@ -65,6 +65,22 @@ classdef Science < mag.TimeSeries
             events = this.Data.Properties.Events;
         end
 
+        function resample(this, targetFrequency)
+
+            arguments
+                this
+                targetFrequency (1, 1) double
+            end
+
+            xyz = resample(this.Data(:, ["x", "y", "z"]), targetFrequency);
+
+            resampledData = retime(this.Data, xyz.Time, "nearest");
+            resampledData(:, ["x", "y", "z"]) = xyz;
+
+            this.Data = resampledData;
+            this.MetaData.DataFrequency = targetFrequency;
+        end
+
         function data = computePSD(this, options)
         % COMPUTEPSD Compute the power spectral density of the magnetic field
         % measurements.

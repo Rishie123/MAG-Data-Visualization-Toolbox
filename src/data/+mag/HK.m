@@ -13,6 +13,16 @@ classdef HK < mag.TimeSeries
             this.Data = hkData;
             this.MetaData = metaData;
         end
+
+        function resample(this, targetFrequency)
+
+            arguments
+                this
+                targetFrequency (1, 1) double
+            end
+
+            this.Data = retime(this.Data, "regular", "linear", TimeStep = seconds(1 / targetFrequency));
+        end
     end
 
     methods (Sealed)

@@ -3,7 +3,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
 
     properties
         % EVENTS Event data.
-        Events mag.event.Event {mustBeVector(Events, "allow-all-empties")}
+        Events (1, :) mag.event.Event
         % METADATA Meta data.
         MetaData mag.meta.Instrument {mustBeScalarOrEmpty}
         % PRIMARY Primary science data.
@@ -11,7 +11,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % SECONDARY Secondary science data.
         Secondary mag.Science {mustBeScalarOrEmpty}
         % HK Housekeeping data.
-        HK mag.HK {mustBeVector(HK, "allow-all-empties")}
+        HK (1, :) mag.HK
     end
 
     properties (Dependent, SetAccess = private)
@@ -166,17 +166,11 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 targetFrequency (1, 1) double
             end
 
-            for s = ["Primary", "Secondary"]
+            this.Primary.resample(targetFrequency);
+            this.Secondary.resample(targetFrequency);
 
-                originalData = this.(s).Data;
-
-                xyz = resample(originalData(:, ["x", "y", "z"]), targetFrequency);
-
-                resampledData = retime(originalData, xyz.Time, "nearest");
-                resampledData(:, ["x", "y", "z"]) = xyz;
-
-                this.(s).Data = resampledData;
-                this.(s).MetaData.DataFrequency = targetFrequency;
+            for hk = this.HK
+                hk.resample(targetFrequency);
             end
         end
 
