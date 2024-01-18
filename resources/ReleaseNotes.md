@@ -1,7 +1,1 @@
-- Allow visualizing events in stackedplot
-- Customize display of "mag.Instrument" class
-- Move definition of `resample` method to `mag.TimeSeries` class
-- Move PNG export before FIG save
-- Do not restrict value of line to "double" only
-- Fix multiple small issues with HK view
-- Fix issue with loading old `mag.AutomatedAnalysis` data
+- Customize display of `mag.Science` and `mag.HK` classes
