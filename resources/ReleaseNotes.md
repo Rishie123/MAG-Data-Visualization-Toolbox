@@ -1,3 +1,4 @@
+- Add option to specify HK pattern for app analysis
 - Customize display of `mag.Science` and `mag.HK` classes
 - Always show custom display of `mag.Instrument` when meta data is available
 - Update comment in app on which export formats do not support start and end dates
