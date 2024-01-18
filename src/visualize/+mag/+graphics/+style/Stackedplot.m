@@ -48,8 +48,11 @@ classdef Stackedplot < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport
 
             l = matlab.graphics.primitive.Text.empty(0, numel(axes));
 
-            for i = 1:numel(axes)
-                l(i) = ylabel(axes(i), this.YLabels(i));
+            if ~isempty(this.YLabels)
+
+                for i = 1:numel(axes)
+                    l(i) = ylabel(axes(i), this.YLabels(i));
+                end
             end
 
             if this.RotateLabels
