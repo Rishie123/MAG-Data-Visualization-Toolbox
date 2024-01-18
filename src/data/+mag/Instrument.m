@@ -158,8 +158,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function resample(this, targetFrequency)
-        % RESAMPLE Resample primary and secondary data to the specified
-        % frequency.
+        % RESAMPLE Resample science and HK data to the specified frequency.
 
             arguments
                 this
@@ -222,10 +221,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
 
             if isscalar(this)
 
-                if this.HasScience && this.HasMetaData && ...
-                        ~isempty(this.Primary.MetaData) && ~ismissing(this.Primary.MetaData.DataFrequency) && ~isequal(this.Primary.MetaData.Mode, "Hybrid") && ...
-                        ~isempty(this.Secondary.MetaData) && ~ismissing(this.Secondary.MetaData.DataFrequency) && ~isequal(this.Secondary.MetaData.Mode, "Hybrid")
-
+                if this.HasScience && this.HasMetaData && ~isempty(this.Primary.MetaData) && ~isempty(this.Secondary.MetaData)
                     tag = char(compose(" in %s (%d, %d)", this.Primary.MetaData.Mode, this.Primary.MetaData.DataFrequency, this.Secondary.MetaData.DataFrequency));
                 else
                     tag = char.empty();

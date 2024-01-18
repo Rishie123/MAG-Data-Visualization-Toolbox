@@ -1,1 +1,3 @@
 - Customize display of `mag.Science` and `mag.HK` classes
+- Always show custom display of `mag.Instrument` when meta data is available
+- Fix typos in `resample` methods help
