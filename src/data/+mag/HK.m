@@ -64,7 +64,7 @@ classdef HK < mag.TimeSeries & matlab.mixin.CustomDisplay
             if isscalar(this)
 
                 if ~isempty(this.MetaData) && ~isempty(this.MetaData.Type)
-                    tag = char(compose("""%s"" ", this.MetaData.Type));
+                    tag = char(compose("%s ", this.MetaData.Type));
                 else
                     tag = char.empty();
                 end
