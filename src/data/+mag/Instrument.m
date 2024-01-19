@@ -174,7 +174,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function downsample(this, targetFrequency)
-        % DOWNSAMPLE Downsample primary and secondary data to the specified
+        % DOWNSAMPLE Downsample science and HK data to the specified
         % frequency.
 
             arguments
@@ -182,25 +182,11 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 targetFrequency (1, 1) double
             end
 
-            for s = ["Primary", "Secondary"]
+            this.Primary.downsample(targetFrequency);
+            this.Secondary.downsample(targetFrequency);
 
-                actualFrequency = 1 / mode(seconds(diff(this.(s).Time)));
-                decimationFactor = actualFrequency / targetFrequency;
-
-                if round(decimationFactor) ~= decimationFactor
-                    error("Calculated decimation factor (%.3f) must be an integer.", decimationFactor);
-                end
-
-                a = ones(1, decimationFactor) / decimationFactor;
-                b = conv(a, a);
-
-                data = this.(s).Data;
-                data{:, ["x", "y", "z"]} = filter(b, 1, data{:, ["x", "y", "z"]});
-
-                data(1:numel(b), :) = [];
-
-                this.(s).Data = downsample(data, decimationFactor);
-                this.(s).MetaData.DataFrequency = targetFrequency;
+            for hk = this.HK
+                hk.downsample(targetFrequency);
             end
         end
     end

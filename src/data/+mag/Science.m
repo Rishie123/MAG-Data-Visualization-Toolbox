@@ -81,9 +81,35 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             this.MetaData.DataFrequency = targetFrequency;
         end
 
+        function downsample(this, targetFrequency)
+
+            arguments
+                this
+                targetFrequency (1, 1) double
+            end
+
+            actualFrequency = 1 / mode(seconds(diff(this.Time)));
+            decimationFactor = actualFrequency / targetFrequency;
+
+            if round(decimationFactor) ~= decimationFactor
+                error("Calculated decimation factor (%.3f) must be an integer.", decimationFactor);
+            end
+
+            a = ones(1, decimationFactor) / decimationFactor;
+            b = conv(a, a);
+
+            data = this.Data;
+            data{:, ["x", "y", "z"]} = filter(b, 1, data{:, ["x", "y", "z"]});
+
+            data(1:numel(b), :) = [];
+
+            this.Data = downsample(data, decimationFactor);
+            this.MetaData.DataFrequency = targetFrequency;
+        end
+
         function data = computePSD(this, options)
-            % COMPUTEPSD Compute the power spectral density of the magnetic field
-            % measurements.
+        % COMPUTEPSD Compute the power spectral density of the magnetic
+        % field measurements.
 
             arguments (Input)
                 this (1, 1) mag.Science
