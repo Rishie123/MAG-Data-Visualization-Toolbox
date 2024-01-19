@@ -158,8 +158,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function resample(this, targetFrequency)
-        % RESAMPLE Resample primary and secondary data to the specified
-        % frequency.
+        % RESAMPLE Resample science and HK data to the specified frequency.
 
             arguments
                 this
@@ -175,7 +174,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function downsample(this, targetFrequency)
-        % DOWNSAMPLE Downsample primary and secondary data to the specified
+        % DOWNSAMPLE Downsample science and HK data to the specified
         % frequency.
 
             arguments
@@ -183,25 +182,11 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 targetFrequency (1, 1) double
             end
 
-            for s = ["Primary", "Secondary"]
+            this.Primary.downsample(targetFrequency);
+            this.Secondary.downsample(targetFrequency);
 
-                actualFrequency = 1 / mode(seconds(diff(this.(s).Time)));
-                decimationFactor = actualFrequency / targetFrequency;
-
-                if round(decimationFactor) ~= decimationFactor
-                    error("Calculated decimation factor (%.3f) must be an integer.", decimationFactor);
-                end
-
-                a = ones(1, decimationFactor) / decimationFactor;
-                b = conv(a, a);
-
-                data = this.(s).Data;
-                data{:, ["x", "y", "z"]} = filter(b, 1, data{:, ["x", "y", "z"]});
-
-                data(1:numel(b), :) = [];
-
-                this.(s).Data = downsample(data, decimationFactor);
-                this.(s).MetaData.DataFrequency = targetFrequency;
+            for hk = this.HK
+                hk.downsample(targetFrequency);
             end
         end
     end
@@ -222,10 +207,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
 
             if isscalar(this)
 
-                if this.HasScience && this.HasMetaData && ...
-                        ~isempty(this.Primary.MetaData) && ~ismissing(this.Primary.MetaData.DataFrequency) && ~isequal(this.Primary.MetaData.Mode, "Hybrid") && ...
-                        ~isempty(this.Secondary.MetaData) && ~ismissing(this.Secondary.MetaData.DataFrequency) && ~isequal(this.Secondary.MetaData.Mode, "Hybrid")
-
+                if this.HasScience && this.HasMetaData && ~isempty(this.Primary.MetaData) && ~isempty(this.Secondary.MetaData)
                     tag = char(compose(" in %s (%d, %d)", this.Primary.MetaData.Mode, this.Primary.MetaData.DataFrequency, this.Secondary.MetaData.DataFrequency));
                 else
                     tag = char.empty();

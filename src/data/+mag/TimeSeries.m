@@ -30,9 +30,11 @@ classdef (Abstract) TimeSeries < mag.Data
 
     methods (Abstract)
 
-        % RESAMPLE Resample primary and secondary data to the specified
-        % frequency.
+        % RESAMPLE Resample data to the specified frequency.
         resample(this, targetFrequency)
+
+        % DOWNSAMPLE Downsample data to the specified frequency.
+        downsample(this, targetFrequency)
     end
 
     methods (Hidden, Sealed)

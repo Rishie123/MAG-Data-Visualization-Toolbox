@@ -1,7 +1,7 @@
-- Allow visualizing events in stackedplot
-- Customize display of "mag.Instrument" class
-- Move definition of `resample` method to `mag.TimeSeries` class
-- Move PNG export before FIG save
-- Do not restrict value of line to "double" only
-- Fix multiple small issues with HK view
-- Fix issue with loading old `mag.AutomatedAnalysis` data
+- Add option to specify event, meta data and HK pattern for app analysis
+- Customize display of `mag.Science` and `mag.HK` classes
+- Always show custom display of `mag.Instrument` when meta data is available
+- Update comment in app on which export formats do not support start and end dates
+- Move definition of `downsample` method to `mag.TimeSeries` class
+- Fix typos in `resample` methods help
+- Fix issue with plotting a `stackedplot` without y-axis labels

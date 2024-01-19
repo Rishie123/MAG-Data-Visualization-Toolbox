@@ -1,4 +1,4 @@
-classdef HK < mag.TimeSeries
+classdef HK < mag.TimeSeries & matlab.mixin.CustomDisplay
 % HK Class containing MAG housekeeping data.
 
     methods
@@ -21,7 +21,19 @@ classdef HK < mag.TimeSeries
                 targetFrequency (1, 1) double
             end
 
-            this.Data = retime(this.Data, "regular", "linear", TimeStep = seconds(1 / targetFrequency));
+            if ~isempty(this.Data)
+                this.Data = retime(this.Data, "regular", "linear", TimeStep = seconds(1 / targetFrequency));
+            end
+        end
+
+        function downsample(this, targetFrequency)
+
+            arguments
+                this
+                targetFrequency (1, 1) double
+            end
+
+            this.resample(targetFrequency);
         end
     end
 
@@ -41,6 +53,26 @@ classdef HK < mag.TimeSeries
                 hkType = this([hkMetaData.Type] == type);
             else
                 hkType = mag.HK.empty();
+            end
+        end
+    end
+
+    methods (Access = protected)
+
+        function header = getHeader(this)
+
+            if isscalar(this)
+
+                if ~isempty(this.MetaData) && ~isempty(this.MetaData.Type)
+                    tag = char(compose("%s ", this.MetaData.Type));
+                else
+                    tag = char.empty();
+                end
+
+                className = matlab.mixin.CustomDisplay.getClassNameForHeader(this);
+                header = ['  ', tag, className, ' with properties:'];
+            else
+                header = getHeader@matlab.mixin.CustomDisplay(this);
             end
         end
     end
