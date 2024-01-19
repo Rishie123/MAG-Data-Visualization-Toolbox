@@ -21,7 +21,9 @@ classdef HK < mag.TimeSeries & matlab.mixin.CustomDisplay
                 targetFrequency (1, 1) double
             end
 
-            this.Data = retime(this.Data, "regular", "linear", TimeStep = seconds(1 / targetFrequency));
+            if ~isempty(this.Data)
+                this.Data = retime(this.Data, "regular", "linear", TimeStep = seconds(1 / targetFrequency));
+            end
         end
 
         function downsample(this, targetFrequency)
