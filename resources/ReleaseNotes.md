@@ -1,7 +1,6 @@
-- Add option to specify event, meta data and HK pattern for app analysis
-- Customize display of `mag.Science` and `mag.HK` classes
-- Always show custom display of `mag.Instrument` when meta data is available
-- Update comment in app on which export formats do not support start and end dates
-- Move definition of `downsample` method to `mag.TimeSeries` class
-- Fix typos in `resample` methods help
-- Fix issue with plotting a `stackedplot` without y-axis labels
+# App
+
+- Add import button to import existing `mag.AutomatedAnalysis`
+- Add "Results" panel to show more results from analysis
+- Add processing steps results in "Results" panel
+- Fix issue analysis not having meta data
