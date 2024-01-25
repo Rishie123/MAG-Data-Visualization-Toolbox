@@ -4,3 +4,7 @@
 - Add "Results" panel to show more results from analysis
 - Add processing steps results in "Results" panel
 - Fix issue analysis not having meta data
+
+# Software
+
+- Add `filter` method for science data
