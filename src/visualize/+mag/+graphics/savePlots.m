@@ -18,7 +18,7 @@ function savePlots(figures, location, options)
 
             exportgraphics(f, fullfile(name + ".png"), Resolution = 300);
 
-            if options.ExportFig
+            if options.SaveAsFig
 
                 try
                     savefig(f, name);
