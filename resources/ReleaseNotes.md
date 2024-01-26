@@ -8,3 +8,4 @@
 # Software
 
 - Add `filter` method for science data
+- Add option to not save figure as ".fig"
