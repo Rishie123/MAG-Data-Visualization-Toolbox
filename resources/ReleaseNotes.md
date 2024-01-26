@@ -9,3 +9,4 @@
 
 - Add `filter` method for science data
 - Add option to not save figure as ".fig"
+- Fix issue with loading data from different time zones
