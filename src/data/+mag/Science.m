@@ -98,13 +98,39 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             a = ones(1, decimationFactor) / decimationFactor;
             b = conv(a, a);
 
-            data = this.Data;
-            data{:, ["x", "y", "z"]} = filter(b, 1, data{:, ["x", "y", "z"]});
+            this.filter(b);
 
-            data(1:numel(b), :) = [];
-
-            this.Data = downsample(data, decimationFactor);
+            this.Data = downsample(this.Data, decimationFactor);
             this.MetaData.DataFrequency = targetFrequency;
+        end
+
+        function filter(this, numeratorOrFilter, denominator)
+        % FILTER Filter science data with specified numerator/denominator
+        % pair, or filter object.
+
+            arguments
+                this
+                numeratorOrFilter (1, :) {mustBeA(numeratorOrFilter, ["double", "digitalFilter"])}
+                denominator (1, :) double = double.empty()
+            end
+
+            if isa(numeratorOrFilter, "digitalFilter")
+                arguments = {numeratorOrFilter};
+            elseif isempty(denominator)
+                arguments = {numeratorOrFilter, 1};
+            else
+                arguments = {numeratorOrFilter, denominator};
+            end
+
+            this.Data{:, ["x", "y", "z"]} = filter(arguments{:}, this.XYZ);
+
+            if isa(numeratorOrFilter, "double")
+                coefficients = numel(numeratorOrFilter);
+            else
+                coefficients = numel(numeratorOrFilter.Coefficients);
+            end
+
+            this.Data{1:coefficients, ["x", "y", "z"]} = [];
         end
 
         function data = computePSD(this, options)
