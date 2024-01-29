@@ -4,7 +4,7 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
     properties
         % EVENTSVISIBLE Display timetable events as vertical lines in the
         % plot.
-        EventsVisible string {mustBeScalarOrEmpty} = string.empty()
+        EventsVisible (1, 1) logical = false
     end
 
     methods
@@ -53,26 +53,32 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
                 ax = nexttile(stackLayout);
                 graph(y) = plot(ax, xData, filteredData.(this.YVariables(y)), this.MarkerStyle{:}, Color = this.Colors(y, :));
 
-                if ~isempty(this.EventsVisible) && ~isempty(data.Properties.Events)
+                if this.EventsVisible && ~isempty(data.Properties.Events)
                     this.addEventsData(ax, data);
                 end
             end
         end
     end
 
-    methods (Access = private)
+    methods (Static, Access = private)
 
-        function addEventsData(this, ax, data)
+        function addEventsData(ax, data)
 
             hold(ax, "on");
             resetAxesHold = onCleanup(@() hold(ax, "off"));
 
-            eventTimes = data.Properties.Events.Properties.RowTimes;
-            eventLabels = data.Properties.Events.(this.EventsVisible);
+            events = data.Properties.Events;
 
-            for e = 1:height(data.Properties.Events)
-                xline(ax, eventTimes(e), "-", eventLabels(e));
+            eventTimes = events.Properties.RowTimes;
+            eventLabels = events.(events.Properties.EventLabelsVariable);
+
+            if ~isempty(events.Properties.EventLengthsVariable)
+                xregion(ax, eventTimes, eventTimes + events.(events.Properties.EventLengthsVariable));
+            elseif ~isempty(events.Properties.EventEndsVariable)
+                xregion(ax, eventTimes, events.(events.Properties.EventEndsVariable));
             end
+
+            xline(ax, eventTimes, "-", eventLabels);
         end
     end
 end
