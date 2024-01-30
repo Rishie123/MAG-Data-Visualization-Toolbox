@@ -38,7 +38,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: test
     env:
-      VERSION: "2.4.0"
+      VERSION: "2.4.1"
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
