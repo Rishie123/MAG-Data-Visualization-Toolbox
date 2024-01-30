@@ -30,13 +30,10 @@ classdef Stairs < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & m
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            options = [{"LineStyle", this.LineStyle}, this.MarkerStyle(:)'];
+            xData = this.getXData(data);
 
-            if isempty(this.XVariable)
-                graph = stairs(axes, data, this.YVariables, options{:});
-            else
-                graph = stairs(axes, data{:, this.XVariable}, data{:, this.YVariables}, options{:});
-            end
+            graph = stairs(axes, xData, data{:, this.YVariables}, this.MarkerStyle{:}, ...
+                LineStyle = this.LineStyle);
 
             this.applyColorStyle(graph);
         end

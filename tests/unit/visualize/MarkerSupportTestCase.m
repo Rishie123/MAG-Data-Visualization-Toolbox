@@ -1,4 +1,4 @@
-classdef (Abstract) MarkerSupportTestCase < matlab.unittest.TestCase
+classdef (Abstract) MarkerSupportTestCase < MAGVisualizationTestCase
 % MARKERSUPPORTTESTCASE Base class for all charts that support markers.
 
     properties (TestParameter)

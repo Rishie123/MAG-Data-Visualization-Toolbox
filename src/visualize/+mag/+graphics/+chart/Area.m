@@ -25,16 +25,9 @@ classdef Area < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            if isempty(this.XVariable)
-                xVariable = data.Properties.DimensionNames{1};
-            else
-                xVariable = this.XVariable;
-            end
+            xData = this.getXData(data);
 
-            hold(axes, "on");
-            resetAxesHold = onCleanup(@() hold(axes, "off"));
-
-            graph = area(axes, data.(xVariable), data{:, this.YVariables});
+            graph = area(axes, xData, data{:, this.YVariables});
 
             this.applyColorStyle(graph, "FaceColor");
         end

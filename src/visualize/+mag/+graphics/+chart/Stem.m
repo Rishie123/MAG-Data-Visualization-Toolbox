@@ -1,6 +1,11 @@
 classdef Stem < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag.graphics.mixin.MarkerSupport
 % STEM Definition of chart of "stem" type.
 
+    properties
+        % LINESTYLE Line style.
+        LineStyle (1, 1) string = "-"
+    end
+
     methods
 
         function this = Stem(options)
@@ -29,7 +34,8 @@ classdef Stem < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag
 
             xData = this.getXData(data);
 
-            graph = stem(axes, xData, data{:, this.YVariables}, this.MarkerStyle{:});
+            graph = stem(axes, xData, data{:, this.YVariables}, this.MarkerStyle{:}, ...
+                LineStyle = this.LineStyle);
 
             this.applyColorStyle(graph);
         end

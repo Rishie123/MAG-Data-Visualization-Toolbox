@@ -1,5 +1,5 @@
-classdef (Abstract) ColorSupportTestCase < matlab.unittest.TestCase
-% COLORSUPPORTTESTCASE Base class for all charts that support markers.
+classdef (Abstract) ColorSupportTestCase < MAGVisualizationTestCase
+% COLORSUPPORTTESTCASE Base class for all charts that support colors.
 
     properties (TestParameter)
         ColorProperties = {struct(Name = "Color", Value = 'g', VerifiableValue = [0, 1, 0]), ...
@@ -24,8 +24,18 @@ classdef (Abstract) ColorSupportTestCase < matlab.unittest.TestCase
             % Verify.
             graph = GraphicsTestUtilities.getChildrenGraph(testCase, ax, testCase.GraphClassName);
 
-            [verifiableName, verifiableValue] = GraphicsTestUtilities.getVerifiables(ColorProperties);
-            testCase.verifyEqual(graph.(verifiableName), verifiableValue, compose("""%s"" property value should match.", ColorProperties.Name));
+            [~, verifiableValue] = GraphicsTestUtilities.getVerifiables(ColorProperties);
+            testCase.verifyEqual(graph.(testCase.getColorPropertyName()), verifiableValue, compose("""%s"" property value should match.", ColorProperties.Name));
+        end
+    end
+
+    methods (Static, Access = protected)
+
+        function name = getColorPropertyName()
+        % GETCOLORPROPERTYNAME Retrieve name of property defining color.
+        % Can be overridden by subclasses for customization.
+
+            name = "Color";
         end
     end
 end
