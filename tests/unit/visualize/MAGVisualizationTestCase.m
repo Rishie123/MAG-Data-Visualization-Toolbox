@@ -22,7 +22,7 @@ classdef (Abstract) MAGVisualizationTestCase < matlab.unittest.TestCase
         function setSimpleProperty(testCase, Properties)
 
             % Set up.
-            ax = testCase.createAxes();
+            ax = GraphicsTestUtilities.createAxes(testCase);
 
             % Exercise.
             chart = feval(testCase.ClassName, ...
@@ -32,30 +32,10 @@ classdef (Abstract) MAGVisualizationTestCase < matlab.unittest.TestCase
             chart.plot(testCase.Data, ax, []);
 
             % Verify.
-            graph = testCase.getChildrenGraph(ax, testCase.GraphClassName);
+            graph = GraphicsTestUtilities.getChildrenGraph(testCase, ax, testCase.GraphClassName);
 
-            testCase.verifyEqual(graph.(Properties.VerifiableName), Properties.Value, compose("""%s"" property value should match.", Properties.Name));
-        end
-    end
-
-    methods (Access = protected)
-
-        function ax = createAxes(testCase)
-        % CREATEAXES Create figure axes for test.
-
-            f = figure(Visible = "off");
-            testCase.addTeardown(@() close(f));
-
-            ax = axes(f);
-        end
-
-        function graph = getChildrenGraph(testCase, axes, type)
-        % GETCHILDRENGRAPH Get graph from axes and verify its type.
-
-            graph = axes.Children;
-
-            testCase.assertNumElements(graph, 1, "One and only one graph should exist.");
-            testCase.assertClass(graph, type, "Graph type should match expectation.");
+            [verifiableName, verifiableValue] = GraphicsTestUtilities.getVerifiables(Properties);
+            testCase.verifyEqual(graph.(verifiableName), verifiableValue, compose("""%s"" property value should match.", Properties.Name));
         end
     end
 end

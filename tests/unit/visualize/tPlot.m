@@ -1,4 +1,4 @@
-classdef tPlot < MAGVisualizationTestCase
+classdef tPlot < MAGVisualizationTestCase & ColorSupportTestCase & MarkerSupportTestCase
 % TPLOT Unit tests for "mag.graphics.chart.Plot" class.
 
     properties (Constant)
@@ -7,7 +7,7 @@ classdef tPlot < MAGVisualizationTestCase
     end
 
     properties (TestParameter)
-        Properties = {struct(Name = "LineStyle", Value = '-', VerifiableName = "LineStyle"), ...
-            struct(Name = "LineStyle", Value = '--', VerifiableName = "LineStyle")}
+        Properties = {struct(Name = "LineStyle", Value = '-'), ...
+            struct(Name = "LineStyle", Value = '--')}
     end
 end
