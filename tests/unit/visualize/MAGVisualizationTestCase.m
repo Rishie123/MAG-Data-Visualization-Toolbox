@@ -8,8 +8,8 @@ classdef (Abstract) MAGVisualizationTestCase < matlab.unittest.TestCase
 
     properties (Abstract, Constant)
         % CLASSNAME Fully qualified name of class under test.
-        ClassName (1, 1) string
+        ClassName
         % GRAPHCLASSNAME Fully qualified name of graph generated.
-        GraphClassName (1, 1) string
+        GraphClassName
     end
 end

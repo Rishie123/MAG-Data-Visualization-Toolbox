@@ -1,4 +1,4 @@
-classdef tPlot < MAGVisualizationTestCase & ColorSupportTestCase & MarkerSupportTestCase
+classdef tPlot < PropertiesTestCase & ColorSupportTestCase & MarkerSupportTestCase
 % TPLOT Unit tests for "mag.graphics.chart.Plot" class.
 
     properties (Constant)

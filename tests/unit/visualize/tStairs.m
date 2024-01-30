@@ -1,4 +1,4 @@
-classdef tStairs < MAGVisualizationTestCase & ColorSupportTestCase & MarkerSupportTestCase
+classdef tStairs < PropertiesTestCase & ColorSupportTestCase & MarkerSupportTestCase
 % TSTAIRS Unit tests for "mag.graphics.chart.Stairs" class.
 
     properties (Constant)

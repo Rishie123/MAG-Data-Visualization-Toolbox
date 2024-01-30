@@ -1,4 +1,4 @@
-classdef tStem < MAGVisualizationTestCase & ColorSupportTestCase & MarkerSupportTestCase
+classdef tStem < PropertiesTestCase & ColorSupportTestCase & MarkerSupportTestCase
 % TSTEM Unit tests for "mag.graphics.chart.Stem" class.
 
     properties (Constant)
