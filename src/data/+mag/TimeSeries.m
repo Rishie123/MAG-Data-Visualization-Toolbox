@@ -1,16 +1,16 @@
 classdef (Abstract) TimeSeries < mag.Data
 % TIMESERIES Abstract base class for MAG time series.
 
+    properties
+        % DATA Timetable containing data.
+        Data timetable
+    end
+
     properties (Dependent)
         % TIME Timestamp of data.
         Time (:, 1) datetime
         IndependentVariable
         DependentVariables
-    end
-
-    properties (Hidden)
-        % DATA Timetable containing data.
-        Data timetable
     end
 
     methods

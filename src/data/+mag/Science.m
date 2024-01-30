@@ -146,7 +146,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             arguments (Output)
-                data (1, 1) mag.Result
+                data (1, 1) mag.PSD
             end
 
             % Filter out data.
@@ -171,8 +171,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             [psd, f] = psdtsh(this.Data{locFilter, ["x", "y", "z"]}, dt, options.FFTType, options.NW);
             psd = psd .^ 0.5;
 
-            magnitude = sqrt(sum(psd.^2, 2));
-            data = mag.Result(table(f, psd(:, 1), psd(:, 2), psd(:, 3), magnitude, VariableNames = ["f", "x", "y", "z", "B"]));
+            data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", "x", "y", "z"]));
         end
     end
 
