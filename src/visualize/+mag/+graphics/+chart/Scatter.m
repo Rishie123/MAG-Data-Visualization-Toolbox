@@ -1,4 +1,4 @@
-classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag.graphics.mixin.MarkerSupport
+classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.MarkerSupport
 % SCATTER Definition of chart of "scatter" type.
 
     methods
@@ -33,8 +33,6 @@ classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & 
             options(1:2:end) = cellstr(replace([options{1:2:end}], "MarkerSize", "SizeData"));
 
             graph = scatter(axes, xData, data{:, this.YVariables}, options{:});
-
-            this.applyColorStyle(graph, "MarkerEdgeColor");
         end
     end
 end
