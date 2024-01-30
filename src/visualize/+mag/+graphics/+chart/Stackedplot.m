@@ -23,7 +23,7 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
 
             arguments (Input)
                 this
-                data timetable
+                data {mustBeA(data, ["mag.Data", "timetable"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 layout (1, 1) matlab.graphics.layout.TiledChartLayout
             end
@@ -34,8 +34,8 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
 
             Ny = numel(this.YVariables);
 
-            % Filter data.
             xData = this.getXData(data);
+            yData = this.getYData(data);
 
             if ~isempty(this.Colors) && (Ny > size(this.Colors, 1))
                 error("Mismatch in number of colors for number of plots.");
@@ -48,7 +48,7 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
             for y = 1:Ny
 
                 ax = nexttile(stackLayout);
-                graph(y) = plot(ax, xData, data.(this.YVariables(y)), this.MarkerStyle{:}, Color = this.Colors(y, :));
+                graph(y) = plot(ax, xData, yData(:, y), this.MarkerStyle{:}, Color = this.Colors(y, :));
 
                 if this.EventsVisible && ~isempty(data.Properties.Events)
                     this.addEventsData(ax, data);

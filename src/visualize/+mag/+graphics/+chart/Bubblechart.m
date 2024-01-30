@@ -23,7 +23,7 @@ classdef Bubblechart < mag.graphics.chart.Chart
 
             arguments (Input)
                 this
-                data tabular
+                data {mustBeA(data, ["mag.Data", "tabular"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -32,10 +32,10 @@ classdef Bubblechart < mag.graphics.chart.Chart
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            args = {this.getXData(data), data{:, this.YVariables}, data{:, this.SVariables}};
+            args = {this.getXData(data), this.getYData(data), data{:, this.SVariables}};
 
             if ~isempty(this.CVariables)
-                args = [args, {data{:, this.CVariables}}];
+                args = [args, data(:, this.CVariables)];
             end
 
             graph = bubblechart(axes, args{:});

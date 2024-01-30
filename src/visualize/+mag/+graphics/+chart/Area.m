@@ -16,7 +16,7 @@ classdef Area < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport
 
             arguments (Input)
                 this
-                data timetable
+                data {mustBeA(data, ["mag.Data", "timetable"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -26,8 +26,9 @@ classdef Area < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport
             end
 
             xData = this.getXData(data);
+            yData = this.getYData(data);
 
-            graph = area(axes, xData, data{:, this.YVariables});
+            graph = area(axes, xData, yData);
 
             this.applyColorStyle(graph, "FaceColor");
         end

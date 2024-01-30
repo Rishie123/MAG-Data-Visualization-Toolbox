@@ -23,7 +23,7 @@ classdef Stem < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag
 
             arguments (Input)
                 this
-                data tabular
+                data {mustBeA(data, ["mag.Data", "tabular"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -33,8 +33,9 @@ classdef Stem < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag
             end
 
             xData = this.getXData(data);
+            yData = this.getYData(data);
 
-            graph = stem(axes, xData, data{:, this.YVariables}, this.MarkerStyle{:}, ...
+            graph = stem(axes, xData, yData, this.MarkerStyle{:}, ...
                 LineStyle = this.LineStyle);
 
             this.applyColorStyle(graph);

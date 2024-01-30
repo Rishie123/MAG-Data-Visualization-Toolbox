@@ -16,7 +16,7 @@ classdef Histogram < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport
 
             arguments (Input)
                 this
-                data table
+                data {mustBeA(data, ["mag.Data", "table"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -25,7 +25,9 @@ classdef Histogram < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            graph = histogram(axes, data{:, this.YVariables});
+            yData = this.getYData(data);
+
+            graph = histogram(axes, yData);
 
             this.applyColorStyle(graph, "FaceColor");
         end

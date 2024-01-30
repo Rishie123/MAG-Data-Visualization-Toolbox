@@ -18,7 +18,7 @@ classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.MarkerSupport
 
             arguments (Input)
                 this
-                data tabular
+                data {mustBeA(data, ["mag.Data", "tabular"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -28,11 +28,12 @@ classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.MarkerSupport
             end
 
             xData = this.getXData(data);
+            yData = this.getYData(data);
 
             options = this.MarkerStyle;
             options(1:2:end) = cellstr(replace([options{1:2:end}], "MarkerSize", "SizeData"));
 
-            graph = scatter(axes, xData, data{:, this.YVariables}, options{:});
+            graph = scatter(axes, xData, yData, options{:});
         end
     end
 end

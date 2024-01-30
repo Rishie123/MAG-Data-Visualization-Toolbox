@@ -26,7 +26,7 @@ classdef Spectrogram < mag.graphics.chart.Chart
 
             arguments (Input)
                 this
-                data timetable
+                data {mustBeA(data, ["mag.Data", "timetable"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -36,21 +36,18 @@ classdef Spectrogram < mag.graphics.chart.Chart
             end
 
             xData = this.getXData(data);
+            yData = this.getYData(data);
 
             % Normalize data.
             if this.Normalize
 
-                yData = data.(this.YVariables);
-
-                if numel(yData) < 500
+                if height(yData) < 500
                     yData = (yData - mean(yData)) ./ std(yData);
                 else
 
-                    k = ceil(numel(yData) / 100);
+                    k = ceil(height(yData) / 100);
                     yData = (yData - movmean(yData, k)) ./ movstd(yData, k);
                 end
-            else
-                yData = data.(this.YVariables);
             end
 
             % Compute spectrogram coefficients.

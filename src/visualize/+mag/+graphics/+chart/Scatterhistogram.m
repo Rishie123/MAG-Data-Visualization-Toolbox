@@ -22,7 +22,7 @@ classdef Scatterhistogram < mag.graphics.chart.Chart
 
             arguments (Input)
                 this
-                data table
+                data {mustBeA(data, ["mag.Data", "table"])}
                 ~
                 layout (1, 1) matlab.graphics.layout.TiledChartLayout
             end
@@ -31,15 +31,16 @@ classdef Scatterhistogram < mag.graphics.chart.Chart
                 graph (1, :) matlab.graphics.Graphics
             end
 
+            xData = this.getXData(data);
+            yData = this.getYData(data);
+
             if isempty(this.GroupVariable)
                 options = {};
             else
-
-                options = {"GroupVariable", this.GroupVariable, ...
-                    "LegendVisible", "on"};
+                options = {"GroupData", data{:, this.GroupVariable}, "LegendVisible", "on"};
             end
 
-            graph = scatterhistogram(layout, data, this.XVariable, this.YVariables, options{:});
+            graph = scatterhistogram(layout, xData, yData, options{:});
         end
     end
 end
