@@ -53,19 +53,4 @@ classdef PSD < mag.Data
             z = this.Data.z;
         end
     end
-
-    methods (Hidden, Sealed)
-
-        function tabularThis = tabular(this)
-        % TABULAR Convert data to tabular.
-
-            tabularThis = this.Data;
-        end
-
-        function tableThis = table(this)
-        % TABLE Convert data to table.
-
-            tableThis = this.Data;
-        end
-    end
 end

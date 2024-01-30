@@ -36,19 +36,4 @@ classdef (Abstract) TimeSeries < mag.Data
         % DOWNSAMPLE Downsample data to the specified frequency.
         downsample(this, targetFrequency)
     end
-
-    methods (Hidden, Sealed)
-
-        function tabularThis = tabular(this)
-        % TABULAR Convert data to tabular.
-
-            tabularThis = this.Data;
-        end
-
-        function tableThis = timetable(this)
-        % TIMETABLE Convert data to timetable.
-
-            tableThis = this.Data;
-        end
-    end
 end
