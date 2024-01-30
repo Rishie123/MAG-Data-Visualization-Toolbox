@@ -2,7 +2,7 @@ function figures = sftPlots(analysis, options)
 % SFTPLOTS Create plots for SFT results.
 
     arguments (Input)
-        analysis (1, 1) mag.AutomatedAnalysis
+        analysis (1, 1) mag.IMAPTestingAnalysis
         options.Filter duration {mustBeScalarOrEmpty} = duration.empty()
         options.PSDStart datetime {mustBeScalarOrEmpty} = datetime.empty()
         options.PSDDuration (1, 1) duration = hours(1)

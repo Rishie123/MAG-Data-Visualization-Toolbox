@@ -1,7 +1,7 @@
 function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents, data)
 
     arguments (Input)
-        this (1, 1) mag.AutomatedAnalysis
+        this (1, 1) mag.IMAPTestingAnalysis
         primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])}
         sensorEvents timetable
         data timetable

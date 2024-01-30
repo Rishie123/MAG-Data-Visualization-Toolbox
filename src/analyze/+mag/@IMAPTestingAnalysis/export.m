@@ -1,7 +1,7 @@
 function export(this, exportStrategy, options)
 
     arguments
-        this (1, 1) mag.AutomatedAnalysis
+        this (1, 1) mag.IMAPTestingAnalysis
         exportStrategy (1, 1) mag.io.Type
         options.Location (1, 1) string {mustBeFolder} = "results"
         options.StartTime (1, 1) datetime = NaT(TimeZone = "UTC")

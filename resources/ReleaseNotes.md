@@ -4,4 +4,4 @@
 
 # Software
 
-- 
+- Rename `AutomatedAnalysis` to `IMAPTestingAnalysis`
