@@ -27,14 +27,12 @@ classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & 
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            filteredData = this.filterData(data);
-            xData = this.getXData(filteredData);
+            xData = this.getXData(data);
 
             options = this.MarkerStyle;
             options(1:2:end) = cellstr(replace([options{1:2:end}], "MarkerSize", "SizeData"));
 
-            graph = scatter(axes, xData, filteredData{:, this.YVariables}, ...
-                options{:});
+            graph = scatter(axes, xData, data{:, this.YVariables}, options{:});
 
             this.applyColorStyle(graph, "MarkerEdgeColor");
         end

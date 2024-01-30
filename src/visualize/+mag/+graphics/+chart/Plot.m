@@ -30,14 +30,12 @@ classdef Plot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            filteredData = this.filterData(data);
-
             options = [{"LineStyle", this.LineStyle}, this.MarkerStyle(:)'];
 
             if isempty(this.XVariable)
-                graph = plot(axes, filteredData, this.YVariables, options{:});
+                graph = plot(axes, data, this.YVariables, options{:});
             else
-                graph = plot(axes, filteredData{:, this.XVariable}, filteredData{:, this.YVariables}, options{:});
+                graph = plot(axes, data{:, this.XVariable}, data{:, this.YVariables}, options{:});
             end
 
             this.applyColorStyle(graph);

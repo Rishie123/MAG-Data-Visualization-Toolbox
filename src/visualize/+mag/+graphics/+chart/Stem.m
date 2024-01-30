@@ -27,11 +27,9 @@ classdef Stem < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            filteredData = this.filterData(data);
-            xData = this.getXData(filteredData);
+            xData = this.getXData(data);
 
-            graph = stem(axes, xData, filteredData{:, this.YVariables}, ...
-                this.MarkerStyle{:});
+            graph = stem(axes, xData, data{:, this.YVariables}, this.MarkerStyle{:});
 
             this.applyColorStyle(graph);
         end

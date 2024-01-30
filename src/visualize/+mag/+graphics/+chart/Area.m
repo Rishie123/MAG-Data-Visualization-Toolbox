@@ -31,19 +31,10 @@ classdef Area < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport
                 xVariable = this.XVariable;
             end
 
-            filteredData = this.filterData(data);
-
             hold(axes, "on");
             resetAxesHold = onCleanup(@() hold(axes, "off"));
 
-            if iscell(filteredData)
-
-                for i = 1:numel(this.YVariables)
-                    graph(i) = area(axes, filteredData{i}.(xVariable), filteredData{i}{:, this.YVariables(i)}); %#ok<AGROW>
-                end
-            else
-                graph = area(axes, filteredData.(xVariable), filteredData{:, this.YVariables});
-            end
+            graph = area(axes, data.(xVariable), data{:, this.YVariables});
 
             this.applyColorStyle(graph, "FaceColor");
         end

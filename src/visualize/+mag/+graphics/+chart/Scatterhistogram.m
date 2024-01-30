@@ -31,9 +31,6 @@ classdef Scatterhistogram < mag.graphics.chart.Chart
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            filteredData = this.filterData(data);
-            assert(~iscell(filteredData), "Different filter lengths not currently supported.");
-
             if isempty(this.GroupVariable)
                 options = {};
             else
@@ -42,7 +39,7 @@ classdef Scatterhistogram < mag.graphics.chart.Chart
                     "LegendVisible", "on"};
             end
 
-            graph = scatterhistogram(layout, filteredData, this.XVariable, this.YVariables, options{:});
+            graph = scatterhistogram(layout, data, this.XVariable, this.YVariables, options{:});
         end
     end
 end

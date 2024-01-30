@@ -35,10 +35,7 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
             Ny = numel(this.YVariables);
 
             % Filter data.
-            filteredData = this.filterData(data);
-            assert(~iscell(filteredData), "Different filter lengths not currently supported.");
-
-            xData = this.getXData(filteredData);
+            xData = this.getXData(data);
 
             if ~isempty(this.Colors) && (Ny > size(this.Colors, 1))
                 error("Mismatch in number of colors for number of plots.");
@@ -51,7 +48,7 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
             for y = 1:Ny
 
                 ax = nexttile(stackLayout);
-                graph(y) = plot(ax, xData, filteredData.(this.YVariables(y)), this.MarkerStyle{:}, Color = this.Colors(y, :));
+                graph(y) = plot(ax, xData, data.(this.YVariables(y)), this.MarkerStyle{:}, Color = this.Colors(y, :));
 
                 if this.EventsVisible && ~isempty(data.Properties.Events)
                     this.addEventsData(ax, data);
