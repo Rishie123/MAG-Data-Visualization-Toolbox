@@ -15,7 +15,7 @@
 - Remove support for `Filters` in charts
 - Remove implicit conversion methods for `table`, `timetable` and `tabular`
 - Fix issues with setting colors in charts
-- Add tests for `mag.Data` and `mag.Science`
+- Add tests for `mag.Data`, `mag.Science` and `mag.HK`
 - Add tests for `mag.graphics.chart.Area`, `mag.graphics.chart.Scatter`, `mag.graphics.chart.Stairs` and `mag.graphics.chart.Stem` plots
 
 # GitHub Workflows

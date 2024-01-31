@@ -174,10 +174,10 @@ classdef tScience < matlab.unittest.TestCase
             data.crop(timeFilter);
 
             % Verify.
-            testCase.assertEqual(height(data.IndependentVariable), height(expectedTimes), "Data should be cropped as expected.");
+            testCase.assertSize(data.IndependentVariable, size(expectedTimes), "Data should be cropped as expected.");
             testCase.verifyEqual(data.Time, expectedTimes, "Data should be cropped as expected.");
 
-            testCase.assertEqual(height(data.DependentVariables), height(expectedData), "Data should be cropped as expected.");
+            testCase.assertSize(data.DependentVariables, size(expectedData), "Data should be cropped as expected.");
             testCase.verifyEqual(data.DependentVariables, expectedData, "Data should be cropped as expected.");
 
             testCase.verifyEqual(data.MetaData.Timestamp, data.Time(1), "Meta data timestamp should be updated.");
@@ -189,8 +189,6 @@ classdef tScience < matlab.unittest.TestCase
         function [data, rawData] = createTestData()
 
             rawData = timetable(datetime("now", TimeZone = "UTC") + minutes(1:10)', (1:10)', (11:20)', (21:30)', 3 * ones(10, 1), (1:10)', VariableNames = ["x", "y", "z", "range", "sequence"]);
-            rawData.B = vecnorm(rawData{:, ["x", "y", "z"]}, 2, 2);
-
             data = mag.Science(rawData, mag.meta.Science());
         end
     end

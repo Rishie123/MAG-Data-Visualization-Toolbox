@@ -86,7 +86,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         function crop(this, timeFilter)
 
             arguments
-                this
+                this (1, 1) mag.Science
                 timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
             end
 
@@ -108,7 +108,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         function resample(this, targetFrequency)
 
             arguments
-                this
+                this (1, 1) mag.Science
                 targetFrequency (1, 1) double
             end
 
@@ -141,7 +141,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         function downsample(this, targetFrequency)
 
             arguments
-                this
+                this (1, 1) mag.Science
                 targetFrequency (1, 1) double
             end
 
@@ -166,7 +166,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         % pair, or filter object.
 
             arguments
-                this
+                this (1, 1) mag.Science
                 numeratorOrFilter (1, :) {mustBeA(numeratorOrFilter, ["double", "digitalFilter"])}
                 denominator (1, :) double = double.empty()
             end

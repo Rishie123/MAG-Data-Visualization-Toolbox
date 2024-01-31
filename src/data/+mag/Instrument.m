@@ -69,7 +69,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % GETSENSOR Return name of primary or secondary sensor.
 
             arguments (Input)
-                this
+                this (1, 1) mag.Instrument
                 primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])} = "Primary"
             end
 
@@ -95,7 +95,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % secondary science.
 
             arguments
-                this
+                this (1, 1) mag.Instrument
                 primaryFilter
                 secondaryFilter = primaryFilter
             end
@@ -109,7 +109,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % filters.
 
             arguments
-                this
+                this (1, 1) mag.Instrument
                 primaryFilter (1, 1) {mustBeA(primaryFilter, ["duration", "timerange", "withtol"])}
                 secondaryFilter (1, 1) {mustBeA(secondaryFilter, ["duration", "timerange", "withtol"])} = primaryFilter
             end
@@ -140,7 +140,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % RESAMPLE Resample science and HK data to the specified frequency.
 
             arguments
-                this
+                this (1, 1) mag.Instrument
                 targetFrequency (1, 1) double
             end
 
@@ -157,7 +157,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % frequency.
 
             arguments
-                this
+                this (1, 1) mag.Instrument
                 targetFrequency (1, 1) double
             end
 

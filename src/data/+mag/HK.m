@@ -17,19 +17,21 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
         function resample(this, targetFrequency)
 
             arguments
-                this
+                this (1, 1) mag.HK
                 targetFrequency (1, 1) double
             end
 
             if ~isempty(this.Data)
-                this.Data = retime(this.Data, "regular", "linear", TimeStep = seconds(1 / targetFrequency));
+
+                timestamps = this.Time(1):seconds(1 / targetFrequency):this.Time(end);
+                this.Data = retime(this.Data, timestamps, "linear");
             end
         end
 
         function downsample(this, targetFrequency)
 
             arguments
-                this
+                this (1, 1) mag.HK
                 targetFrequency (1, 1) double
             end
 
@@ -42,12 +44,14 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
         function crop(this, timeFilter)
 
             arguments
-                this
+                this mag.HK
                 timeFilter (1, 1) timerange
             end
 
             for i = 1:numel(this)
+
                 this(i).Data = this(i).Data(timeFilter, :);
+                this(i).MetaData.Timestamp = this(i).Time(1);
             end
         end
 
@@ -55,7 +59,7 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
         % GETHKTYPE Get specific type of HK. Default is power HK.
 
             arguments
-                this
+                this mag.HK
                 type (1, 1) string {mustBeMember(type, ["PROCSTAT", "PW", "SID15", "STATUS"])} = "PW"
             end
 
