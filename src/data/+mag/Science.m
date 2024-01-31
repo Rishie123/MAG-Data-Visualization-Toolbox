@@ -1,4 +1,4 @@
-classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
+classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 % SCIENCE Class containing MAG science data.
 
     properties (Dependent)
@@ -63,6 +63,28 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
         function events = get.Events(this)
             events = this.Data.Properties.Events;
+        end
+
+        function crop(this, timeFilter)
+
+            arguments
+                this
+                timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
+            end
+
+            if isa(timeFilter, "duration")
+                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "openleft");
+            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
+                timePeriod = timeFilter;
+            end
+
+            this.Data = this.Data(timePeriod, :);
+
+            if ~isempty(this.Data.Properties.Events)
+                this.Data.Properties.Events = this.Data.Properties.Events(timePeriod, :);
+            end
+
+            this.MetaData.Timestamp = this.Time(1);
         end
 
         function resample(this, targetFrequency)

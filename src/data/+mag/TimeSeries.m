@@ -30,6 +30,9 @@ classdef (Abstract) TimeSeries < mag.Data
 
     methods (Abstract)
 
+        % CROP Crop data based on selected filter.
+        crop(this, timeFilter)
+
         % RESAMPLE Resample data to the specified frequency.
         resample(this, targetFrequency)
 

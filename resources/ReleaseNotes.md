@@ -7,6 +7,8 @@
 - Rename `AutomatedAnalysis` to `IMAPTestingAnalysis`
 - Rename `Result` to `PSD`
 - Remove support for `Filters` in charts
+- Make `crop` a method of `mag.TimeSeries` 
+- Customize `get` method of `mag.Data` to accept multiple property names
 - Allow charts to have `mag.Data` as input
 - Remove implicit conversion methods for `table`, `timetable` and `tabular`
 - Fix issues with setting colors in charts
