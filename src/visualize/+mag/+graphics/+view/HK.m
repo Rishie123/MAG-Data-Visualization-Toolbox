@@ -96,7 +96,7 @@ classdef HK < mag.graphics.view.View
             if ~isempty(sid15) && ~isempty(procstat)
 
                 drt = sid15.get("FOBDataReadyTime", "FIBDataReadyTime");
-                drt = table(1000 * (drt(:, 1) - drt(:, 2)), VariableNames = "Difference");
+                drt = timetable(sid15.Time, 1000 * (drt(:, 1) - drt(:, 2)), VariableNames = "Difference");
 
                 this.Figures(end + 1) = mag.graphics.visualize( ...
                     procstat, mag.graphics.style.Default(Title = "Messages in Queue", YLabel = "n [-]", Legend = ["FOB", "FIB"], Charts = [mag.graphics.chart.Plot(YVariables = "FOBQueueNumMSG"), mag.graphics.chart.Plot(YVariables = "FIBQueueNumMSG")]), ...

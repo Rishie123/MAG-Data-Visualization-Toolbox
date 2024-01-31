@@ -27,11 +27,11 @@ classdef (Sealed) Power < mag.HK
         % P8V +8.0 V voltage.
         P8V (:, 1) double
         % P8I +8.0 V current.
-        P8I (:, 1) double
+        P8VI (:, 1) double
         % N8V -8.0 V voltage.
         N8V (:, 1) double
         % N8I -8.0 V current.
-        N8I (:, 1) double
+        N8VI (:, 1) double
         % P2V4V +2.4 V voltage.
         P2V4V (:, 1) double
         % MAGORANGE Outboard sensor range.
@@ -71,7 +71,7 @@ classdef (Sealed) Power < mag.HK
         end
 
         function p1v5i = get.P1V5I(this)
-            p1v5i = this.Data.P1V5VI;
+            p1v5i = this.Data.P1V5I;
         end
 
         function p1v8v = get.P1V8V(this)
@@ -79,7 +79,7 @@ classdef (Sealed) Power < mag.HK
         end
 
         function p1v8i = get.P1V8I(this)
-            p1v8i = this.Data.P1V8VI;
+            p1v8i = this.Data.P1V8I;
         end
 
         function p3v3v = get.P3V3V(this)
@@ -87,7 +87,7 @@ classdef (Sealed) Power < mag.HK
         end
 
         function p3v3i = get.P3V3I(this)
-            p3v3i = this.Data.P3V3VI;
+            p3v3i = this.Data.P3V3I;
         end
 
         function p2v5v = get.P2V5V(this)
@@ -95,23 +95,23 @@ classdef (Sealed) Power < mag.HK
         end
 
         function p2v5i = get.P2V5I(this)
-            p2v5i = this.Data.P2V5VI;
+            p2v5i = this.Data.P2V5I;
         end
 
         function p8v = get.P8V(this)
             p8v = this.Data.P8V;
         end
 
-        function p8i = get.P8I(this)
-            p8i = this.Data.P8VI;
+        function p8vi = get.P8VI(this)
+            p8vi = this.Data.P8VI;
         end
 
         function n8v = get.N8V(this)
             n8v = this.Data.N8V;
         end
 
-        function n8i = get.N8I(this)
-            n8i = this.Data.N8VI;
+        function n8vi = get.N8VI(this)
+            n8vi = this.Data.N8VI;
         end
 
         function p2v4v = get.P2V4V(this)
