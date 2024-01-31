@@ -1,3 +1,7 @@
+# App
+
+- Fix issue with default patterns on some computers
+
 # Software
 
 - Add separate classes for each specific HK type
