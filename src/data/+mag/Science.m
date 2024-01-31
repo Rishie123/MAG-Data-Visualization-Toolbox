@@ -112,7 +112,24 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 targetFrequency (1, 1) double
             end
 
-            xyz = resample(this.Data(:, ["x", "y", "z"]), targetFrequency);
+            actualFrequency = 1 / seconds(mode(this.dT));
+            
+            if actualFrequency > targetFrequency
+
+                numerator = 1;
+                denominator = actualFrequency / targetFrequency;
+            else
+
+                numerator = targetFrequency / actualFrequency;
+                denominator = 1;
+            end
+
+            if (round(numerator) ~= numerator) || (round(denominator) ~= denominator)
+                error("Calculated numerator (%.3f) and denominator (%.3f) must be integers.", numerator, denominator);
+            end
+
+            xyz = resample(this.Data(:, ["x", "y", "z"]), numerator, denominator);
+            xyz = xyz(timerange(this.Time(1), this.Time(end), "closed"), :);
 
             resampledData = retime(this.Data, xyz.Time, "nearest");
             resampledData(:, ["x", "y", "z"]) = xyz;
@@ -128,7 +145,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 targetFrequency (1, 1) double
             end
 
-            actualFrequency = 1 / mode(seconds(diff(this.Time)));
+            actualFrequency = 1 / seconds(mode(this.dT));
             decimationFactor = actualFrequency / targetFrequency;
 
             if round(decimationFactor) ~= decimationFactor
@@ -165,12 +182,16 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             this.Data{:, ["x", "y", "z"]} = filter(arguments{:}, this.XYZ);
 
             if isa(numeratorOrFilter, "digitalFilter")
-                coefficients = numel(numeratorOrFilter.Coefficients);
+                numCoefficients = numel(numeratorOrFilter.Coefficients);
             else
-                coefficients = numel(numeratorOrFilter);
+                numCoefficients = numel(numeratorOrFilter);
             end
 
-            this.Data{1:coefficients, ["x", "y", "z"]} = [];
+            if numCoefficients > height(this.Data)
+                numCoefficients = height(this.Data);
+            end
+
+            this.Data{1:numCoefficients, ["x", "y", "z"]} = missing();
         end
 
         function data = computePSD(this, options)
