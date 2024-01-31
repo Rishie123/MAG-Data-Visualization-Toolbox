@@ -1,6 +1,7 @@
 # Software
 
 - Add separate classes for each specific HK type
+- Add reference frame to science meta data
 - Make `crop` a method of `mag.TimeSeries`
 - Make magnitude and derivatives dependent properties of `mag.Science`
 - Customize `get` method of `mag.Data` to accept multiple property names
