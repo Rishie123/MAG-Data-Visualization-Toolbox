@@ -12,6 +12,12 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         XYZ (:, 3) double
         % B Magnitude of the magnetic field.
         B (:, 1) double
+        % DX x-axis derivative of the magnetic field.
+        dX (:, 1) double
+        % DY y-axis derivative of the magnetic field.
+        dY (:, 1) double
+        % DZ z-axis derivative of the magnetic field.
+        dZ (:, 1) double
         % RANGE Range values of sensor.
         Range (:, 1) uint8
         % SEQUENCE Sequence number of vectors.
@@ -50,7 +56,19 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function b = get.B(this)
-            b = this.Data.B;
+            b = vecnorm(this.XYZ, 2, 2);
+        end
+
+        function dx = get.dX(this)
+            dx = [diff(this.X); missing()];
+        end
+
+        function dy = get.dY(this)
+            dy = [diff(this.Y); missing()];
+        end
+
+        function dz = get.dZ(this)
+            dz = [diff(this.Z); missing()];
         end
 
         function range = get.Range(this)

@@ -9,6 +9,8 @@ classdef (Abstract) TimeSeries < mag.Data
     properties (Dependent)
         % TIME Timestamp of data.
         Time (:, 1) datetime
+        % DT Time derivative.
+        dT (:, 1) duration
         IndependentVariable
         DependentVariables
     end
@@ -17,6 +19,10 @@ classdef (Abstract) TimeSeries < mag.Data
 
         function time = get.Time(this)
             time = this.Data.(this.Data.Properties.DimensionNames{1});
+        end
+
+        function dt = get.dT(this)
+            dt = [diff(this.Time); duration(missing())];
         end
 
         function independentVariable = get.IndependentVariable(this)
