@@ -1,7 +1,8 @@
 # Software
 
 - Add separate classes for each specific HK type
-- Make `crop` a method of `mag.TimeSeries` 
+- Make `crop` a method of `mag.TimeSeries`
+- Make magnitude and derivatives dependent properties of `mag.Science`
 - Customize `get` method of `mag.Data` to accept multiple property names
 - Allow charts to have `mag.Data` as input
 - Rename `mag.AutomatedAnalysis` to `mag.IMAPTestingAnalysis`
