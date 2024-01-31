@@ -53,7 +53,7 @@ classdef Magnitude < mag.process.Step
                 magnitude (:, 1) double
             end
 
-            magnitude = sqrt(sum(data.^2, 2));
+            magnitude = vecnorm(data, 2, 2);
         end
     end
 end

@@ -73,7 +73,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             if isa(timeFilter, "duration")
-                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "openleft");
+                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
             elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
                 timePeriod = timeFilter;
             end
@@ -146,10 +146,10 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             this.Data{:, ["x", "y", "z"]} = filter(arguments{:}, this.XYZ);
 
-            if isa(numeratorOrFilter, "double")
-                coefficients = numel(numeratorOrFilter);
-            else
+            if isa(numeratorOrFilter, "digitalFilter")
                 coefficients = numel(numeratorOrFilter.Coefficients);
+            else
+                coefficients = numel(numeratorOrFilter);
             end
 
             this.Data{1:coefficients, ["x", "y", "z"]} = [];

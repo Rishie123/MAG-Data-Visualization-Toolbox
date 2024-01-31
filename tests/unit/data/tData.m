@@ -102,7 +102,7 @@ classdef tData < matlab.unittest.TestCase
         function [data, rawData] = createTestData()
 
             rawData = timetable(datetime("now") + (1:10)', (1:10)', (11:20)', (21:30)', VariableNames = ["x", "y", "z"]);
-            data = mag.Science(rawData, mag.meta.Science);
+            data = mag.Science(rawData, mag.meta.Science());
         end
     end
 end
