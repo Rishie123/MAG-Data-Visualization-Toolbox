@@ -2,6 +2,7 @@ classdef PSD < mag.Data
 % PSD Class containing MAG PSD data.
 
     properties
+        % DATA Table containing data.
         Data table
     end
 
