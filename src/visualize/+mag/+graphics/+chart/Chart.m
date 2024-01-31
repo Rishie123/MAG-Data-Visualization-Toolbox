@@ -58,9 +58,7 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
                 if isa(data, "tabular")
                     yData = data{:, this.YVariables};
                 else
-
-                    yData = arrayfun(@(x) data.(x), this.YVariables, UniformOutput = false);
-                    yData = horzcat(yData{:});
+                    yData = data.get(this.YVariables);
                 end
             end
         end
