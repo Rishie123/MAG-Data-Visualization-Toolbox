@@ -20,7 +20,7 @@ function loadHKData(this, hkMetaData)
             end
 
             % Assign value.
-            this.Results.HK(end + 1) = mag.HK(table2timetable(rawHK, RowTimes = "t"), hkMetaData(hkp));
+            this.Results.HK(end + 1) = mag.hk.dispatchHKType(table2timetable(rawHK, RowTimes = "t"), hkMetaData(hkp));
         end
     end
 

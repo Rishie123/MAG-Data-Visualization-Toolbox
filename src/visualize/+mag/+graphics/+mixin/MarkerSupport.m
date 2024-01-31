@@ -7,7 +7,7 @@ classdef (Abstract, HandleCompatible, Hidden) MarkerSupport
         % MARKERSIZE Marker size.
         MarkerSize (1, 1) double = 10
         % MARKERFACE Marker face color option. "flat" means filled marker.
-        MarkerFace (1, 1) string {mustBeMember(MarkerFace, ["none", "flat"])} = "none"
+        MarkerColor {mag.graphics.mixin.mustBeColor} = "none"
     end
 
     properties (Dependent, Access = protected)
@@ -21,7 +21,8 @@ classdef (Abstract, HandleCompatible, Hidden) MarkerSupport
 
             style = {"Marker", this.Marker, ...
                 "MarkerSize", this.MarkerSize, ...
-                "MarkerFaceColor", this.MarkerFace};
+                "MarkerEdgeColor", this.MarkerColor, ...
+                "MarkerFaceColor", this.MarkerColor};
         end
     end
 
@@ -36,7 +37,7 @@ classdef (Abstract, HandleCompatible, Hidden) MarkerSupport
                 set(graph(i), ...
                     Marker = this.Marker, ...
                     MarkerSize = this.MarkerSize, ...
-                    MarkerFaceColor = this.MarkerFace);
+                    MarkerFaceColor = this.MarkerColor);
             end
         end
     end

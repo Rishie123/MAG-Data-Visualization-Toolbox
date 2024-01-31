@@ -3,7 +3,7 @@ classdef (Abstract, HandleCompatible, Hidden) ColorSupport
 
     properties
         % COLORS Colors used for different lines in same plot.
-        Colors (:, 3) double = double.empty(0, 3)
+        Colors {mag.graphics.mixin.mustBeColor} = double.empty(0, 3)
     end
 
     methods (Access = protected)

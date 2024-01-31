@@ -1,5 +1,5 @@
-classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
-% AUTOMATEDANALYSIS Automate analysis of a CPT or SFT folder.
+classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
+% IMAPTESTINGANALYSIS Automate analysis of an IMAP CPT or SFT folder.
 
     properties (Constant, Hidden)
         % VERSION Version number.
@@ -36,12 +36,10 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         ScienceProcessing (1, :) mag.process.Step = [
             mag.process.Filter(OnRangeChange = [seconds(1), seconds(1)]), ...
             mag.process.Range(), ...
-            mag.process.Calibration(), ...
-            mag.process.Magnitude()]
+            mag.process.Calibration()]
         % RAMPPROCESSING Steps needed to process only ramp mode data.
         RampProcessing (1, :) mag.process.Step = [ ...
             mag.process.Unwrap(Variables = ["x", "y", "z"]), ...
-            mag.process.Derivative(Variables = ["x", "y", "z"]), ...
             mag.process.Ramp()]
         % HKPROCESSING Steps needed to process imported HK data.
         HKProcessing (1, :) mag.process.Step = [ ...
@@ -89,11 +87,11 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % START Start automated analysis with options.
 
             arguments
-                options.?mag.AutomatedAnalysis
+                options.?mag.IMAPTestingAnalysis
             end
 
             args = namedargs2cell(options);
-            analysis = mag.AutomatedAnalysis(args{:});
+            analysis = mag.IMAPTestingAnalysis(args{:});
 
             analysis.detect();
             analysis.load();
@@ -102,10 +100,10 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
     methods
 
-        function this = AutomatedAnalysis(options)
+        function this = IMAPTestingAnalysis(options)
 
             arguments
-                options.?mag.AutomatedAnalysis
+                options.?mag.IMAPTestingAnalysis
             end
 
             this.assignProperties(options);
@@ -421,7 +419,7 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         function loadedObject = loadobj(object)
         % LOADOBJ Override default loading from MAT file.
 
-            if isa(object, "mag.AutomatedAnalysis")
+            if isa(object, "mag.IMAPTestingAnalysis")
                 loadedObject = object;
             elseif isa(object, "struct")
 
@@ -448,11 +446,11 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                         loadedObject.(mapping(k)) = object.(k);
                     end
 
-                    loadedObject = mag.AutomatedAnalysis.loadobj(loadedObject);
+                    loadedObject = mag.IMAPTestingAnalysis.loadobj(loadedObject);
                 elseif isfield(object, "PrimaryRamp")
 
                     % Convert object directly to version 3.0.
-                    loadedObject = mag.AutomatedAnalysis();
+                    loadedObject = mag.IMAPTestingAnalysis();
                     loadedObject.Results = mag.Instrument();
 
                     for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
@@ -468,7 +466,7 @@ classdef (Sealed) AutomatedAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                     end
                 end
             else
-                error("Cannot retrieve ""mag.AutomatedAnalysis"" from ""%s"".", class(object));
+                error("Cannot retrieve ""mag.IMAPTestingAnalysis"" from ""%s"".", class(object));
             end
         end
     end

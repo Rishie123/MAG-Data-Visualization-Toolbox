@@ -3,7 +3,7 @@ classdef tComputeMagnitude < MAGAnalysisTestCase
 
     properties (TestParameter)
         Vector = {[0, 0, 0], [-1, -2, 3], [1, 2, 3; 4, 5, -6]}
-        Magnitude = {0, sqrt(1 + 4 + 9), [sqrt(1 + 4 + 9); sqrt(16 + 25 + 36)]}
+        Magnitude = {0, vecnorm([-1, -2, 3], 2, 2), vecnorm([1, 2, 3; 4, 5, -6], 2, 2)}
     end
 
     methods (Test, ParameterCombination = "sequential")

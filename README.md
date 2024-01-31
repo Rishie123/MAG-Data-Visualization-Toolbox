@@ -24,7 +24,7 @@ TBD
 
 ### App
 
-The `DataVisualization` app provides an interface to the `mag.AutomatedAnalysis` object. It can be used for quick visualization of data collected during an AT, CPT or SFT. 
+The `DataVisualization` app provides an interface to the `mag.IMAPTestingAnalysis` object. It can be used for quick visualization of data collected during an AT, CPT or SFT. 
 
 ## Development
 

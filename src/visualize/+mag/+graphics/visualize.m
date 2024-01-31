@@ -59,7 +59,7 @@ function axes = doVisualize(t, data, styles)
 
     arguments (Input)
         t (1, 1) matlab.graphics.layout.TiledChartLayout
-        data {mustBeA(data, ["mag.Data", "table", "timetable"])}
+        data {mustBeA(data, ["mag.Data", "tabular"])}
         styles (1, :) mag.graphics.style.Axes
     end
 

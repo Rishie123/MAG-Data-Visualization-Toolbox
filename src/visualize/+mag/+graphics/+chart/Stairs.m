@@ -21,7 +21,7 @@ classdef Stairs < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & m
 
             arguments (Input)
                 this
-                data tabular
+                data {mustBeA(data, ["mag.Data", "tabular"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -30,15 +30,11 @@ classdef Stairs < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & m
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            filteredData = this.filterData(data);
+            xData = this.getXData(data);
+            yData = this.getYData(data);
 
-            options = [{"LineStyle", this.LineStyle}, this.MarkerStyle(:)'];
-
-            if isempty(this.XVariable)
-                graph = stairs(axes, filteredData, this.YVariables, options{:});
-            else
-                graph = stairs(axes, filteredData{:, this.XVariable}, filteredData{:, this.YVariables}, options{:});
-            end
+            graph = stairs(axes, xData, yData, this.MarkerStyle{:}, ...
+                LineStyle = this.LineStyle);
 
             this.applyColorStyle(graph);
         end

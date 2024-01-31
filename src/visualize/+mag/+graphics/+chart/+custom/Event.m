@@ -18,7 +18,6 @@ classdef Event < mag.graphics.chart.Chart
 
             arguments
                 options.?mag.graphics.chart.custom.Event
-                options.Filters (1, :) logical
             end
 
             this.assignProperties(options);
@@ -28,13 +27,17 @@ classdef Event < mag.graphics.chart.Chart
 
             arguments (Input)
                 this
-                data timetable
+                data {mustBeA(data, ["mag.TimeSeries", "timetable"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
 
             arguments (Output)
                 graph (1, :) matlab.graphics.Graphics
+            end
+
+            if isa(data, "mag.TimeSeries")
+                data = data.Data;
             end
 
             hold(axes, "on");
@@ -55,20 +58,12 @@ classdef Event < mag.graphics.chart.Chart
                 interestingEvents(locCombine, :) = [];
             end
 
-            if ~isempty(this.Filters)
-
-                filteredTime = data.(data.Properties.DimensionNames{1})(this.Filters);
-                interestingEvents = interestingEvents(timerange(filteredTime(1) - seconds(2.5), filteredTime(end), "closed"), :);
-            else
-                filteredTime = data.(data.Properties.DimensionNames{1});
-            end
-
             time = interestingEvents.Time;
             variable = interestingEvents.(this.EventOfInterest);
 
             plotTime = repmat(datetime("now", TimeZone = "UTC"), 2 * numel(time), 1);
             plotTime(1:2:end) = time;
-            plotTime(2:2:end) = [time(2:end); filteredTime(end)];
+            plotTime(2:2:end) = [time(2:end); data.(data.Properties.DimensionNames{1})(end)];
             plotTime = reshape(plotTime, 2, []);
 
             plotVariable = zeros(2 * numel(variable), 1);

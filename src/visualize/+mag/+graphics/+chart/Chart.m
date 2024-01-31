@@ -6,8 +6,6 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
         XVariable string {mustBeScalarOrEmpty}
         % YVARIABLES Name of variables plotted on y-axis.
         YVariables (1, :) string
-        % FILTERS Filter x- and y-axis variables.
-        Filters logical = logical.empty()
     end
 
     methods (Abstract)
@@ -18,38 +16,50 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
     methods (Access = protected)
 
-        function filteredData = filterData(this, data)
-        % FILTERDATA Filter data based on specified filter.
+        function xData = getXData(this, data)
+        % GETXDATA Retrieve x-axis data, based on selected variable name.
+        % If no name is provided, use independent variable.
 
-            if isempty(this.Filters)
+            arguments
+                this
+                data {mustBeA(data, ["mag.Data", "tabular"])}
+            end
 
-                % No filtering.
-                filteredData = data;
-            elseif (size(this.Filters, 2) == 1) && (numel(this.YVariables) >= 1)
+            if isempty(this.XVariable)
 
-                % Same filtering for each y-axis variable.
-                filteredData = data(this.Filters, :);
-            elseif (size(this.Filters, 2) == numel(this.YVariables))
-
-                % Different filtering for each y-axis variable.
-                filteredData = cell(1, numel(this.YVariables));
-
-                for i = 1:numel(this.YVariables)
-                    filteredData{i} = data(this.Filters(:, i), :);
+                if isa(data, "tabular")
+                    xData = data.(data.Properties.DimensionNames{1});
+                else
+                    xData = data.IndependentVariable;
                 end
             else
-                error("Mismatch between filter and y-axis variable selection.");
+                xData = data.(this.XVariable);
             end
         end
 
-        function xData = getXData(this, data)
-        % GETXDATA Retrieve x-axis data, based on selected variable name.
-        % If no name is provided, use time.
+        function yData = getYData(this, data)
+        % GETYDATA Retrieve y-axis data, based on selected variable names.
+        % If no name is provided, use dependent variables.
 
-            if isempty(this.XVariable)
-                xData = data.(data.Properties.DimensionNames{1});
+            arguments
+                this
+                data {mustBeA(data, ["mag.Data", "tabular"])}
+            end
+
+            if isempty(this.YVariables)
+
+                if isa(data, "tabular")
+                    yData = data.(data.Properties.DimensionNames{2});
+                else
+                    yData = data.DependentVariables;
+                end
             else
-                xData = data.(this.XVariable);
+
+                if isa(data, "tabular")
+                    yData = data{:, this.YVariables};
+                else
+                    yData = data.get(this.YVariables);
+                end
             end
         end
     end

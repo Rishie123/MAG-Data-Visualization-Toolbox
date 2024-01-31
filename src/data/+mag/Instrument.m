@@ -69,7 +69,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % GETSENSOR Return name of primary or secondary sensor.
 
             arguments (Input)
-                this
+                this (1, 1) mag.Instrument
                 primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])} = "Primary"
             end
 
@@ -95,7 +95,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % secondary science.
 
             arguments
-                this
+                this (1, 1) mag.Instrument
                 primaryFilter
                 secondaryFilter = primaryFilter
             end
@@ -109,30 +109,13 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % filters.
 
             arguments
-                this
+                this (1, 1) mag.Instrument
                 primaryFilter (1, 1) {mustBeA(primaryFilter, ["duration", "timerange", "withtol"])}
                 secondaryFilter (1, 1) {mustBeA(secondaryFilter, ["duration", "timerange", "withtol"])} = primaryFilter
             end
 
-            if isa(primaryFilter, "duration")
-
-                primaryPeriod = timerange(this.Primary.Time(1) + primaryFilter, this.Primary.Time(end), "openleft");
-                secondaryPeriod = timerange(this.Secondary.Time(1) + secondaryFilter, this.Secondary.Time(end), "openleft");
-            elseif isa(primaryFilter, "timerange") || isa(primaryFilter, "withtol")
-                [primaryPeriod, secondaryPeriod] = deal(primaryFilter, secondaryFilter);
-            end
-
-            this.Primary.Data = this.Primary.Data(primaryPeriod, :);
-
-            if ~isempty(this.Primary.Data.Properties.Events)
-                this.Primary.Data.Properties.Events = this.Primary.Data.Properties.Events(primaryPeriod, :);
-            end
-
-            this.Secondary.Data = this.Secondary.Data(secondaryPeriod, :);
-
-            if ~isempty(this.Secondary.Data.Properties.Events)
-                this.Secondary.Data.Properties.Events = this.Secondary.Data.Properties.Events(secondaryPeriod, :);
-            end
+            this.Primary.crop(primaryFilter);
+            this.Secondary.crop(secondaryFilter);
         end
 
         function cropDataBasedOnScience(this)
@@ -147,21 +130,17 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             end
 
             % Filter HK.
-            for i = 1:numel(this.HK)
-                this.HK(i).Data = this.HK(i).Data(timerange(timeRange(1), timeRange(2), "closed"), :);
-            end
+            this.HK.crop(timerange(timeRange(1), timeRange(2), "closed"));
 
             % Adjust meta data.
             this.MetaData.Timestamp = timeRange(1);
-            this.Primary.MetaData.Timestamp = timeRange(1);
-            this.Secondary.MetaData.Timestamp = timeRange(1);
         end
 
         function resample(this, targetFrequency)
         % RESAMPLE Resample science and HK data to the specified frequency.
 
             arguments
-                this
+                this (1, 1) mag.Instrument
                 targetFrequency (1, 1) double
             end
 
@@ -178,7 +157,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         % frequency.
 
             arguments
-                this
+                this (1, 1) mag.Instrument
                 targetFrequency (1, 1) double
             end
 

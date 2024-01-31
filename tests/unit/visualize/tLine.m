@@ -1,4 +1,4 @@
-classdef tLine < MAGVisualizationTestCase
+classdef tLine < PropertiesTestCase & ColorSupportTestCase
 % TLINE Unit tests for "mag.graphics.chart.Line" class.
 
     properties (Constant)

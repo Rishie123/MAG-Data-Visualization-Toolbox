@@ -21,6 +21,8 @@ classdef Science < mag.meta.Data
         % PACKETFREQUENCY Frequency of packets (how often packets are
         % received).
         PacketFrequency (1, 1) double = NaN
+        % REFERENCEFRAME Reference frame of magnetic field data.
+        ReferenceFrame string {mustBeScalarOrEmpty} = string.empty()
     end
 
     methods

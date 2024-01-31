@@ -1,4 +1,4 @@
-classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag.graphics.mixin.MarkerSupport
+classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.MarkerSupport
 % SCATTER Definition of chart of "scatter" type.
 
     methods
@@ -18,7 +18,7 @@ classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & 
 
             arguments (Input)
                 this
-                data tabular
+                data {mustBeA(data, ["mag.Data", "tabular"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -27,16 +27,13 @@ classdef Scatter < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & 
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            filteredData = this.filterData(data);
-            xData = this.getXData(filteredData);
+            xData = this.getXData(data);
+            yData = this.getYData(data);
 
             options = this.MarkerStyle;
             options(1:2:end) = cellstr(replace([options{1:2:end}], "MarkerSize", "SizeData"));
 
-            graph = scatter(axes, xData, filteredData{:, this.YVariables}, ...
-                options{:});
-
-            this.applyColorStyle(graph, "MarkerEdgeColor");
+            graph = scatter(axes, xData, yData, options{:});
         end
     end
 end

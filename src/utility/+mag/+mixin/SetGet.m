@@ -4,6 +4,8 @@ classdef (Abstract) SetGet < matlab.mixin.SetGetExactNames
     methods (Sealed)
 
         function set(this, varargin)
+        % SET Customize setting property values. The method also accepts a
+        % struct of properties.
 
             if (nargin() == 2) && isstruct(varargin{1})
                 args = namedargs2cell(varargin{1});
@@ -12,7 +14,7 @@ classdef (Abstract) SetGet < matlab.mixin.SetGetExactNames
             end
 
             if ~isempty(args)
-                set@matlab.mixin.SetGet(this, args{:});
+                set@matlab.mixin.SetGetExactNames(this, args{:});
             end
         end
     end

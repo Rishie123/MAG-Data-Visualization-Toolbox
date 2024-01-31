@@ -1,4 +1,4 @@
-classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
+classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 % SCIENCE Class containing MAG science data.
 
     properties (Dependent)
@@ -12,6 +12,12 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         XYZ (:, 3) double
         % B Magnitude of the magnetic field.
         B (:, 1) double
+        % DX x-axis derivative of the magnetic field.
+        dX (:, 1) double
+        % DY y-axis derivative of the magnetic field.
+        dY (:, 1) double
+        % DZ z-axis derivative of the magnetic field.
+        dZ (:, 1) double
         % RANGE Range values of sensor.
         Range (:, 1) uint8
         % SEQUENCE Sequence number of vectors.
@@ -50,7 +56,19 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function b = get.B(this)
-            b = this.Data.B;
+            b = vecnorm(this.XYZ, 2, 2);
+        end
+
+        function dx = get.dX(this)
+            dx = [diff(this.X); missing()];
+        end
+
+        function dy = get.dY(this)
+            dy = [diff(this.Y); missing()];
+        end
+
+        function dz = get.dZ(this)
+            dz = [diff(this.Z); missing()];
         end
 
         function range = get.Range(this)
@@ -65,14 +83,53 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             events = this.Data.Properties.Events;
         end
 
+        function crop(this, timeFilter)
+
+            arguments
+                this (1, 1) mag.Science
+                timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
+            end
+
+            if isa(timeFilter, "duration")
+                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
+            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
+                timePeriod = timeFilter;
+            end
+
+            this.Data = this.Data(timePeriod, :);
+
+            if ~isempty(this.Data.Properties.Events)
+                this.Data.Properties.Events = this.Data.Properties.Events(timePeriod, :);
+            end
+
+            this.MetaData.Timestamp = this.Time(1);
+        end
+
         function resample(this, targetFrequency)
 
             arguments
-                this
+                this (1, 1) mag.Science
                 targetFrequency (1, 1) double
             end
 
-            xyz = resample(this.Data(:, ["x", "y", "z"]), targetFrequency);
+            actualFrequency = 1 / seconds(mode(this.dT));
+            
+            if actualFrequency > targetFrequency
+
+                numerator = 1;
+                denominator = actualFrequency / targetFrequency;
+            else
+
+                numerator = targetFrequency / actualFrequency;
+                denominator = 1;
+            end
+
+            if (round(numerator) ~= numerator) || (round(denominator) ~= denominator)
+                error("Calculated numerator (%.3f) and denominator (%.3f) must be integers.", numerator, denominator);
+            end
+
+            xyz = resample(this.Data(:, ["x", "y", "z"]), numerator, denominator);
+            xyz = xyz(timerange(this.Time(1), this.Time(end), "closed"), :);
 
             resampledData = retime(this.Data, xyz.Time, "nearest");
             resampledData(:, ["x", "y", "z"]) = xyz;
@@ -84,11 +141,11 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         function downsample(this, targetFrequency)
 
             arguments
-                this
+                this (1, 1) mag.Science
                 targetFrequency (1, 1) double
             end
 
-            actualFrequency = 1 / mode(seconds(diff(this.Time)));
+            actualFrequency = 1 / seconds(mode(this.dT));
             decimationFactor = actualFrequency / targetFrequency;
 
             if round(decimationFactor) ~= decimationFactor
@@ -109,7 +166,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         % pair, or filter object.
 
             arguments
-                this
+                this (1, 1) mag.Science
                 numeratorOrFilter (1, :) {mustBeA(numeratorOrFilter, ["double", "digitalFilter"])}
                 denominator (1, :) double = double.empty()
             end
@@ -124,13 +181,17 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             this.Data{:, ["x", "y", "z"]} = filter(arguments{:}, this.XYZ);
 
-            if isa(numeratorOrFilter, "double")
-                coefficients = numel(numeratorOrFilter);
+            if isa(numeratorOrFilter, "digitalFilter")
+                numCoefficients = numel(numeratorOrFilter.Coefficients);
             else
-                coefficients = numel(numeratorOrFilter.Coefficients);
+                numCoefficients = numel(numeratorOrFilter);
             end
 
-            this.Data{1:coefficients, ["x", "y", "z"]} = [];
+            if numCoefficients > height(this.Data)
+                numCoefficients = height(this.Data);
+            end
+
+            this.Data{1:numCoefficients, ["x", "y", "z"]} = missing();
         end
 
         function data = computePSD(this, options)
@@ -146,7 +207,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             arguments (Output)
-                data (1, 1) mag.Result
+                data (1, 1) mag.PSD
             end
 
             % Filter out data.
@@ -171,8 +232,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             [psd, f] = psdtsh(this.Data{locFilter, ["x", "y", "z"]}, dt, options.FFTType, options.NW);
             psd = psd .^ 0.5;
 
-            magnitude = sqrt(sum(psd.^2, 2));
-            data = mag.Result(table(f, psd(:, 1), psd(:, 2), psd(:, 3), magnitude, VariableNames = ["f", "x", "y", "z", "B"]));
+            data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", "x", "y", "z"]));
         end
     end
 
