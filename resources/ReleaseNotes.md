@@ -1,23 +1,5 @@
-# App
-
-- Fix issue with default patterns on some computers
-
 # Software
 
-- Add separate classes for each specific HK type
-- Add reference frame to science meta data
-- Make `crop` a method of `mag.TimeSeries`
-- Make magnitude and derivatives dependent properties of `mag.Science`
-- Customize `get` method of `mag.Data` to accept multiple property names
-- Allow charts to have `mag.Data` as input
-- Rename `mag.AutomatedAnalysis` to `mag.IMAPTestingAnalysis`
-- Rename `mag.Result` to `mag.PSD`
-- Remove support for `Filters` in charts
-- Remove implicit conversion methods for `table`, `timetable` and `tabular`
-- Fix issues with setting colors in charts
-- Add tests for `mag.Data`, `mag.Science` and `mag.HK`
-- Add tests for `mag.graphics.chart.Area`, `mag.graphics.chart.Scatter`, `mag.graphics.chart.Stairs` and `mag.graphics.chart.Stem` plots
-
-# GitHub Workflows
-
-- Update dependencies to latest versions
+- Replace last element of file with `missing` to improve plot where data is missing
+- Fix issue with consecutive events of the same type missing a completion message
+- Fix issue when cropping data and no timestamps are selected

@@ -102,7 +102,9 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 this.Data.Properties.Events = this.Data.Properties.Events(timePeriod, :);
             end
 
-            this.MetaData.Timestamp = this.Time(1);
+            if ~isempty(this.Time)
+                this.MetaData.Timestamp = this.Time(1);
+            end
         end
 
         function resample(this, targetFrequency)

@@ -400,16 +400,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 return;
             end
 
-            result.Primary.Data = result.Primary.Data(primaryPeriod, :);
-            result.Primary.Data.Properties.Events = result.Primary.Data.Properties.Events(primaryPeriod, :);
-
-            result.Secondary.Data = result.Secondary.Data(secondaryPeriod, :);
-            result.Secondary.Data.Properties.Events = result.Secondary.Data.Properties.Events(secondaryPeriod, :);
+            result.crop(primaryPeriod, secondaryPeriod);
 
             if isempty(result.Primary.Data) || isempty(result.Secondary.Data)
                 result = mag.Instrument.empty();
-            else
-                result.cropDataBasedOnScience();
             end
         end
     end
