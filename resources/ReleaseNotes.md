@@ -10,3 +10,4 @@
 - Reintroduce filtering for charts
 - Fix issue with consecutive events of the same type missing a completion message
 - Fix issue when cropping data and no timestamps are selected
+- Fix issue with `mag.graphics.chart.Stem` not showing markers
