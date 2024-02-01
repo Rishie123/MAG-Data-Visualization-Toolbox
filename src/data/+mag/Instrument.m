@@ -47,7 +47,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function value = get.HasScience(this)
-            value = ~isempty(this.Primary) && ~isempty(this.Secondary);
+
+            value = ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
+                ~isempty(this.Primary.Data) && ~isempty(this.Secondary.Data);
         end
 
         function value = get.HasHK(this)
