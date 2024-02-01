@@ -180,6 +180,44 @@ classdef tScience < matlab.unittest.TestCase
             testCase.assertSize(downsampledData.DependentVariables, size(data.DependentVariables), "Filtering should not affect size.");
             testCase.verifyTrue(all(ismissing(downsampledData.XYZ), "all"), "All data should be replaced with missing values to account for filter warm-up.");
         end
+
+        % Test that "replace" method replaces data with default filler.
+        function replaceMethod_default(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            % Exercise.
+            modifiedData = data.copy();
+            modifiedData.replace(minutes(3));
+
+            % Verify.
+            testCase.assertSize(modifiedData.IndependentVariable, size(data.Time), "Time should not be modified.");
+            testCase.verifyEqual(modifiedData.Time, data.Time, "Time should not be modified.");
+
+            testCase.assertSize(modifiedData.DependentVariables, size(data.DependentVariables), "Data size should not change.");
+            testCase.verifyTrue(all(ismissing(modifiedData.XYZ(1:4, :)), "all"), "Data within filter should be replaced.");
+            testCase.verifyEqual(modifiedData.DependentVariables(5:end, :), data.DependentVariables(5:end, :), "Only data within filter should be replaced.");
+        end
+
+        % Test that "replace" method replaces data with default filler.
+        function replaceMethod_specified(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            % Exercise.
+            modifiedData = data.copy();
+            modifiedData.replace(minutes(3), 0);
+
+            % Verify.
+            testCase.assertSize(modifiedData.IndependentVariable, size(data.Time), "Time should not be modified.");
+            testCase.verifyEqual(modifiedData.Time, data.Time, "Time should not be modified.");
+
+            testCase.assertSize(modifiedData.DependentVariables, size(data.DependentVariables), "Data size should not change.");
+            testCase.verifyEqual(modifiedData.XYZ(1:4, :), zeros(4, 3), "Data within filter should be replaced.");
+            testCase.verifyEqual(modifiedData.DependentVariables(5:end, :), data.DependentVariables(5:end, :), "Only data within filter should be replaced.");
+        end
     end
 
     methods (Access = private)

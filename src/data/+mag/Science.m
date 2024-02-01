@@ -90,7 +90,11 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
             end
 
-            timePeriod = this.convertToTimePeriod(timeFilter);
+            if isa(timeFilter, "duration")
+                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
+            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
+                timePeriod = timeFilter;
+            end
 
             this.Data = this.Data(timePeriod, :);
 
@@ -204,7 +208,12 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 filler (1, 1) double = missing()
             end
 
-            timePeriod = this.convertToTimePeriod(timeFilter);
+            if isa(timeFilter, "duration")
+                timePeriod = timerange(this.Time(1), this.Time(1) + timeFilter, "closed");
+            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
+                timePeriod = timeFilter;
+            end
+
             this.Data{timePeriod, ["x", "y", "z"]} = filler;
         end
 
@@ -270,18 +279,6 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 header = ['  ', className, tag, ' with properties:'];
             else
                 header = getHeader@matlab.mixin.CustomDisplay(this);
-            end
-        end
-    end
-
-    methods (Static, Access = private)
-
-        function timePeriod = convertToTimePeriod(timeFilter)
-
-            if isa(timeFilter, "duration")
-                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
-            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
-                timePeriod = timeFilter;
             end
         end
     end
