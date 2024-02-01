@@ -3,6 +3,19 @@ classdef tScience < matlab.unittest.TestCase
 
     methods (Test)
 
+        % Test that magnetic field magnitude is computed correctly.
+        function magnitude(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            % Exercise.
+            magnitude = data.B;
+
+            % Verify.
+            testCase.verifyEqual(magnitude, sqrt(sum([data.X.^2, data.Y.^2, data.Z.^2], 2)), "Magnitude should have expected values.");
+        end
+
         % Test that "crop" method crops data based on a "duration" object.
         function cropMethod_duration(testCase)
 
