@@ -288,7 +288,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
             rampMode.Secondary = this.SecondaryRamp;
 
             if rampMode.HasScience
-                rampMode.cropDataBasedOnScience();
+                rampMode.cropToMatch();
             else
                 rampMode = mag.Instrument.empty();
             end
