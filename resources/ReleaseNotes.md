@@ -1,3 +1,8 @@
+# App
+
+- Fix issue when event, meta data and HK patterns are empty
+- Fix issue with closing invalid figures
+
 # Software
 
 - Replace last element of file with `missing` to improve plot where data is missing
