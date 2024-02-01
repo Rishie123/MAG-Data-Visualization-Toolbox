@@ -92,6 +92,20 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             sensor = supportedSensors(locSelected);
         end
 
+        function fillWarmUp(this, timePeriod, filler)
+        % FILLWARMUP Replace beginning of science mode with filler
+        % variable.
+
+            arguments
+                this (1, 1) mag.Instrument
+                timePeriod (1, 1) duration = minutes(1)
+                filler (1, 1) double = missing()
+            end
+
+            this.Primary.replace(timePeriod, filler);
+            this.Secondary.replace(timePeriod, filler);
+        end
+
         function crop(this, primaryFilter, secondaryFilter)
         % CROP Crop data based on selected filters for primary and
         % secondary science.

@@ -5,6 +5,8 @@
 
 # Software
 
+- Add method to `mag.Instrument` to fill warm-up with `missing` data
+- Add method to `mag.Science` to replace periods with a filler variable
 - Replace last element of file with `missing` to improve plot where data is missing
 - Science object with no data is considered empty in `mag.Instrument`
 - Reintroduce filtering for charts

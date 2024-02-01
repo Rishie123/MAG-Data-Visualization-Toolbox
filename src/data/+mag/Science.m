@@ -90,11 +90,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
             end
 
-            if isa(timeFilter, "duration")
-                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
-            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
-                timePeriod = timeFilter;
-            end
+            timePeriod = this.convertToTimePeriod(timeFilter);
 
             this.Data = this.Data(timePeriod, :);
 
@@ -198,6 +194,20 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             this.Data{1:numCoefficients, ["x", "y", "z"]} = missing();
         end
 
+        function replace(this, timeFilter, filler)
+        % REPLACE Replace length of data specified by time filter with
+        % filler variable.
+
+            arguments
+                this (1, 1) mag.Science
+                timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
+                filler (1, 1) double = missing()
+            end
+
+            timePeriod = this.convertToTimePeriod(timeFilter);
+            this.Data{timePeriod, ["x", "y", "z"]} = filler;
+        end
+
         function data = computePSD(this, options)
         % COMPUTEPSD Compute the power spectral density of the magnetic
         % field measurements.
@@ -260,6 +270,18 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 header = ['  ', className, tag, ' with properties:'];
             else
                 header = getHeader@matlab.mixin.CustomDisplay(this);
+            end
+        end
+    end
+
+    methods (Static, Access = private)
+
+        function timePeriod = convertToTimePeriod(timeFilter)
+
+            if isa(timeFilter, "duration")
+                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
+            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
+                timePeriod = timeFilter;
             end
         end
     end
