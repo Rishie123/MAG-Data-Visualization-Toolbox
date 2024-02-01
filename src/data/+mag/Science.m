@@ -102,7 +102,9 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 this.Data.Properties.Events = this.Data.Properties.Events(timePeriod, :);
             end
 
-            if ~isempty(this.Time)
+            if isempty(this.Time)
+                this.MetaData.Timestamp = NaT(TimeZone = mag.process.DateTime.TimeZone);
+            else
                 this.MetaData.Timestamp = this.Time(1);
             end
         end

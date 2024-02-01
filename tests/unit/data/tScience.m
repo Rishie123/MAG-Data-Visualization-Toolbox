@@ -63,6 +63,22 @@ classdef tScience < matlab.unittest.TestCase
             testCase.verifyEqual(data.Events.Time, data.Time, "Data should be cropped as expected.");
         end
 
+        % Test that "crop" method does not fail when no data is selected.
+        function cropMethod_noSelection(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            % Exercise.
+            data.crop(timerange(datetime("Inf", TimeZone = "local"), datetime("-Inf", TimeZone = "local")));
+
+            % Verify.
+            testCase.verifyEmpty(data.IndependentVariable, "All data should be cropped out.");
+            testCase.verifyEmpty(data.DependentVariables, "All data should be cropped out.");
+
+            testCase.verifyTrue(ismissing(data.MetaData.Timestamp), "All data should be cropped out.");
+        end
+
         % Test that "resample" method can resample to a lower frequency.
         function resampleMethod_lowerFrequency(testCase)
 
@@ -189,7 +205,7 @@ classdef tScience < matlab.unittest.TestCase
         function [data, rawData] = createTestData()
 
             rawData = timetable(datetime("now", TimeZone = "UTC") + minutes(1:10)', (1:10)', (11:20)', (21:30)', 3 * ones(10, 1), (1:10)', VariableNames = ["x", "y", "z", "range", "sequence"]);
-            data = mag.Science(rawData, mag.meta.Science());
+            data = mag.Science(rawData, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC")));
         end
     end
 end

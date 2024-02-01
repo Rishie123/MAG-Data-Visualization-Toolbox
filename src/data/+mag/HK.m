@@ -52,7 +52,9 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
 
                 this(i).Data = this(i).Data(timeFilter, :);
 
-                if ~isempty(this(i).Time)
+                if isempty(this(i).Time)
+                    this(i).MetaData.Timestamp = NaT(TimeZone = mag.process.DateTime.TimeZone);
+                else
                     this(i).MetaData.Timestamp = this(i).Time(1);
                 end
             end

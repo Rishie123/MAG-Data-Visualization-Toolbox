@@ -18,6 +18,25 @@ classdef tHK < matlab.unittest.TestCase
             testCase.cropAndVerify(data, timeFilter, expectedTimes, expectedData);
         end
 
+        % Test that "crop" method does not fail when no data is selected.
+        function cropMethod_noSelection(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            % Exercise.
+            data.crop(timerange(datetime("Inf", TimeZone = "local"), datetime("-Inf", TimeZone = "local")));
+
+            % Verify.
+            for i = 1:numel(data)
+
+                testCase.verifyEmpty(data(i).IndependentVariable, "All data should be cropped out.");
+                testCase.verifyEmpty(data(i).DependentVariables, "All data should be cropped out.");
+
+                testCase.verifyTrue(ismissing(data(i).MetaData.Timestamp), "All data should be cropped out.");
+            end
+        end
+
         % Test that "resample" method can resample to a higher frequency.
         function resampleMethod_higherFrequency(testCase)
 
