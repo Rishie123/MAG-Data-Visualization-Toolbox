@@ -1,6 +1,10 @@
 classdef tHK < matlab.unittest.TestCase
 % THK Unit tests for "mag.HK" class.
 
+    properties (TestParameter)
+        HKTypes = {"SID15", "Processor", "Power", "Status"}
+    end
+
     methods (Test)
 
         % Test that "crop" method crops data based on a "timerange" object.
@@ -88,6 +92,27 @@ classdef tHK < matlab.unittest.TestCase
 
             % Verify.
             testCase.verifyClass(hk, "mag.hk.Processor", "Correct type should be returned.");
+        end
+
+        % Test that all dependent properties of the HK types supported can
+        % be accessed.
+        function dependentProperties(~, HKTypes)
+
+            % Set up.
+            fileName = fullfile(fileparts(mfilename("fullpath")), "../../data", HKTypes + ".csv");
+
+            data = readtimetable(fileName);
+            data.Properties.DimensionNames{1} = 't';
+
+            metaClass = meta.class.fromName("mag.hk." + HKTypes);
+            properties = metaClass.PropertyList;
+
+            % Exercise and verify.
+            data = mag.hk.(HKTypes)(data, mag.meta.HK());
+
+            for p = properties([properties.Dependent] & cellfun(@(x) isequal(x, "public"), {properties.GetAccess}))'
+                data.(p.Name);
+            end
         end
     end
 
