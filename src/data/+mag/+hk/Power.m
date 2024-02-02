@@ -1,4 +1,4 @@
-classdef (Sealed) Power < mag.HK
+classdef Power < mag.HK
 % POWER Class containing MAG power HK packet data.
 
     properties (Dependent)

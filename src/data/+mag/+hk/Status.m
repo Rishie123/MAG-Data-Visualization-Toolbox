@@ -1,4 +1,4 @@
-classdef (Sealed) Status < mag.HK
+classdef Status < mag.HK
 % STATUS Class containing MAG status HK packet data.
 
     properties (Dependent)

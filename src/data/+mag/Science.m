@@ -1,4 +1,4 @@
-classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
+classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 % SCIENCE Class containing MAG science data.
 
     properties (Dependent)
