@@ -11,6 +11,7 @@
 - Science object with no data is considered empty in `mag.Instrument`
 - Reintroduce filtering for charts
 - Rename `cropDataBasedOnScience` to `cropToMatch`
+- Make sure derivative is empty when data is empty
 - Fix issue with consecutive events of the same type missing a completion message
 - Fix issue when cropping data and no timestamps are selected
 - Fix issue with `mag.graphics.chart.Stem` not showing markers

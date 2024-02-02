@@ -60,15 +60,15 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function dx = get.dX(this)
-            dx = [diff(this.X); missing()];
+            dx = this.computeDerivative(this.X);
         end
 
         function dy = get.dY(this)
-            dy = [diff(this.Y); missing()];
+            dy = this.computeDerivative(this.Y);
         end
 
         function dz = get.dZ(this)
-            dz = [diff(this.Z); missing()];
+            dz = this.computeDerivative(this.Z);
         end
 
         function range = get.Range(this)

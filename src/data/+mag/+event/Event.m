@@ -36,13 +36,13 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
     methods (Hidden, Sealed)
 
-        function tableThis = timetable(this)
+        function timetableThis = timetable(this)
         % TIMETABLE Convert events to timetable.
 
             emptyTime = datetime.empty();
             emptyTime.TimeZone = "UTC";
 
-            tableThis = struct2table(struct(Time = emptyTime, ...
+            timetableThis = struct2table(struct(Time = emptyTime, ...
                 Mode = double.empty(0, 1), ...
                 PrimaryRate = double.empty(0, 1), ...
                 SecondaryRate = double.empty(0, 1), ...
@@ -51,21 +51,21 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
                 Range = double.empty(0, 1), ...
                 Sensor = string.empty(0, 1), ...
                 Label = string.empty(0, 1)));
-            tableThis = table2timetable(tableThis, RowTimes = "Time");
+            timetableThis = table2timetable(timetableThis, RowTimes = "Time");
 
             for t = 1:numel(this)
 
                 tt = this(t).convertToTimeTable();
-                tableThis = outerjoin(tableThis, tt, MergeKeys = true, Keys = ["Time", intersect(tableThis.Properties.VariableNames, tt.Properties.VariableNames)]);
+                timetableThis = outerjoin(timetableThis, tt, MergeKeys = true, Keys = ["Time", intersect(timetableThis.Properties.VariableNames, tt.Properties.VariableNames)]);
             end
 
-            tableThis = sortrows(tableThis);
+            timetableThis = sortrows(timetableThis);
 
-            fillVariables = intersect(["Mode", "PrimaryRate", "SecondaryRate", "PacketFrequency", "Range"], tableThis.Properties.VariableNames);
-            tableThis(:, fillVariables) = fillmissing(tableThis(:, fillVariables), "previous");
+            fillVariables = intersect(["Mode", "PrimaryRate", "SecondaryRate", "PacketFrequency", "Range"], timetableThis.Properties.VariableNames);
+            timetableThis(:, fillVariables) = fillmissing(timetableThis(:, fillVariables), "previous");
 
-            tableThis{contains(tableThis.Label, "Config"), ["PrimaryRate", "SecondaryRate", "PacketFrequency", "Duration"]} = missing();
-            tableThis{contains(tableThis.Label, "Ramp"), "Range"} = missing();
+            timetableThis{contains(timetableThis.Label, "Config"), ["PrimaryRate", "SecondaryRate", "PacketFrequency", "Duration"]} = missing();
+            timetableThis{contains(timetableThis.Label, "Ramp"), "Range"} = missing();
         end
     end
 

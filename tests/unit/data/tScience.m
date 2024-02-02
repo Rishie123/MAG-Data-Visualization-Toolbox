@@ -1,6 +1,10 @@
 classdef tScience < matlab.unittest.TestCase
 % TSCIENCE Unit tests for "mag.Science" class.
 
+    properties (TestParameter)
+        DerivativeVariable = {"dX", "dY", "dZ"}
+    end
+
     methods (Test)
 
         % Test that magnetic field magnitude is computed correctly.
@@ -9,11 +13,44 @@ classdef tScience < matlab.unittest.TestCase
             % Set up.
             data = testCase.createTestData();
 
+            expectedMagnitude = sqrt(sum([data.X.^2, data.Y.^2, data.Z.^2], 2));
+
             % Exercise.
-            magnitude = data.B;
+            actualMagnitude = data.B;
 
             % Verify.
-            testCase.verifyEqual(magnitude, sqrt(sum([data.X.^2, data.Y.^2, data.Z.^2], 2)), "Magnitude should have expected values.");
+            testCase.verifyThat(actualMagnitude, matlab.unittest.constraints.IsEqualTo(expectedMagnitude, Within = matlab.unittest.constraints.AbsoluteTolerance(1e-12)), ...
+                "Magnitude should have expected values.");
+        end
+
+        % Test that derivative of an empty value is itself empty.
+        function derivative_empty(testCase, DerivativeVariable)
+
+            % Set up.
+            data = testCase.createEmptyTestData();
+
+            % Exercise.
+            derivative = data.(DerivativeVariable);
+
+            % Verify.
+            testCase.verifyEmpty(derivative, "Derivative of empty value should itself be empty.");
+        end
+
+        % Test that derivative of a value is correct.
+        function derivative_nonEmpty(testCase, DerivativeVariable)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            v = erase(DerivativeVariable, "d");
+            expectedDerivative = diff(data.(v));
+
+            % Exercise.
+            actualDerivative = data.(DerivativeVariable);
+
+            % Verify.
+            testCase.verifyEqual(actualDerivative(1:end-1), expectedDerivative, "Derivative should match expected value.");
+            testCase.verifyTrue(ismissing(actualDerivative(end)), "Last element in derivative should be missing.");
         end
 
         % Test that "crop" method crops data based on a "duration" object.
@@ -231,6 +268,75 @@ classdef tScience < matlab.unittest.TestCase
             testCase.verifyEqual(modifiedData.XYZ(1:4, :), zeros(4, 3), "Data within filter should be replaced.");
             testCase.verifyEqual(modifiedData.DependentVariables(5:end, :), data.DependentVariables(5:end, :), "Only data within filter should be replaced.");
         end
+
+        % Test that displaying a single object displays the correct
+        % information.
+        function customDisplay_singleObject(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            data.MetaData.DataFrequency = 64;
+            data.MetaData.Mode = "Burst";
+            data.MetaData.Model = "FM4";
+            data.MetaData.Sensor = "FIB";
+
+            % Exercise.
+            output = evalc("display(data)");
+
+            % Verify.
+            testCase.verifySubstring(eraseTags(output), "FIB (FM4) in Burst (64)", "Science meta data should be included in display.");
+        end
+
+        % Test that displaying a single object displays the correct
+        % information, even when model is missing.
+        function customDisplay_singleObject_noModel(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            data.MetaData.DataFrequency = 64;
+            data.MetaData.Mode = "Burst";
+            data.MetaData.Model = string.empty();
+            data.MetaData.Sensor = "FIB";
+
+            % Exercise.
+            output = evalc("display(data)");
+
+            % Verify.
+            testCase.verifySubstring(eraseTags(output), "FIB in Burst (64)", "Science meta data should be included in display.");
+        end
+
+        % Test that displaying a single object displays the correct
+        % information, even when model and sensor are missing.
+        function customDisplay_singleObject_noSensor(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            data.MetaData.DataFrequency = 64;
+            data.MetaData.Mode = "Burst";
+            data.MetaData.Model = string.empty();
+            data.MetaData.Sensor = mag.meta.Sensor.empty();
+
+            % Exercise.
+            output = evalc("display(data)");
+
+            % Verify.
+            testCase.verifySubstring(eraseTags(output), "in Burst (64)", "Science meta data should be included in display.");
+        end
+
+        % Test that displaying heterogeneous arrays does not error.
+        function customDisplay_heterogeneous(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            data = [data, data];
+
+            % Exercise and verify.
+            display(data);
+        end
     end
 
     methods (Access = private)
@@ -252,6 +358,22 @@ classdef tScience < matlab.unittest.TestCase
     end
 
     methods (Static, Access = private)
+
+        function [data, rawData] = createEmptyTestData()
+
+            emptyTime = datetime.empty();
+            emptyTime.TimeZone = "UTC";
+
+            rawData = struct2table(struct(Time = emptyTime, ...
+                x = double.empty(0, 1), ...
+                y = double.empty(0, 1), ...
+                z = double.empty(0, 1), ...
+                range = double.empty(0, 1), ...
+                sequence = double.empty(0, 1)));
+            rawData = table2timetable(rawData, RowTimes = "Time");
+
+            data = mag.Science(rawData, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC")));
+        end
 
         function [data, rawData] = createTestData()
 

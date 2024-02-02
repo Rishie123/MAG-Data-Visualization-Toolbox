@@ -22,7 +22,7 @@ classdef (Abstract) TimeSeries < mag.Data
         end
 
         function dt = get.dT(this)
-            dt = [diff(this.Time); duration(missing())];
+            dt = this.computeDerivative(this.Time);
         end
 
         function independentVariable = get.IndependentVariable(this)
@@ -44,5 +44,18 @@ classdef (Abstract) TimeSeries < mag.Data
 
         % DOWNSAMPLE Downsample data to the specified frequency.
         downsample(this, targetFrequency)
+    end
+
+    methods (Static, Access = protected)
+
+        function dx = computeDerivative(x)
+        % COMPUTEDERIVATIVE Calculate numerical derivative.
+
+            if isempty(x)
+                dx = feval(class(x) + ".empty");
+            else
+                dx = vertcat(diff(x), missing());
+            end
+        end
     end
 end

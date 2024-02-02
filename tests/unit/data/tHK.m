@@ -81,6 +81,32 @@ classdef tHK < matlab.unittest.TestCase
             testCase.assertEqual(height(resampledData.DependentVariables), height(data.DependentVariables) / 2, "Frequency should be halved.");
         end
 
+        % Test that "getHKType" returns empty on empty input.
+        function getHKType_empty(testCase)
+
+            % Set up.
+            data = mag.hk.Power.empty();
+
+            % Exercise.
+            hk = data.getHKType("PROCSTAT");
+
+            % Verify.
+            testCase.verifyEmpty(hk, "Empty should be returned for empty input.");
+        end
+
+        % Test that "getHKType" method returns Power HK by default.
+        function getHKType_default(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            % Exercise.
+            hk = data.getHKType();
+
+            % Verify.
+            testCase.verifyEmpty(hk, "Empty should be returned when no such type exists.");
+        end
+
         % Test that "getHKType" method selects the correct type.
         function getHKType(testCase)
 
@@ -113,6 +139,30 @@ classdef tHK < matlab.unittest.TestCase
             for p = properties([properties.Dependent] & cellfun(@(x) isequal(x, "public"), {properties.GetAccess}))'
                 data.(p.Name);
             end
+        end
+
+        % Test that displaying a single object displays the correct
+        % information.
+        function customDisplay_singleObject(testCase)
+
+            % Set up.
+            data = testCase.createTestData(); %#ok<NASGU>
+
+            % Exercise.
+            output = evalc("display(data(1))");
+
+            % Verify.
+            testCase.verifySubstring(eraseTags(output), "Status HK (STATUS)", "HK meta data should be included in display.");
+        end
+
+        % Test that displaying heterogeneous arrays does not error.
+        function customDisplay_heterogeneous(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+
+            % Exercise and verify.
+            display(data);
         end
     end
 
