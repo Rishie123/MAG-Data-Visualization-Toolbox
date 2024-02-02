@@ -236,11 +236,11 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             % Filter out data.
             if isempty(options.Start)
 
-                t = this.Data.t;
+                t = this.Time;
                 locFilter = true(size(this.Data, 1), 1);
             else
 
-                t = (this.Data.t - options.Start);
+                t = (this.Time - options.Start);
 
                 locFilter = t > 0;
 
@@ -252,7 +252,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             % Compute PSD.
             dt = seconds(median(diff(t(locFilter))));
 
-            [psd, f] = psdtsh(this.Data{locFilter, ["x", "y", "z"]}, dt, options.FFTType, options.NW);
+            [psd, f] = psdtsh(this.XYZ(locFilter, :), dt, options.FFTType, options.NW);
             psd = psd .^ 0.5;
 
             data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", "x", "y", "z"]));

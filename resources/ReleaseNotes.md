@@ -15,5 +15,6 @@
 - Fix issue with consecutive events of the same type missing a completion message
 - Fix issue when cropping data and no timestamps are selected
 - Fix issue with `mag.graphics.chart.Stem` not showing markers
+- Add tests for `mag.PSD` and `mag.Science/computePSD`
 - Add tests for `mag.graphics.mixin.mustBeColor`
 - Fix typo in `MarkerSupportTestCase`
