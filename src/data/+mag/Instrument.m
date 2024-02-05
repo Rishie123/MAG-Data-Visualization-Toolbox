@@ -141,7 +141,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             arguments
                 this (1, 1) mag.Instrument
                 startTime (1, 1) datetime = this.TimeRange(1)
-                endTime (1, 1) datetile = this.TimeRange(2)
+                endTime (1, 1) datetime = this.TimeRange(2)
             end
 
             % Filter events.
