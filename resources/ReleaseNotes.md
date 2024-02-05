@@ -7,6 +7,7 @@
 
 - Add method to `mag.Instrument` to fill warm-up with `missing` data
 - Add method to `mag.Science` to replace periods with a filler variable
+- Add save/load utility class
 - Separate calculation of spectrogram in separate function
 - Replace last element of file with `missing` to improve plot where data is missing
 - Science object with no data is considered empty in `mag.Instrument`
