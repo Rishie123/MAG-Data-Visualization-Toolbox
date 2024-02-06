@@ -50,6 +50,11 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
             secondary = ps.apply(secondary, smd);
         end
 
+        % Remove last data point, to avoid continuous lines when data is
+        % missing.
+        primary{end, ["x", "y", "z"]} = missing();
+        secondary{end, ["x", "y", "z"]} = missing();
+
         %% Convert to timetable
 
         primaryData = vertcat(primaryData, table2timetable(primary, RowTimes = "t")); %#ok<AGROW>

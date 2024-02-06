@@ -14,6 +14,7 @@ classdef Stem < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag
                 options.?mag.graphics.chart.Stem
                 options.Marker (1, 1) string = "o"
                 options.MarkerSize (1, 1) double = 6
+                options.MarkerColor {mag.graphics.mixin.mustBeColor} = []
             end
 
             this.assignProperties(options);

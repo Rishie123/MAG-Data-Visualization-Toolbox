@@ -47,7 +47,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function value = get.HasScience(this)
-            value = ~isempty(this.Primary) && ~isempty(this.Secondary);
+
+            value = ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
+                ~isempty(this.Primary.Data) && ~isempty(this.Secondary.Data);
         end
 
         function value = get.HasHK(this)
@@ -90,6 +92,20 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             sensor = supportedSensors(locSelected);
         end
 
+        function fillWarmUp(this, timePeriod, filler)
+        % FILLWARMUP Replace beginning of science mode with filler
+        % variable.
+
+            arguments
+                this (1, 1) mag.Instrument
+                timePeriod (1, 1) duration = minutes(1)
+                filler (1, 1) double = missing()
+            end
+
+            this.Primary.replace(timePeriod, filler);
+            this.Secondary.replace(timePeriod, filler);
+        end
+
         function crop(this, primaryFilter, secondaryFilter)
         % CROP Crop data based on selected filters for primary and
         % secondary science.
@@ -101,7 +117,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             end
 
             this.cropScience(primaryFilter, secondaryFilter);
-            this.cropDataBasedOnScience();
+            this.cropToMatch();
         end
 
         function cropScience(this, primaryFilter, secondaryFilter)
@@ -118,22 +134,26 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             this.Secondary.crop(secondaryFilter);
         end
 
-        function cropDataBasedOnScience(this)
-        % CROPDATABASEDONSCIENCE Crop meta data, events and HK based on
-        % science timestamps.
+        function cropToMatch(this, startTime, endTime)
+        % CROPTOMATCH Crop meta data, events and HK based on science
+        % timestamps or specified timestamps.
 
-            timeRange = this.TimeRange;
+            arguments
+                this (1, 1) mag.Instrument
+                startTime (1, 1) datetime = this.TimeRange(1)
+                endTime (1, 1) datetime = this.TimeRange(2)
+            end
 
             % Filter events.
             if ~isempty(this.Events)
-                this.Events = this.Events(isbetween([this.Events.CommandTimestamp], timeRange(1), timeRange(2), "closed"));
+                this.Events = this.Events(isbetween([this.Events.CommandTimestamp], startTime, endTime, "closed"));
             end
 
             % Filter HK.
-            this.HK.crop(timerange(timeRange(1), timeRange(2), "closed"));
+            this.HK.crop(timerange(startTime, endTime, "closed"));
 
             % Adjust meta data.
-            this.MetaData.Timestamp = timeRange(1);
+            this.MetaData.Timestamp = startTime;
         end
 
         function resample(this, targetFrequency)

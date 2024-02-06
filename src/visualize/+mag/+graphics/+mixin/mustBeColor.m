@@ -8,6 +8,8 @@ function mustBeColor(color)
         exception = MException("", "Invalid format for ""Colors"" property.");
         exception.throwAsCaller();
     else
+
         mustBeTextScalar(color);
+        mustBeNonzeroLengthText(color);
     end
 end

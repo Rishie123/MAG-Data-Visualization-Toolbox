@@ -1,9 +1,8 @@
-classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
+classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.SaveLoad
 % IMAPTESTINGANALYSIS Automate analysis of an IMAP CPT or SFT folder.
 
-    properties (Constant, Hidden)
-        % VERSION Version number.
-        Version (1, 1) string = mag.version()
+    properties (Constant)
+        Version = mag.version()
     end
 
     properties
@@ -288,7 +287,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
             rampMode.Secondary = this.SecondaryRamp;
 
             if rampMode.HasScience
-                rampMode.cropDataBasedOnScience();
+                rampMode.cropToMatch();
             else
                 rampMode = mag.Instrument.empty();
             end
@@ -400,16 +399,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 return;
             end
 
-            result.Primary.Data = result.Primary.Data(primaryPeriod, :);
-            result.Primary.Data.Properties.Events = result.Primary.Data.Properties.Events(primaryPeriod, :);
-
-            result.Secondary.Data = result.Secondary.Data(secondaryPeriod, :);
-            result.Secondary.Data.Properties.Events = result.Secondary.Data.Properties.Events(secondaryPeriod, :);
+            result.crop(primaryPeriod, secondaryPeriod);
 
             if isempty(result.Primary.Data) || isempty(result.Secondary.Data)
                 result = mag.Instrument.empty();
-            else
-                result.cropDataBasedOnScience();
             end
         end
     end
@@ -424,7 +417,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
             elseif isa(object, "struct")
 
                 % Recreate object based on version.
-                if isfield(object, "Outboard")
+                if isequal(object.OriginalVersion, 1.0)
 
                     % Convert object to version 2.0 and recursively
                     % dispatch it.
@@ -447,9 +440,9 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                     end
 
                     loadedObject = mag.IMAPTestingAnalysis.loadobj(loadedObject);
-                elseif isfield(object, "PrimaryRamp")
+                elseif isequal(object.OriginalVersion, 2.0)
 
-                    % Convert object directly to version 3.0.
+                    % Convert object directly to version 2.5.
                     loadedObject = mag.IMAPTestingAnalysis();
                     loadedObject.Results = mag.Instrument();
 

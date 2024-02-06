@@ -151,6 +151,16 @@ function loadEventsData(this)
         ae = acknowledgeEvents([acknowledgeEvents.timestamp] >= e.CommandTimestamp);
         ce = completedEvents([completedEvents.timestamp] >= e.CommandTimestamp);
 
+        % Remove responses to subsequent commands of the same type.
+        similarSubsequentEvents = events(([events.Type] == e.Type) & ([events.SubType] == e.SubType) & ([events.CommandTimestamp] > e.CommandTimestamp));
+
+        if ~isempty(similarSubsequentEvents)
+
+            ae = ae([ae.timestamp] < similarSubsequentEvents(1).CommandTimestamp);
+            ce = ce([ce.timestamp] < similarSubsequentEvents(1).CommandTimestamp);
+        end
+
+        % Find acknoledgement time.
         if isfield(ae, "type") && isfield(ae, "subtype")
 
             ae = ae((str2double([ae.type]) == e.Type) & (str2double([ae.subtype]) == e.SubType));
@@ -164,6 +174,7 @@ function loadEventsData(this)
             end
         end
 
+        % Find completion time.
         if isfield(ce, "type") && isfield(ce, "subtype")
 
             ce = ce((str2double([ce.type]) == e.Type) & (str2double([ce.subtype]) == e.SubType));

@@ -1,4 +1,4 @@
-classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
+classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 % SCIENCE Class containing MAG science data.
 
     properties (Dependent)
@@ -60,15 +60,15 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function dx = get.dX(this)
-            dx = [diff(this.X); missing()];
+            dx = this.computeDerivative(this.X);
         end
 
         function dy = get.dY(this)
-            dy = [diff(this.Y); missing()];
+            dy = this.computeDerivative(this.Y);
         end
 
         function dz = get.dZ(this)
-            dz = [diff(this.Z); missing()];
+            dz = this.computeDerivative(this.Z);
         end
 
         function range = get.Range(this)
@@ -102,7 +102,11 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 this.Data.Properties.Events = this.Data.Properties.Events(timePeriod, :);
             end
 
-            this.MetaData.Timestamp = this.Time(1);
+            if isempty(this.Time)
+                this.MetaData.Timestamp = NaT(TimeZone = mag.process.DateTime.TimeZone);
+            else
+                this.MetaData.Timestamp = this.Time(1);
+            end
         end
 
         function resample(this, targetFrequency)
@@ -194,6 +198,25 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             this.Data{1:numCoefficients, ["x", "y", "z"]} = missing();
         end
 
+        function replace(this, timeFilter, filler)
+        % REPLACE Replace length of data specified by time filter with
+        % filler variable.
+
+            arguments
+                this (1, 1) mag.Science
+                timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
+                filler (1, 1) double = missing()
+            end
+
+            if isa(timeFilter, "duration")
+                timePeriod = timerange(this.Time(1), this.Time(1) + timeFilter, "closed");
+            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
+                timePeriod = timeFilter;
+            end
+
+            this.Data{timePeriod, ["x", "y", "z"]} = filler;
+        end
+
         function data = computePSD(this, options)
         % COMPUTEPSD Compute the power spectral density of the magnetic
         % field measurements.
@@ -213,11 +236,11 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             % Filter out data.
             if isempty(options.Start)
 
-                t = this.Data.t;
+                t = this.Time;
                 locFilter = true(size(this.Data, 1), 1);
             else
 
-                t = (this.Data.t - options.Start);
+                t = (this.Time - options.Start);
 
                 locFilter = t > 0;
 
@@ -229,7 +252,7 @@ classdef (Sealed) Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             % Compute PSD.
             dt = seconds(median(diff(t(locFilter))));
 
-            [psd, f] = psdtsh(this.Data{locFilter, ["x", "y", "z"]}, dt, options.FFTType, options.NW);
+            [psd, f] = psdtsh(this.XYZ(locFilter, :), dt, options.FFTType, options.NW);
             psd = psd .^ 0.5;
 
             data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", "x", "y", "z"]));

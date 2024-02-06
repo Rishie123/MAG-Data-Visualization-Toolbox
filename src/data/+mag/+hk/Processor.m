@@ -1,4 +1,4 @@
-classdef (Sealed) Processor < mag.HK
+classdef Processor < mag.HK
 % PROCESSOR Class containing MAG processor HK packet data.
 
     properties (Dependent)

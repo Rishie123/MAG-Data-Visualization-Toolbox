@@ -1,4 +1,4 @@
-classdef (Sealed) SID15 < mag.HK
+classdef SID15 < mag.HK
 % SID15 Class containing MAG SID15 HK packet data.
 
     properties (Dependent)

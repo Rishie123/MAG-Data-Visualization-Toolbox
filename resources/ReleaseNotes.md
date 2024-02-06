@@ -1,23 +1,23 @@
 # App
 
-- Fix issue with default patterns on some computers
+- Fix issue when event, meta data and HK patterns are empty
+- Fix issue with closing invalid figures
 
 # Software
 
-- Add separate classes for each specific HK type
-- Add reference frame to science meta data
-- Make `crop` a method of `mag.TimeSeries`
-- Make magnitude and derivatives dependent properties of `mag.Science`
-- Customize `get` method of `mag.Data` to accept multiple property names
-- Allow charts to have `mag.Data` as input
-- Rename `mag.AutomatedAnalysis` to `mag.IMAPTestingAnalysis`
-- Rename `mag.Result` to `mag.PSD`
-- Remove support for `Filters` in charts
-- Remove implicit conversion methods for `table`, `timetable` and `tabular`
-- Fix issues with setting colors in charts
-- Add tests for `mag.Data`, `mag.Science` and `mag.HK`
-- Add tests for `mag.graphics.chart.Area`, `mag.graphics.chart.Scatter`, `mag.graphics.chart.Stairs` and `mag.graphics.chart.Stem` plots
-
-# GitHub Workflows
-
-- Update dependencies to latest versions
+- Add method to `mag.Instrument` to fill warm-up with `missing` data
+- Add method to `mag.Science` to replace periods with a filler variable
+- Add save/load utility class
+- Separate calculation of spectrogram in separate function
+- Replace last element of file with `missing` to improve plot where data is missing
+- Science object with no data is considered empty in `mag.Instrument`
+- Reintroduce filtering for charts
+- Rename `cropDataBasedOnScience` to `cropToMatch`
+- Make sure derivative is empty when data is empty
+- Remove unnecessary `Sealed` attributes on classes
+- Fix issue with consecutive events of the same type missing a completion message
+- Fix issue when cropping data and no timestamps are selected
+- Fix issue with `mag.graphics.chart.Stem` not showing markers
+- Add tests for `mag.Instrument`, `mag.PSD` and `mag.Science/computePSD`
+- Add tests for `mag.graphics.mixin.mustBeColor`
+- Fix typo in `MarkerSupportTestCase`

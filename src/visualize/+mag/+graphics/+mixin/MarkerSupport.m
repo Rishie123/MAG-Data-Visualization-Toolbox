@@ -20,9 +20,13 @@ classdef (Abstract, HandleCompatible, Hidden) MarkerSupport
         function style = get.MarkerStyle(this)
 
             style = {"Marker", this.Marker, ...
-                "MarkerSize", this.MarkerSize, ...
-                "MarkerEdgeColor", this.MarkerColor, ...
-                "MarkerFaceColor", this.MarkerColor};
+                "MarkerSize", this.MarkerSize};
+
+            if ~isempty(this.MarkerColor)
+
+                style = [style, {"MarkerEdgeColor", this.MarkerColor, ...
+                    "MarkerFaceColor", this.MarkerColor}];
+            end
         end
     end
 

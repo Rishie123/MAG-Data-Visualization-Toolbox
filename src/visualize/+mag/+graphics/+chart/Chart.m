@@ -6,6 +6,8 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
         XVariable string {mustBeScalarOrEmpty}
         % YVARIABLES Name of variables plotted on y-axis.
         YVariables (1, :) string
+        % FILTER Filter x- and y-axis variables.
+        Filter (:, 1) logical = logical.empty()
     end
 
     methods (Abstract)
@@ -35,6 +37,8 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
             else
                 xData = data.(this.XVariable);
             end
+
+            xData = this.applyFilter(xData);
         end
 
         function yData = getYData(this, data)
@@ -60,6 +64,28 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
                 else
                     yData = data.get(this.YVariables);
                 end
+            end
+
+            yData = this.applyFilter(yData);
+        end
+    end
+
+    methods (Access = private)
+
+        function filteredData = applyFilter(this, data)
+        % APPLYFILTER Filter data based on specified filter.
+
+            % No filtering.
+            if isempty(this.Filter)
+                filteredData = data;
+
+            % Same filtering for each y-axis variable.                
+            elseif height(this.Filter) == height(data)
+                filteredData = data(this.Filter, :);
+
+            % Otherwise, throw an error.
+            else
+                error("Mismatch between filter and x- or y-axis variables.");
             end
         end
     end
