@@ -13,7 +13,9 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % METADATAPATTERN Pattern of meta data files.
         MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-*.xlsx")]
         % SCIENCEPATTERN Pattern of science data files.
-        SciencePattern (1, :) string = fullfile("MAGScience*.csv")
+        SciencePattern (1, :) string = fullfile("MAGScience-*-(*)-*.csv")
+        % IALIRTPATTERN Pattern of I-ALiRT data files.
+        IALiRTPattern (1, :) string = fullfile("MAGScience-IALiRT-*.csv")
         % HKPATTERN Pattern of housekeeping files.
         HKPattern (1, :) string = [fullfile("*", "Export", "idle_export_pwr.*.csv"), ...
             fullfile("*", "Export", "idle_export_stat.*.csv"), ...
@@ -53,6 +55,8 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         MetaDataFileNames (1, :) string
         % SCIENCEFILENAMES Files containing science data.
         ScienceFileNames (1, :) string
+        % IALIRTFILENAMES Files containing I-ALiRT data.
+        IALiRTFileNames (1, :) string
         % HKFILENAMES Files containing HK data.
         HKFileNames (1, :) string
     end
@@ -76,6 +80,8 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         MetaDataFiles (:, 1) struct
         % SCIENCEFILES Information about files containing science data.
         ScienceFiles (:, 1) struct
+        % IALIRTFILES Information about files containing I-ALiRT data.
+        IALiRTFiles (:, 1) struct
         % HKFILES Information about files containing HK data.
         HKFiles cell
     end
@@ -120,6 +126,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
             value = string(fullfile({this.ScienceFiles.folder}, {this.ScienceFiles.name}));
         end
 
+        function value = get.IALiRTFileNames(this)
+            value = string(fullfile({this.IALiRTFiles.folder}, {this.IALiRTFiles.name}));
+        end
+
         function value = get.HKFileNames(this)
 
             for hkp = 1:numel(this.HKPattern)
@@ -137,6 +147,8 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
             this.ScienceFiles = dir(fullfile(this.Location, this.SciencePattern));
 
+            this.IALiRTFiles = dir(fullfile(this.Location, this.IALiRTPattern));
+
             for hkp = 1:numel(this.HKPattern)
                 this.HKFiles{hkp} = dir(fullfile(this.Location, this.HKPattern(hkp)));
             end
@@ -152,6 +164,8 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
             [primaryMetaData, secondaryMetaData, hkMetaData] = this.loadMetaData();
 
             this.loadScienceData(primaryMetaData, secondaryMetaData);
+
+            this.loadIALiRTData(primaryMetaData, secondaryMetaData);
 
             this.loadHKData(hkMetaData);
         end
