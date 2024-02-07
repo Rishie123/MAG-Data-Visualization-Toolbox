@@ -1,12 +1,11 @@
 function loadScienceData(this, primaryMetaData, secondaryMetaData)
     %% Import Data
 
-    [~, ~, extension] = fileparts(this.SciencePattern);
-
     if isempty(this.ScienceFileNames)
         return;
     end
 
+    [~, ~, extension] = fileparts(this.SciencePattern);
     rawScience = this.dispatchExtension(extension, ImportFileNames = this.ScienceFileNames).import();
 
     primaryData = timetable.empty();

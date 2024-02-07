@@ -35,12 +35,12 @@ classdef Ramp < mag.process.Step
             end
 
             % Verify that no data is dropped during ramp mode.
-            for d = ["dx", "dy", "dz"]
+            for d = ["x", "y", "z"]
 
-                diff = data.(d)';
-                matches = strfind(diff, this.Pattern);
+                dv = diff(data.(d)');
+                matches = strfind(dv, this.Pattern);
 
-                if numel(matches) < floor((numel(diff) - 1) / numel(this.Pattern))
+                if numel(matches) < floor((numel(dv) - 1) / numel(this.Pattern))
                     warning("Ramp pattern inconsistent along %s-axis.", extractAfter(d, "d"));
                 end
             end
