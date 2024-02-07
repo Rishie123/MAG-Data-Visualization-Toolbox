@@ -39,8 +39,8 @@ classdef RampMode < mag.graphics.view.View
             primarySample = primary.copy();
             secondarySample = secondary.copy();
 
-            primarySample.crop(timerange(primarySample.Time(1) + rampSampleOffset, primarySample.Time(1) + rampSampleOffset + rampSampleDuration), :);
-            secondarySample.crop(timerange(secondarySample.Time(1) + rampSampleOffset, secondarySample.Time(1) + rampSampleOffset + rampSampleDuration), :);
+            primarySample.crop(timerange(primarySample.Time(1) + rampSampleOffset, primarySample.Time(1) + rampSampleOffset + rampSampleDuration));
+            secondarySample.crop(timerange(secondarySample.Time(1) + rampSampleOffset, secondarySample.Time(1) + rampSampleOffset + rampSampleDuration));
 
             this.Figures(2) = mag.graphics.visualize( ...
                 primarySample, mag.graphics.style.Stackedplot(Title = primarySensor, YLabels = ["dx [-]", "dy [-]", "dz [-]"], Charts = mag.graphics.chart.Stackedplot(YVariables = ["dX", "dY", "dZ"], Marker = "o")), ...

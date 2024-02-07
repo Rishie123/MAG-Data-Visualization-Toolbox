@@ -1,5 +1,6 @@
 classdef (Abstract, HandleCompatible) SaveLoad
-% SAVELOAD Utility class to aid saving and loading to MAT files.
+% SAVELOAD Interface adding support for customization of saving and loading
+% to MAT files.
 
     properties (Abstract, Constant)
         % VERSION Version number.
