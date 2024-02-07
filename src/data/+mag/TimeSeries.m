@@ -49,7 +49,7 @@ classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
         % COMPUTEDERIVATIVE Calculate numerical derivative.
 
             if isempty(x)
-                dx = feval(class(x) + ".empty");
+                dx = diff(x);
             else
                 dx = vertcat(diff(x), missing());
             end
