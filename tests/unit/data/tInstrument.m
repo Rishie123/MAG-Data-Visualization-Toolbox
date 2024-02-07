@@ -32,19 +32,19 @@ classdef tInstrument < matlab.mock.TestCase
         % data.
         function timeRange_withData(testCase)
 
-            % % Set up.
-            % [instrument, primaryBehavior, secondaryBehavior] = testCase.createTestData();
-            % 
-            % minTime = datetime("yesterday");
-            % maxTime = datetime("tomorrow");
-            % 
-            % testCase.assignOutputsWhen(get(primaryBehavior.Time), [minTime; datetime("today")]);
-            % testCase.assignOutputsWhen(get(secondaryBehavior.Time), [datetime("today"); maxTime]);
-            % 
-            % expectedTimeRange = [minTime, maxTime];
-            % 
-            % % Exercise and verify.
-            % testCase.verifyEqual(instrument.TimeRange, expectedTimeRange, """TimeRange"" should return minimum and maximum time based on both sensors.");
+            % Set up.
+            instrument = testCase.createTestData();
+
+            minTime = datetime("yesterday", TimeZone = "UTC");
+            maxTime = datetime("tomorrow", TimeZone = "UTC");
+
+            instrument.Primary.Data.Time(1) = minTime;
+            instrument.Secondary.Data.Time(end) = maxTime;
+
+            expectedTimeRange = [minTime, maxTime];
+
+            % Exercise and verify.
+            testCase.verifyEqual(instrument.TimeRange, expectedTimeRange, """TimeRange"" should return minimum and maximum time based on both sensors.");
         end
 
         % Test that primary sensor name is returned correctly.
