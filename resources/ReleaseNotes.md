@@ -5,3 +5,4 @@
 # Software
 
 - Add support for I-ALiRT data
+- Simplify custom displays logic
