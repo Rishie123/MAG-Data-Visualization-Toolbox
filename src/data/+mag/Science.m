@@ -252,7 +252,10 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             % Compute PSD.
             dt = seconds(median(diff(t(locFilter))));
 
-            [psd, f] = psdtsh(this.XYZ(locFilter, :), dt, options.FFTType, options.NW);
+            xyz = this.XYZ(locFilter, :);
+            xyz(ismissing(xyz) | isinf(xyz)) = 0;
+
+            [psd, f] = psdtsh(xyz, dt, options.FFTType, options.NW);
             psd = psd .^ 0.5;
 
             data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", "x", "y", "z"]));
