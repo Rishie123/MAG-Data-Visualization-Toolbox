@@ -1,11 +1,7 @@
-classdef Field < mag.graphics.view.View
+classdef Field < mag.graphics.view.Science
 % FIELD Show magnetic field and optional HK.
 
     properties
-        % NAME Figure name.
-        Name string {mustBeScalarOrEmpty} = missing()
-        % TITLE Figure title.
-        Title string {mustBeScalarOrEmpty} = missing()
         % EVENT Event name to show.
         Event string {mustBeScalarOrEmpty, mustBeMember(Event, ["Mode", "Range"])} = string.empty()
     end
@@ -75,39 +71,6 @@ classdef Field < mag.graphics.view.View
                     Arrangement = [4 + numEvents, 2], ...
                     LinkXAxes = true, ...
                     WindowState = "maximized");
-            end
-        end
-    end
-
-    methods (Access = private)
-
-        function value = getFigureTitle(this, primary, secondary)
-
-            if ismissing(this.Title)
-                value = sprintf("%s (%d, %d)", primary.MetaData.getDisplay("Mode"), primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"));
-            else
-                value = this.Title;
-            end
-        end
-
-        function value = getFigureName(this, primary, secondary)
-
-            if ismissing(this.Name)
-                value = sprintf("%s (%d, %d) Time Series (%s)", primary.MetaData.getDisplay("Mode"), primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"), datestr(primary.MetaData.Timestamp, "dd-mmm-yyyy HHMMSS")); %#ok<DATST>
-            else
-                value = this.Name;
-            end
-        end
-    end
-
-    methods (Static, Access = private)
-
-        function value = getFieldTitle(data)
-
-            if isempty(data.MetaData.FEE) || isempty(data.MetaData.Model) || isempty(data.MetaData.Can)
-                value = data.MetaData.getDisplay("Sensor");
-            else
-                value = sprintf("%s (%s - %s - %s)", data.MetaData.getDisplay("Sensor"), data.MetaData.getDisplay("FEE"), data.MetaData.getDisplay("Model"), data.MetaData.getDisplay("Can"));
             end
         end
     end

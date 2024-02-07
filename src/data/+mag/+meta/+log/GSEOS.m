@@ -71,7 +71,9 @@ classdef GSEOS < mag.meta.log.Type
                 model = regexp(messages, "^MAG_PROG_BTSUCC HW_MODEL = (.*)$", "tokens", "once", "dotexceptnewline", "lineanchors");
                 genericData = regexp(messages, join(this.MetaDataPattern, "\s*"), "names", "dotexceptnewline", "lineanchors");
 
-                assert(~isempty(genericData), "No generic meta data detected.");
+                if isempty(genericData)
+                    return;
+                end
 
                 instrumentMetaData.Model = model;
                 instrumentMetaData.BSW = genericData.bsw;

@@ -1,13 +1,18 @@
 function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
     %% Import Data
 
-    [~, ~, extension] = fileparts(this.SciencePattern);
-
     if isempty(this.IALiRTFileNames)
         return;
     end
 
-    rawIALiRT = this.dispatchExtension(extension, ImportFileNames = this.ScienceFileNames).import();
+    primaryMetaData = primaryMetaData.copy();
+    primaryMetaData.set(Mode = "I-ALiRT", DataFrequency = 1/8, PacketFrequency = 8);
+
+    secondaryMetaData = secondaryMetaData.copy();
+    secondaryMetaData.set(Mode = "I-ALiRT", DataFrequency = 1/8, PacketFrequency = 8);
+
+    [~, ~, extension] = fileparts(this.IALiRTPattern);
+    rawIALiRT = this.dispatchExtension(extension, ImportFileNames = this.IALiRTFileNames).import();
 
     primaryData = timetable.empty();
     secondaryData = timetable.empty();
@@ -35,13 +40,8 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
         secondary = renamevars(secondary, ["x_sec", "y_sec", "z_sec", "rng_sec", "sec_coarse", "sec_fine"], newVariableNames);
 
         % Current file meta data.
-        [mode, primaryFrequency, secondaryFrequency, packetFrequency] = extractFileMetaData(this.ScienceFileNames(i));
-
         pmd = primaryMetaData.copy();
-        pmd.set(Mode = mode, DataFrequency = primaryFrequency, PacketFrequency = packetFrequency);
-
         smd = secondaryMetaData.copy();
-        smd.set(Mode = mode, DataFrequency = secondaryFrequency, PacketFrequency = packetFrequency);
 
         % Apply processing steps.
         for ps = this.PerFileProcessing
@@ -63,7 +63,7 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
 
     %% Amend Timestamp
 
-    [startTime, endTime] = bounds(primaryData.t);
+    startTime = bounds(primaryData.t);
 
     if numel(rawIALiRT) == 1
 
@@ -76,8 +76,19 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
 
     %% Add Mode and Range Change Events
 
-    sensorEvents = timetable(this.Results.Events);
-    sensorEvents = sensorEvents(timerange(startTime, endTime, "closed"), :);
+    emptyTime = datetime.empty();
+    emptyTime.TimeZone = "UTC";
+
+    sensorEvents = struct2table(struct(Time = emptyTime, ...
+        Mode = double.empty(0, 1), ...
+        PrimaryRate = double.empty(0, 1), ...
+        SecondaryRate = double.empty(0, 1), ...
+        PacketFrequency = double.empty(0, 1), ...
+        Duration = double.empty(0, 1), ...
+        Range = double.empty(0, 1), ...
+        Sensor = string.empty(0, 1), ...
+        Label = string.empty(0, 1)));
+    sensorEvents = table2timetable(sensorEvents, RowTimes = "Time");
 
     primaryData.Properties.Events = this.generateEventTable("Primary", sensorEvents, primaryData);
     secondaryData.Properties.Events = this.generateEventTable("Secondary", sensorEvents, secondaryData);
@@ -90,32 +101,6 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
         secondaryData = ps.apply(secondaryData, secondaryMetaData);
     end
 
-    %% Extract Ramp Mode (If Any)
-
-    % Determine ramp mode times.
-    primaryRampPeriod = findRampModePeriod(primaryData.Properties.Events);
-    secondaryRampPeriod = findRampModePeriod(secondaryData.Properties.Events);
-
-    primaryRampMode = primaryData(primaryRampPeriod, :);
-    secondaryRampMode = secondaryData(secondaryRampPeriod, :);
-
-    primaryData(primaryRampPeriod, :) = [];
-    secondaryData(secondaryRampPeriod, :) = [];
-
-    if ~isempty(primaryRampMode) && ~isempty(secondaryRampMode)
-
-        % Process ramp mode.
-        for rs = this.RampProcessing
-
-            primaryRampMode = rs.apply(primaryRampMode, primaryMetaData);
-            secondaryRampMode = rs.apply(secondaryRampMode, secondaryMetaData);
-        end
-
-        % Assign ramp mode.
-        this.PrimaryRamp = mag.Science(primaryRampMode, primaryMetaData);
-        this.SecondaryRamp = mag.Science(secondaryRampMode, secondaryMetaData);
-    end
-
     %% Process Science Data
 
     for ss = this.ScienceProcessing
@@ -126,41 +111,5 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
 
     %% Assign Values
 
-    this.Results.Primary = mag.Science(primaryData, primaryMetaData);
-    this.Results.Secondary = mag.Science(secondaryData, secondaryMetaData);
-end
-
-function [mode, packetFrequency] = extractFileMetaData(fileName)
-
-    arguments
-        fileName (1, 1) string
-    end
-
-    rawData = regexp(fileName, mag.meta.Science.MetaDataFilePattern, "names");
-
-    if isempty(rawData)
-
-        % Assume default values.
-        if contains(fileName, "normal", IgnoreCase = true)
-
-            mode = "Normal";
-            primaryFrequency = "2";
-            secondaryFrequency = "2";
-            packetFrequency = "8";
-        elseif contains(fileName, "burst", IgnoreCase = true)
-
-            mode = "Burst";
-            primaryFrequency = "128";
-            secondaryFrequency = "128";
-            packetFrequency = "2";
-        else
-            error("Unrecognized file name format for ""%s"".", fileName);
-        end
-    else
-
-        mode = regexprep(rawData.mode, "(\w)(\w+)", "${upper($1)}$2");
-        primaryFrequency = rawData.primaryFrequency;
-        secondaryFrequency = rawData.secondaryFrequency;
-        packetFrequency = rawData.packetFrequency;
-    end
+    this.Results.IALiRT = mag.IALiRT(mag.Science(primaryData, primaryMetaData), mag.Science(secondaryData, secondaryMetaData));
 end

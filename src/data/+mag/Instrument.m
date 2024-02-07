@@ -157,6 +157,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 this.Events = this.Events(isbetween([this.Events.CommandTimestamp], startTime, endTime, "closed"));
             end
 
+            % Filter I-ALiRT.
+            this.IALiRT.crop(timerange(startTime, endTime, "closed"));
+
             % Filter HK.
             this.HK.crop(timerange(startTime, endTime, "closed"));
 
@@ -207,6 +210,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             copiedThis.MetaData = copy(this.MetaData);
             copiedThis.Primary = copy(this.Primary);
             copiedThis.Secondary = copy(this.Secondary);
+            copiedThis.IALiRT = copy(this.IALiRT);
             copiedThis.HK = copy(this.HK);
         end
 
@@ -232,7 +236,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             if isscalar(this)
 
                 propertyList = ["HasData", "HasMetaData", "HasScience", "HasHK", "TimeRange", ...
-                    "Primary", "Secondary", ...
+                    "Primary", "Secondary", "IALiRT", ...
                     "MetaData", "Events", "HK"];
                 groups = matlab.mixin.util.PropertyGroup(propertyList, "");
             else

@@ -39,6 +39,11 @@ function figures = sftPlots(analysis, options)
         end
     end
 
+    % Show I-ALiRT.
+    if ~isempty(analysis.Results.IALiRT)
+        views(end + 1) = mag.graphics.view.IALiRT(analysis.Results);
+    end
+
     % Show HK.
     views(end + 1) = mag.graphics.view.HK(analysis.Results);
 
