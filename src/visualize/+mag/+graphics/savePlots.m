@@ -6,6 +6,7 @@ function savePlots(figures, location, options)
         location (1, 1) string {mustBeFolder} = "results"
         options.ColonReplacement (1, 1) string = ""
         options.DotReplacement (1, 1) string = "_"
+        options.SlashReplacement (1, 1) string = "_"
         options.SaveAsFig (1, 1) logical = true
     end
 
@@ -13,7 +14,7 @@ function savePlots(figures, location, options)
 
         if isvalid(f)
 
-            name = replace(f.Name, [":", "."], [options.ColonReplacement, options.DotReplacement]);
+            name = replace(f.Name, [":", ".", "/", "\"], [options.ColonReplacement, options.DotReplacement, options.SlashReplacement, options.SlashReplacement]);
             name = fullfile(location, name);
 
             exportgraphics(f, fullfile(name + ".png"), Resolution = 300);
