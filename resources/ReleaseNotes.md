@@ -9,3 +9,4 @@
 - Simplify calculation of derivatives when input is empty
 - Fix issue with detecting automated range changes happening after range change commands
 - Fix issue with warning generation in `mag.process.Ramp`
+- Fix issue with loading `mag.IMAPTestingAnalysis` from versions without separate HK classes per type

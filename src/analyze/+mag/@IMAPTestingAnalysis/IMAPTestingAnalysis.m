@@ -173,6 +173,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         function modes = getAllModes(this)
         % GETALLMODES Get all modes as separate data.
 
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
+
             arguments (Output)
                 modes (1, :) mag.Instrument
             end
@@ -236,6 +240,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         function modeCycling = getModeCycling(this)
         % GETMODECYCLING Get mode cycling data.
 
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
+
             arguments (Output)
                 modeCycling mag.Instrument {mustBeScalarOrEmpty}
             end
@@ -265,6 +273,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         function rangeCycling = getRangeCycling(this)
         % GETRANGECYCLING Get range cycling data.
 
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
+
             arguments (Output)
                 rangeCycling mag.Instrument {mustBeScalarOrEmpty}
             end
@@ -291,6 +303,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         function rampMode = getRampMode(this)
         % GETRAMPMODE Get ramp mode data.
 
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
+
             arguments (Output)
                 rampMode mag.Instrument {mustBeScalarOrEmpty}
             end
@@ -309,6 +325,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
         function finalNormal = getFinalNormalMode(this)
         % GETFINALNORMALMODE Get normal mode at the end of analysis.
+
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
 
             arguments (Output)
                 finalNormal mag.Instrument {mustBeScalarOrEmpty}
@@ -335,7 +355,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % magnitude.
 
             arguments (Input)
-                this
+                this (1, 1) mag.IMAPTestingAnalysis
                 gap (1, 1) duration
             end
 
@@ -427,7 +447,20 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % LOADOBJ Override default loading from MAT file.
 
             if isa(object, "mag.IMAPTestingAnalysis")
+
                 loadedObject = object;
+
+                if strlength(object.OriginalVersion) ~= 0
+                    return;
+                end
+
+                % If no original version is available, make sure the HK
+                % data is dispatched to the correct classes.
+                results = loadedObject.Results;
+
+                for hk = 1:numel(results.HK)
+                    results.HK(hk) = mag.hk.dispatchHKType(results.HK(hk).Data, results.HK(hk).MetaData);
+                end
             elseif isa(object, "struct")
 
                 % Recreate object based on version.
