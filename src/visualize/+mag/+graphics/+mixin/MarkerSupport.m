@@ -7,7 +7,7 @@ classdef (Abstract, HandleCompatible, Hidden) MarkerSupport
         % MARKERSIZE Marker size.
         MarkerSize (1, 1) double = 10
         % MARKERFACE Marker face color option. "flat" means filled marker.
-        MarkerColor {mag.graphics.mixin.mustBeColor} = "none"
+        MarkerColor {mustBeScalarOrEmpty, mag.graphics.mixin.mustBeColor}
     end
 
     properties (Dependent, Access = protected)

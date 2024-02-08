@@ -14,6 +14,7 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
             arguments
                 options.?mag.graphics.chart.Stackedplot
                 options.Colors (:, 3) double = colororder()
+                options.MarkerSize (1, 1) double = 6
             end
 
             this.assignProperties(options);
