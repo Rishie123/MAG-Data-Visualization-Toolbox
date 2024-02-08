@@ -158,7 +158,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             end
 
             % Filter I-ALiRT.
-            this.IALiRT.crop(timerange(startTime, endTime, "closed"));
+            if this.HasIALiRT
+                this.IALiRT.crop(timerange(startTime, endTime, "closed"));
+            end
 
             % Filter HK.
             this.HK.crop(timerange(startTime, endTime, "closed"));
