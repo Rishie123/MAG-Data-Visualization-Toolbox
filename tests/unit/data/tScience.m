@@ -14,7 +14,7 @@ classdef tScience < matlab.unittest.TestCase
             metaData = mag.meta.Science();
 
             % Exercise and verify.
-            testCase.verifyError(@() set(metaData.Model, "AM2"), ?MException, "Error should be thrown when model name is invalid.");
+            testCase.verifyError(@() set(metaData, "Model", "AM2"), ?MException, "Error should be thrown when model name is invalid.");
         end
 
         % Test that science meta data restricts setting "FEE" value.
@@ -24,7 +24,7 @@ classdef tScience < matlab.unittest.TestCase
             metaData = mag.meta.Science();
 
             % Exercise and verify.
-            testCase.verifyError(@() set(metaData.FEE, "FAA2"), ?MException, "Error should be thrown when FEE name is invalid.");
+            testCase.verifyError(@() set(metaData, "FEE", "FAA2"), ?MException, "Error should be thrown when FEE name is invalid.");
         end
 
         % Test that magnetic field magnitude is computed correctly.
