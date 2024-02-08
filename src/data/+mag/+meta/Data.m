@@ -51,7 +51,7 @@ classdef (Abstract) Data < matlab.mixin.Copyable & matlab.mixin.Heterogeneous & 
         % (default is missing).
 
             arguments
-                this
+                this mag.meta.Data {mustBeVector}
                 property (1, 1) string
                 alternative = missing()
             end
