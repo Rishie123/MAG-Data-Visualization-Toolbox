@@ -5,6 +5,7 @@
 # Software
 
 - Add support for I-ALiRT data
+- Add view for plotting PSD for each selected event
 - Simplify custom displays logic
 - Simplify calculation of derivatives when input is empty
 - Improve "no-Range 0" Range Cycling plot by excluding first Range 0 vector
