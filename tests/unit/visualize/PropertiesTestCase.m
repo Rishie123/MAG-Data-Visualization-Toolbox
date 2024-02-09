@@ -13,15 +13,19 @@ classdef (Abstract) PropertiesTestCase < MAGVisualizationTestCase
             % Set up.
             [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
 
+            args = testCase.getExtraArguments();
+
             % Exercise.
             chart = feval(testCase.ClassName, ...
-                Properties.Name, Properties.Value, ...
-                YVariables = "Number");
+                args{:}, ...
+                Properties.Name, Properties.Value);
 
-            chart.plot(testCase.Data, ax, tl);
+            assembledGraph = chart.plot(testCase.Data, ax, tl);
 
             % Verify.
             graph = GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
+
+            testCase.verifySameHandle(assembledGraph, graph, "Chart should return assembled graph.");
 
             [verifiableName, verifiableValue] = GraphicsTestUtilities.getVerifiables(Properties);
             testCase.verifyEqual(graph.(verifiableName), verifiableValue, compose("""%s"" property value should match.", Properties.Name));

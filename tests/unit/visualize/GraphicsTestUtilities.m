@@ -27,8 +27,13 @@ classdef GraphicsTestUtilities
                 type (1, 1) string
             end
 
-            axes = unique([axes; mag.graphics.getAllAxes(layout)]);
-            graph = [axes.Children];
+            if isvalid(axes)
+                axes = unique([axes; mag.graphics.getAllAxes(layout)]);
+            else
+                axes = unique(mag.graphics.getAllAxes(layout));
+            end
+
+            graph = vertcat(axes.Children);
 
             testCase.assertNumElements(graph, 1, "One and only one graph should exist.");
             testCase.assertClass(graph, type, "Graph type should match expectation.");
