@@ -3,7 +3,7 @@ classdef (Abstract) MAGVisualizationTestCase < matlab.unittest.TestCase
 
     properties (Constant)
         % DATA Test data.
-        Data timetable = timetable(datetime("now") + (1:10)', (1:10)', "a" + (1:10)')
+        Data timetable = timetable(datetime("now") + (1:10)', (1:10)', "a" + (1:10)', VariableNames = ["Number", "Letter"])
     end
 
     properties (Abstract, Constant)

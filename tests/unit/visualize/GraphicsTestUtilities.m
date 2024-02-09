@@ -3,8 +3,8 @@ classdef GraphicsTestUtilities
 
     methods (Static)
 
-        function ax = createAxes(testCase)
-        % CREATEAXES Create figure axes for test.
+        function [tl, ax] = createFigure(testCase)
+        % CREATEFIGURE Create figure axes for test.
 
             arguments
                 testCase (1, 1) matlab.unittest.TestCase
@@ -13,25 +13,30 @@ classdef GraphicsTestUtilities
             f = figure(Visible = "off");
             testCase.addTeardown(@() close(f));
 
-            ax = axes(f);
+            tl = tiledlayout(f, "flow");
+            ax = nexttile(tl);
         end
 
-        function graph = getChildrenGraph(testCase, axes, type)
+        function graph = getChildrenGraph(testCase, layout, axes, type)
         % GETCHILDRENGRAPH Get graph from axes and verify its type.
 
             arguments
                 testCase (1, 1) matlab.unittest.TestCase
+                layout (1, 1) matlab.graphics.layout.TiledChartLayout
                 axes (1, 1) matlab.graphics.axis.Axes
                 type (1, 1) string
             end
 
-            graph = axes.Children;
+            axes = unique([axes; mag.graphics.getAllAxes(layout)]);
+            graph = [axes.Children];
 
             testCase.assertNumElements(graph, 1, "One and only one graph should exist.");
             testCase.assertClass(graph, type, "Graph type should match expectation.");
         end
 
         function [name, value] = getVerifiables(properties)
+        % GETVERIFIABLES Extract values to be used for verification
+        % statement.
 
             arguments
                 properties (1, 1) struct

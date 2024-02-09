@@ -2,7 +2,7 @@ function ax = getAllAxes(f)
 % GETALLAXES Get all axes of the figure.
 
     arguments (Input)
-        f (1, 1) matlab.ui.Figure
+        f (1, 1) {mustBeA(f, ["matlab.ui.Figure", "matlab.graphics.layout.TiledChartLayout"])}
     end
 
     arguments (Output)
