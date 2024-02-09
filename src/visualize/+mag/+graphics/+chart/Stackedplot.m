@@ -14,6 +14,7 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
             arguments
                 options.?mag.graphics.chart.Stackedplot
                 options.Colors (:, 3) double = colororder()
+                options.MarkerSize (1, 1) double = 6
             end
 
             this.assignProperties(options);
@@ -37,7 +38,7 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
             xData = this.getXData(data);
             yData = this.getYData(data);
 
-            if ~isempty(this.Colors) && (Ny > size(this.Colors, 1))
+            if isempty(this.Colors) || (Ny > size(this.Colors, 1))
                 error("Mismatch in number of colors for number of plots.");
             end
 

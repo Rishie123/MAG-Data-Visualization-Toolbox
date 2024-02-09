@@ -3,6 +3,10 @@ classdef tHK < matlab.unittest.TestCase
 
     properties (TestParameter)
         HKTypes = {"SID15", "Processor", "Power", "Status"}
+        Dispatch = {struct(Type = "SID15", Class = "mag.hk.SID15"), ...
+            struct(Type = "PROCSTAT", Class = "mag.hk.Processor"), ...
+            struct(Type = "PW", Class = "mag.hk.Power"), ...
+            struct(Type = "STATUS", Class = "mag.hk.Status")}
     end
 
     methods (Test)
@@ -186,6 +190,20 @@ classdef tHK < matlab.unittest.TestCase
 
             % Exercise and verify.
             evalc("display(hk)");
+        end
+
+        % Test that HK data is dispatched to the correct class.
+        function dispatchHKType(testCase, Dispatch)
+
+            % Set up.
+            tt = timetable.empty();
+            metaData = mag.meta.HK(Type = Dispatch.Type);
+
+            % Exercise.
+            hk = mag.hk.dispatchHKType(tt, metaData);
+
+            % Verify.
+            testCase.verifyClass(hk, Dispatch.Class, "HK data should be dispateched to correct type.");
         end
     end
 

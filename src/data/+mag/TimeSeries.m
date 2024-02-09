@@ -1,4 +1,4 @@
-classdef (Abstract) TimeSeries < mag.Data
+classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
 % TIMESERIES Abstract base class for MAG time series.
 
     properties
@@ -36,9 +36,6 @@ classdef (Abstract) TimeSeries < mag.Data
 
     methods (Abstract)
 
-        % CROP Crop data based on selected filter.
-        crop(this, timeFilter)
-
         % RESAMPLE Resample data to the specified frequency.
         resample(this, targetFrequency)
 
@@ -52,7 +49,7 @@ classdef (Abstract) TimeSeries < mag.Data
         % COMPUTEDERIVATIVE Calculate numerical derivative.
 
             if isempty(x)
-                dx = feval(class(x) + ".empty");
+                dx = diff(x);
             else
                 dx = vertcat(diff(x), missing());
             end

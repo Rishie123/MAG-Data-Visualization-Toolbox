@@ -1,15 +1,6 @@
 classdef Frequency < mag.graphics.view.View
 % FREQUENCY Show PSD and spectrogram of magnetic field.
 
-    properties (Constant, Access = private)
-        % FLABEL Frequency label.
-        FLabel (1, 1) string = "frequency [Hz]"
-        % PSDLABEL PSD label.
-        PSDLabel (1, 1) string = "PSD [nT Hz^{-0.5}]"
-        % PLABEL Power label.
-        PLabel (1, 1) string = "power [dB]"
-    end
-
     properties
         % PSDSTART Start date of PSD plot.
         PSDStart (1, 1) datetime = NaT(TimeZone = "UTC")
@@ -76,11 +67,11 @@ classdef Frequency < mag.graphics.view.View
     methods (Static, Access = private)
 
         function value = getFigureTitle(primary, secondary, psdStart, psdDuration)
-            value = sprintf("Start: %s - Duration: %s - (%d, %d)", psdStart, psdDuration, primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"));
+            value = compose("Start: %s - Duration: %s - (%d, %d)", psdStart, psdDuration, primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"));
         end
 
         function value = getFigureName(primary, secondary, psdStart)
-            value = sprintf("%s (%d, %d) Frequency (%s)", primary.MetaData.getDisplay("Mode"), primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"), datestr(psdStart, "dd-mmm-yyyy HHMMSS")); %#ok<DATST>
+            value = compose("%s (%d, %d) Frequency (%s)", primary.MetaData.getDisplay("Mode"), primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"), datestr(psdStart, "dd-mmm-yyyy HHMMSS")); %#ok<DATST>
         end
     end
 end

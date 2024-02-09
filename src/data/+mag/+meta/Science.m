@@ -15,7 +15,7 @@ classdef Science < mag.meta.Data
         % SENSOR Sensor type.
         Sensor mag.meta.Sensor {mustBeScalarOrEmpty}
         % MODE Selected mode.
-        Mode string {mustBeScalarOrEmpty, mustBeMember(Mode, ["Normal", "Burst", "Hybrid"])} = "Hybrid"
+        Mode string {mustBeScalarOrEmpty, mustBeMember(Mode, ["Normal", "Burst", "Hybrid", "I-ALiRT"])} = "Hybrid"
         % DATAFREQUENCY Frequency of data (how many vectors per second).
         DataFrequency (1, 1) double = NaN
         % PACKETFREQUENCY Frequency of packets (how often packets are

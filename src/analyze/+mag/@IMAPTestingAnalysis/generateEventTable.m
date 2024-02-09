@@ -35,7 +35,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     end
 
     % Improve timestamp estimates.
-    sensorEvents = updateEventTimestamps(sensorEvents, data);
+    sensorEvents = updateRampModeTimestamps(sensorEvents, data);
 
     % Add automatic transitions.
     locTimedCommand = ~ismissing(sensorEvents.Duration) & (sensorEvents.Duration ~= 0);
@@ -60,16 +60,6 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
 
     sensorEvents = sortrows(sensorEvents);
 
-    % Extract first automatic range change in the session.
-    if contains("Range", sensorEvents.Properties.VariableNames)
-
-        firstRangeChange = sensorEvents(find(~ismissing([sensorEvents.Range]), 1), :).Time;
-
-        if ~isempty(firstRangeChange)
-            ranges = ranges(timerange(ranges.t(1), firstRangeChange - seconds(1)), "range");
-        end
-    end
-
     % Basic structure for events table.
     emptyTime = datetime.empty();
     emptyTime.TimeZone = "UTC";
@@ -85,29 +75,24 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     eventTable = table2timetable(eventTable, RowTimes = "Time");
 
     % Process range changes.
-    % Range changes can be automatic, so add automatic transitions.
+    % Range changes can be automatic, so add automatic transitions. If they
+    % are commanded, correct the times at which they occur.
     if ~isempty(ranges)
 
-        locRange = diff(ranges.range) ~= 0;
-        rangeTable = vertcat(ranges(1, :), ranges(find(locRange) + 1, "range"));
-        rangeTable = renamevars(rangeTable, "range", "Range");
-
-        rangeTable.Label = compose("%s Range %d", primaryOrSecondary, [rangeTable.Range]);
-        rangeTable.Reason = repmat("Auto", size(rangeTable, 1), 1);
-        rangeTable.Properties.DimensionNames(1) = "Time";
-
-        rangeTable = sortrows(rangeTable, "Time");
+        [rangeTable, sensorEvents] = findRangeChanges(ranges, sensorEvents, primaryOrSecondary);
 
         if isempty(sensorEvents)
 
-            eventTable = outerjoin(eventTable, rangeTable, MergeKeys = true, Keys = ["Time", intersect(eventTable.Properties.VariableNames, rangeTable.Properties.VariableNames)]);
+            eventTable = joinEventTables(eventTable, rangeTable);
             eventTable{:, "Mode"} = string(missing());
             eventTable{:, ["DataFrequency", "PacketFrequency"]} = double(missing());
         else
-            eventTable = outerjoin(sensorEvents, rangeTable, MergeKeys = true, Keys = ["Time", intersect(sensorEvents.Properties.VariableNames, rangeTable.Properties.VariableNames)]);
+            eventTable = joinEventTables(sensorEvents, rangeTable);
         end
+
+    % Just use sensor events.
     else
-        eventTable = outerjoin(eventTable, sensorEvents, MergeKeys = true, Keys = ["Time", intersect(eventTable.Properties.VariableNames, sensorEvents.Properties.VariableNames)]);
+        eventTable = joinEventTables(eventTable, sensorEvents);
     end
 
     % Process variables.
@@ -124,7 +109,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     eventTable = eventtable(eventTable, EventLabelsVariable = "Label");
 end
 
-function events = updateEventTimestamps(events, data)
+function events = updateRampModeTimestamps(events, data)
 
     % Improve ramp mode estimate.
     idxRamp = find(contains([events.Label], "Ramp", IgnoreCase = true));
@@ -165,4 +150,41 @@ function events = updateEventTimestamps(events, data)
         events.Time(idxRamp(1)) = data.t(idxStart);
         events.Time(idxRamp(end)) = data.t(idxEnd + numel(mag.process.Ramp.Pattern) + 1);
     end
+end
+
+function [rangeTable, events] = findRangeChanges(ranges, events, primaryOrSecondary)
+
+    % Find range changes.
+    locRange = diff(ranges.range) ~= 0;
+
+    rangeTable = vertcat(ranges(1, :), ranges(find(locRange) + 1, "range"));
+    rangeTable = renamevars(rangeTable, "range", "Range");
+    rangeTable.Properties.DimensionNames(1) = "Time";
+
+    % Update timestamps for commanded range changes.
+    idxDelete = [];
+
+    for i = 1:height(rangeTable)
+
+        e = events(withtol(rangeTable.Time(i), minutes(1)), "Range");
+
+        if any(e.Range == rangeTable.Range(i))
+
+            events.Time(events.Time == e.Time) = rangeTable.Time(i);
+            idxDelete(end + 1) = i; %#ok<AGROW>
+        end
+    end
+
+    rangeTable(idxDelete, :) = [];
+    events{~contains(events.Label, "Range"), "Range"} = missing();
+
+    % Complete automatic range changes.
+    rangeTable.Label = compose("%s Range %d", primaryOrSecondary, [rangeTable.Range]);
+    rangeTable.Reason = repmat("Auto", size(rangeTable, 1), 1);
+
+    rangeTable = sortrows(rangeTable, "Time");
+end
+
+function eventTable = joinEventTables(table1, table2)
+    eventTable = outerjoin(table1, table2, MergeKeys = true, Keys = ["Time", intersect(table1.Properties.VariableNames, table2.Properties.VariableNames)]);
 end

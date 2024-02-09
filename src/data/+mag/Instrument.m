@@ -10,6 +10,8 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         Primary mag.Science {mustBeScalarOrEmpty}
         % SECONDARY Secondary science data.
         Secondary mag.Science {mustBeScalarOrEmpty}
+        % IALIRT I-ALiRT data.
+        IALiRT mag.IALiRT {mustBeScalarOrEmpty}
         % HK Housekeeping data.
         HK (1, :) mag.HK
     end
@@ -21,6 +23,8 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         HasMetaData (1, 1) logical
         % HASSCIENCE Logical denoting whether instrument has science data.
         HasScience (1, 1) logical
+        % HASIALIRT Logical denoting whether instrument has I-ALiRT data.
+        HasIALiRT (1, 1) logical
         % HASHK Logical denoting whether instrument has HK data.
         HasHK (1, 1) logical
         % TIMERANGE Time range covered by science data.
@@ -39,7 +43,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function value = get.HasData(this)
-            value = this.HasMetaData || this.HasScience || this.HasHK;
+            value = this.HasMetaData || this.HasScience || this.HasIALiRT || this.HasHK;
         end
 
         function value = get.HasMetaData(this)
@@ -50,6 +54,10 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
 
             value = ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
                 ~isempty(this.Primary.Data) && ~isempty(this.Secondary.Data);
+        end
+
+        function value = get.HasIALiRT(this)
+            value = ~isempty(this.IALiRT);
         end
 
         function value = get.HasHK(this)
@@ -149,6 +157,11 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 this.Events = this.Events(isbetween([this.Events.CommandTimestamp], startTime, endTime, "closed"));
             end
 
+            % Filter I-ALiRT.
+            if this.HasIALiRT
+                this.IALiRT.crop(timerange(startTime, endTime, "closed"));
+            end
+
             % Filter HK.
             this.HK.crop(timerange(startTime, endTime, "closed"));
 
@@ -199,20 +212,17 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             copiedThis.MetaData = copy(this.MetaData);
             copiedThis.Primary = copy(this.Primary);
             copiedThis.Secondary = copy(this.Secondary);
+            copiedThis.IALiRT = copy(this.IALiRT);
             copiedThis.HK = copy(this.HK);
         end
 
         function header = getHeader(this)
 
-            if isscalar(this)
-
-                if this.HasScience && this.HasMetaData && ~isempty(this.Primary.MetaData) && ~isempty(this.Secondary.MetaData)
-                    tag = char(compose(" in %s (%d, %d)", this.Primary.MetaData.Mode, this.Primary.MetaData.DataFrequency, this.Secondary.MetaData.DataFrequency));
-                else
-                    tag = char.empty();
-                end
+            if isscalar(this) && this.HasScience && this.HasMetaData && ~isempty(this.Primary.MetaData) && ~isempty(this.Secondary.MetaData)
 
                 className = matlab.mixin.CustomDisplay.getClassNameForHeader(this);
+                tag = char(compose(" in %s (%d, %d)", this.Primary.MetaData.Mode, this.Primary.MetaData.DataFrequency, this.Secondary.MetaData.DataFrequency));
+
                 header = ['  ', className, tag, ' with properties:'];
             else
                 header = getHeader@matlab.mixin.CustomDisplay(this);
@@ -224,7 +234,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             if isscalar(this)
 
                 propertyList = ["HasData", "HasMetaData", "HasScience", "HasHK", "TimeRange", ...
-                    "Primary", "Secondary", ...
+                    "Primary", "Secondary", "IALiRT", ...
                     "MetaData", "Events", "HK"];
                 groups = matlab.mixin.util.PropertyGroup(propertyList, "");
             else

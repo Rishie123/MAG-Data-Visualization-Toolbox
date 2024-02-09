@@ -61,7 +61,7 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function hkType = getHKType(this, type)
-        % GETHKTYPE Get specific type of HK. Default is power HK.
+            % GETHKTYPE Get specific type of HK. Default is power HK.
 
             arguments
                 this mag.HK
@@ -82,15 +82,11 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
 
         function header = getHeader(this)
 
-            if isscalar(this)
-
-                if ~isempty(this.MetaData) && ~isempty(this.MetaData.Type)
-                    tag = char(compose("%s", this.MetaData.Type));
-                else
-                    tag = char.empty();
-                end
+            if isscalar(this) && ~isempty(this.MetaData) && ~isempty(this.MetaData.Type)
 
                 className = matlab.mixin.CustomDisplay.getClassNameForHeader(this);
+                tag = char(compose("%s", this.MetaData.Type));
+
                 header = ['  ', className, ' HK (', tag, ') with properties:'];
             else
                 header = getHeader@matlab.mixin.CustomDisplay(this);

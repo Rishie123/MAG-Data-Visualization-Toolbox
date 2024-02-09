@@ -2,6 +2,12 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 % VIEW Abstract base class for view of MAG data.
 
     properties (Constant, Access = protected)
+        % FLABEL Frequency label.
+        FLabel (1, 1) string = "frequency [Hz]"
+        % PLABEL Power label.
+        PLabel (1, 1) string = "power [dB]"
+        % PSDLABEL PSD label.
+        PSDLabel (1, 1) string = "PSD [nT Hz^{-0.5}]"
         % TLABEL Temperature label.
         TLabel (1, 1) string = "T [" + char(176) + "C]"
     end

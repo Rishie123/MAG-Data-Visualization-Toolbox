@@ -117,7 +117,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             actualFrequency = 1 / seconds(mode(this.dT));
-            
+
             if actualFrequency > targetFrequency
 
                 numerator = 1;
@@ -166,8 +166,8 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function filter(this, numeratorOrFilter, denominator)
-        % FILTER Filter science data with specified numerator/denominator
-        % pair, or filter object.
+            % FILTER Filter science data with specified numerator/denominator
+            % pair, or filter object.
 
             arguments
                 this (1, 1) mag.Science
@@ -199,8 +199,8 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function replace(this, timeFilter, filler)
-        % REPLACE Replace length of data specified by time filter with
-        % filler variable.
+            % REPLACE Replace length of data specified by time filter with
+            % filler variable.
 
             arguments
                 this (1, 1) mag.Science
@@ -218,8 +218,8 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function data = computePSD(this, options)
-        % COMPUTEPSD Compute the power spectral density of the magnetic
-        % field measurements.
+            % COMPUTEPSD Compute the power spectral density of the magnetic
+            % field measurements.
 
             arguments (Input)
                 this (1, 1) mag.Science
@@ -266,16 +266,14 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
         function header = getHeader(this)
 
-            if isscalar(this)
+            if isscalar(this) && ~isempty(this.MetaData)
 
                 if ~isempty(this.MetaData) && ~isempty(this.MetaData.Sensor) && ~isempty(this.MetaData.Model)
                     tag = char(compose(" from %s (%s) in %s (%d)", this.MetaData.Sensor, this.MetaData.Model, this.MetaData.Mode, this.MetaData.DataFrequency));
                 elseif ~isempty(this.MetaData) && ~isempty(this.MetaData.Sensor)
                     tag = char(compose(" from %s in %s (%d)", this.MetaData.Sensor, this.MetaData.Mode, this.MetaData.DataFrequency));
-                elseif ~isempty(this.MetaData)
-                    tag = char(compose(" in %s (%d)", this.MetaData.Mode, this.MetaData.DataFrequency));
                 else
-                    tag = char.empty();
+                    tag = char(compose(" in %s (%d)", this.MetaData.Mode, this.MetaData.DataFrequency));
                 end
 
                 className = matlab.mixin.CustomDisplay.getClassNameForHeader(this);

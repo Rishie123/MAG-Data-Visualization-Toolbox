@@ -13,7 +13,9 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % METADATAPATTERN Pattern of meta data files.
         MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-*.xlsx")]
         % SCIENCEPATTERN Pattern of science data files.
-        SciencePattern (1, :) string = fullfile("MAGScience*.csv")
+        SciencePattern (1, :) string = fullfile("MAGScience-*-(*)-*.csv")
+        % IALIRTPATTERN Pattern of I-ALiRT data files.
+        IALiRTPattern (1, :) string = fullfile("MAGScience-IALiRT-*.csv")
         % HKPATTERN Pattern of housekeeping files.
         HKPattern (1, :) string = [fullfile("*", "Export", "idle_export_pwr.*.csv"), ...
             fullfile("*", "Export", "idle_export_stat.*.csv"), ...
@@ -53,6 +55,8 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         MetaDataFileNames (1, :) string
         % SCIENCEFILENAMES Files containing science data.
         ScienceFileNames (1, :) string
+        % IALIRTFILENAMES Files containing I-ALiRT data.
+        IALiRTFileNames (1, :) string
         % HKFILENAMES Files containing HK data.
         HKFileNames (1, :) string
     end
@@ -76,6 +80,8 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         MetaDataFiles (:, 1) struct
         % SCIENCEFILES Information about files containing science data.
         ScienceFiles (:, 1) struct
+        % IALIRTFILES Information about files containing I-ALiRT data.
+        IALiRTFiles (:, 1) struct
         % HKFILES Information about files containing HK data.
         HKFiles cell
     end
@@ -120,6 +126,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
             value = string(fullfile({this.ScienceFiles.folder}, {this.ScienceFiles.name}));
         end
 
+        function value = get.IALiRTFileNames(this)
+            value = string(fullfile({this.IALiRTFiles.folder}, {this.IALiRTFiles.name}));
+        end
+
         function value = get.HKFileNames(this)
 
             for hkp = 1:numel(this.HKPattern)
@@ -137,6 +147,8 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
             this.ScienceFiles = dir(fullfile(this.Location, this.SciencePattern));
 
+            this.IALiRTFiles = dir(fullfile(this.Location, this.IALiRTPattern));
+
             for hkp = 1:numel(this.HKPattern)
                 this.HKFiles{hkp} = dir(fullfile(this.Location, this.HKPattern(hkp)));
             end
@@ -153,11 +165,17 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
             this.loadScienceData(primaryMetaData, secondaryMetaData);
 
+            this.loadIALiRTData(primaryMetaData, secondaryMetaData);
+
             this.loadHKData(hkMetaData);
         end
 
         function modes = getAllModes(this)
         % GETALLMODES Get all modes as separate data.
+
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
 
             arguments (Output)
                 modes (1, :) mag.Instrument
@@ -222,6 +240,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         function modeCycling = getModeCycling(this)
         % GETMODECYCLING Get mode cycling data.
 
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
+
             arguments (Output)
                 modeCycling mag.Instrument {mustBeScalarOrEmpty}
             end
@@ -251,6 +273,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         function rangeCycling = getRangeCycling(this)
         % GETRANGECYCLING Get range cycling data.
 
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
+
             arguments (Output)
                 rangeCycling mag.Instrument {mustBeScalarOrEmpty}
             end
@@ -277,6 +303,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         function rampMode = getRampMode(this)
         % GETRAMPMODE Get ramp mode data.
 
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
+
             arguments (Output)
                 rampMode mag.Instrument {mustBeScalarOrEmpty}
             end
@@ -295,6 +325,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
         function finalNormal = getFinalNormalMode(this)
         % GETFINALNORMALMODE Get normal mode at the end of analysis.
+
+            arguments (Input)
+                this (1, 1) mag.IMAPTestingAnalysis
+            end
 
             arguments (Output)
                 finalNormal mag.Instrument {mustBeScalarOrEmpty}
@@ -321,7 +355,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % magnitude.
 
             arguments (Input)
-                this
+                this (1, 1) mag.IMAPTestingAnalysis
                 gap (1, 1) duration
             end
 
@@ -413,7 +447,20 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % LOADOBJ Override default loading from MAT file.
 
             if isa(object, "mag.IMAPTestingAnalysis")
+
                 loadedObject = object;
+
+                if strlength(object.OriginalVersion) ~= 0
+                    return;
+                end
+
+                % If no original version is available, make sure the HK
+                % data is dispatched to the correct classes.
+                results = loadedObject.Results;
+
+                for hk = 1:numel(results.HK)
+                    results.HK(hk) = mag.hk.dispatchHKType(results.HK(hk).Data, results.HK(hk).MetaData);
+                end
             elseif isa(object, "struct")
 
                 % Recreate object based on version.

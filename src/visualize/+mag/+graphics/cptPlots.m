@@ -47,8 +47,8 @@ function figures = cptPlots(analysis, options)
         if nnz(locNoRangeZero) > 0
 
             noRange0Cycling = rangeCycling.copy();
-            noRange0Cycling.crop(timerange(rangeCycling.Primary.Events.Time(1), rangeCycling.Primary.Events.Time(end), "closed"), ...
-                timerange(rangeCycling.Secondary.Events.Time(1), rangeCycling.Secondary.Events.Time(end), "closed"));
+            noRange0Cycling.crop(timerange(rangeCycling.Primary.Events.Time(1), rangeCycling.Primary.Events.Time(end), "openright"), ...
+                timerange(rangeCycling.Secondary.Events.Time(1), rangeCycling.Secondary.Events.Time(end), "openright"));
 
             views(end + 1) = mag.graphics.view.Field(noRange0Cycling, Event = "Range", Name = "Range Cycling (No Range 0)", Title = string.empty());
         end
@@ -61,71 +61,13 @@ function figures = cptPlots(analysis, options)
 
     %% PSD
 
-    % primaryPSDPlotData = computeEventBasedPSD(modesPrimary, "DataFrequency");
-    % secondaryPSDPlotData = computeEventBasedPSD(modesSecondary, "DataFrequency");
-    % 
-    % charts = cell(2, numel(primaryPSDPlotData));
-    % charts(:, 1:2:end) = reshape(primaryPSDPlotData, 2, []);
-    % charts(:, 2:2:end) = reshape(secondaryPSDPlotData, 2, []);
-    % 
-    % figures(end + 1) = mag.graphics.visualize( ...
-    %     charts{:}, ...
-    %     Name = "Mode Cycling PSD Analysis", ...
-    %     LinkXAxes = false, ...
-    %     WindowState = "maximized");
-    % 
-    % if ~isempty(rangesPrimary) && ~isempty(rangesSecondary)
-    % 
-    %     primaryPSDPlotData = computeEventBasedPSD(rangesPrimary, "Range");
-    %     secondaryPSDPlotData = computeEventBasedPSD(rangesSecondary, "Range");
-    % 
-    %     charts = cell(2, numel(primaryPSDPlotData));
-    %     charts(:, 1:2:end) = reshape(primaryPSDPlotData, 2, []);
-    %     charts(:, 2:2:end) = reshape(secondaryPSDPlotData, 2, []);
-    % 
-    %     figures(end + 1) = mag.graphics.visualize( ...
-    %         charts{:}, ...
-    %         Name = "Range Cycling PSD Analysis", ...
-    %         LinkXAxes = false, ...
-    %         Arrangement = [4, 2], ...
-    %         WindowState = "maximized");
-    % end
+    views(end + 1) = mag.graphics.view.PSD(modeCycling, Name = "Mode Cycling PSD Analysis", Event = "DataFrequency");
+
+    if ~isempty(rangeCycling) && rangeCycling.HasData
+        views(end + 1) = mag.graphics.view.PSD(rangeCycling, Name = "Range Cycling PSD Analysis", Event = "Range");
+    end
 
     %% Visualize
 
     figures = [figures, views.visualizeAll()];
-end
-
-function charts = computeEventBasedPSD(data, eventOfInterest)
-
-    charts = {};
-    yLine = mag.graphics.chart.Line(Axis = "y", Value = 0.01, Style = "--", Label = "10pT");
-
-    events = data.Events(data.Events.Reason == "Command", :);
-    interestingEvents = events(ismember(events.(eventOfInterest), unique(events.(eventOfInterest))), :);
-
-    for i = 1:size(interestingEvents, 1)
-
-        % Find when event takes place.
-        if i == size(interestingEvents, 1)
-            endTime = data.Time(end);
-        else
-            endTime = interestingEvents.Time(i + 1);
-        end
-
-        startTime = interestingEvents.Time(i);
-        duration = endTime - startTime;
-
-        if duration > 0
-
-            % Compute PSD.
-            psd = data.computePSD(Start = startTime, Duration = duration);
-
-            % Add plot.
-            charts = [charts, {psd, ...
-                mag.graphics.style.Default(Title = sprintf("%s %s (%s, %s)", data.MetaData.getDisplay("Sensor"), interestingEvents.Label(i), datestr(startTime, "dd-mmm-yy HH:MM"), duration), ...
-                XLabel = "frequency [Hz]", YLabel = "PSD [nT Hz^{-0.5}]", XScale = "log", YScale = "log", Legend = ["x", "y", "z"], ...
-                Charts = [mag.graphics.chart.Plot(XVariable = "f", YVariables = ["x", "y", "z"]), yLine])}]; %#ok<DATST,AGROW>
-        end
-    end
 end
