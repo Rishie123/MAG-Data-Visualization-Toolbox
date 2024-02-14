@@ -5,7 +5,7 @@ classdef PSD < mag.graphics.view.View
         % NAME Figure name.
         Name string {mustBeScalarOrEmpty} = missing()
         % EVENT Event name to show.
-        Event string {mustBeMember(Event, ["DataFrequency", "Range"])}
+        Event (1, 1) string {mustBeMember(Event, ["DataFrequency", "Range"])}
     end
 
     methods
