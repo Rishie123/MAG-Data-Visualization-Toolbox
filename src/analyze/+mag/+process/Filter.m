@@ -7,11 +7,6 @@ classdef Filter < mag.process.Step
         DetailedDescription
     end
 
-    properties (Constant, Access = private)
-        % VECTORSPERPACKET Number of expected vectors in each packet.
-        VectorsPerPacket (1, :) double = [1 * 8, 2 * 8, 4 * 8, 8 * 2, 64 * 2, 128 * 2]
-    end
-
     properties
         % ONRANGECHANGE How long to remove when range changes.
         OnRangeChange (1, 2) duration
