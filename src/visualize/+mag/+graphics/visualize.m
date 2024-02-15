@@ -48,7 +48,7 @@ function f = visualize(data, styles, options)
 
     if ~isempty(options.GlobalLegend)
 
-        l = legend(ax(end), options.GlobalLegend, Orientation = "horizontal");
+        l = legend(ax(1), options.GlobalLegend, Orientation = "horizontal");
         l.Layout.Tile = "south";
     end
 
