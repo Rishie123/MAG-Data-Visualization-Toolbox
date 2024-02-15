@@ -1,5 +1,5 @@
-classdef Difference < mag.graphics.operation.Action
-% DIFFERENCE Perform difference of two variables.
+classdef Subtract < mag.graphics.operation.Action
+% SUBTRACT Perform difference of two variables.
 
     properties
         % MINUEND Name of property to subtract from.
@@ -10,10 +10,10 @@ classdef Difference < mag.graphics.operation.Action
 
     methods
 
-        function this = Difference(options)
+        function this = Subtract(options)
 
             arguments
-                options.?mag.graphics.operation.Difference
+                options.?mag.graphics.operation.Subtract
             end
 
             this.assignProperties(options);
@@ -22,7 +22,7 @@ classdef Difference < mag.graphics.operation.Action
         function plottableData = apply(this, originalData)
 
             arguments
-                this (1, 1) mag.graphics.operation.Difference
+                this (1, 1) mag.graphics.operation.Subtract
                 originalData {mustBeA(originalData, ["mag.Data", "tabular"])}
             end
 
