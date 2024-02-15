@@ -1,11 +1,11 @@
 # Software
 
 - Export I-ALiRT data
-- Separate `ScienceProcessing` and `IALiRTProcessing` in `mag.IMAPTestingAnalysis`
-- Add operations to plot composite variables (e.g., difference between variables)
-- Add plot for comparison of I-ALiRT data to science data
+- Add plot for comparison of I-ALiRT and science data and timestamps
+- Add operations to plot composite variables (e.g., difference between variables, convert variable value, etc.)
 - Add optional global legend to figures generated with `mag.graphics.visualize`
 - Add option to change tile indexing in figures generated with `mag.graphics.visualize`
+- Separate `ScienceProcessing` and `IALiRTProcessing` in `mag.IMAPTestingAnalysis`
 - Allow filtering both by time and number of vectors in `mag.process.Filter`
 - Also crop I-ALiRT data when calling `cropScience`
 - Remove check of mistimed packets
