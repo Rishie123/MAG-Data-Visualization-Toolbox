@@ -12,6 +12,7 @@ classdef Scatterhistogram < mag.graphics.chart.Chart
 
             arguments
                 options.?mag.graphics.chart.Scatterhistogram
+                options.YVariables (1, 1) {mustBeA(options.YVariables, ["string", "mag.graphics.operations.Select"])}
             end
 
             this.assignProperties(options);
