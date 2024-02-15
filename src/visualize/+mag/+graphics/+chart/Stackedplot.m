@@ -33,10 +33,10 @@ classdef Stackedplot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSuppor
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            Ny = numel(this.YVariables);
-
             xData = this.getXData(data);
             yData = this.getYData(data);
+
+            Ny = width(yData);
 
             if isempty(this.Colors) || (Ny > size(this.Colors, 1))
                 error("Mismatch in number of colors for number of plots.");

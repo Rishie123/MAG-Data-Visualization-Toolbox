@@ -8,7 +8,7 @@ classdef Frequency < mag.graphics.view.View
         PSDDuration (1, 1) duration = hours(1)
     end
 
-    methods 
+    methods
 
         function this = Frequency(results, options)
 
