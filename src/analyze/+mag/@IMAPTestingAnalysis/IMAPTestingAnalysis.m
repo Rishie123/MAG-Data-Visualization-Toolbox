@@ -26,8 +26,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
             mag.process.Missing(Variables = ["x", "y", "z"]), ...
             mag.process.Timestamp(), ...
             mag.process.DateTime(), ...
-            mag.process.SignedInteger(), ...
-            mag.process.Crop(NumberOfVectors = 1)]
+            mag.process.SignedInteger()]
         % WHOLEDATAPROCESSING Steps needed to process all of imported data.
         WholeDataProcessing (1, :) mag.process.Step = [ ...
             mag.process.Sort(), ...
@@ -36,6 +35,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % science data.
         ScienceProcessing (1, :) mag.process.Step = [
             mag.process.Filter(OnRangeChange = [-seconds(0.5), seconds(0.5)]), ...
+            mag.process.Range(), ...
+            mag.process.Calibration()]
+        % IALIRTPROCESSING Steps needed to process only I-ALiRT data.
+        IALiRTProcessing (1, :) mag.process.Step = [
             mag.process.Range(), ...
             mag.process.Calibration()]
         % RAMPPROCESSING Steps needed to process only ramp mode data.
@@ -461,52 +464,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 for hk = 1:numel(results.HK)
                     results.HK(hk) = mag.hk.dispatchHKType(results.HK(hk).Data, results.HK(hk).MetaData);
                 end
-            elseif isa(object, "struct")
-
-                % Recreate object based on version.
-                if isequal(object.OriginalVersion, 1.0)
-
-                    % Convert object to version 2.0 and recursively
-                    % dispatch it.
-                    loadedObject = struct();
-                    loadedObject.Version = 2.0;
-
-                    for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
-                            "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
-                            "Events", "MetaData", "HK", "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles"]
-
-                        if isfield(object, p)
-                            loadedObject.(p) = object.(p);
-                        end
-                    end
-
-                    mapping = dictionary(Outboard = "Primary", Inboard = "Secondary", OutRamp = "PrimaryRamp", InRamp = "SecondaryRamp");
-
-                    for k = mapping.keys()'
-                        loadedObject.(mapping(k)) = object.(k);
-                    end
-
-                    loadedObject = mag.IMAPTestingAnalysis.loadobj(loadedObject);
-                elseif isequal(object.OriginalVersion, 2.0)
-
-                    % Convert object directly to version 2.5.
-                    loadedObject = mag.IMAPTestingAnalysis();
-                    loadedObject.Results = mag.Instrument();
-
-                    for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
-                            "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
-                            "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles", ...
-                            "PrimaryRamp", "SecondaryRamp"]
-
-                        loadedObject.(p) = object.(p);
-                    end
-
-                    for p = ["Events", "MetaData", "Primary", "Secondary", "HK"]
-                        loadedObject.Results.(p) = object.(p);
-                    end
-                end
             else
-                error("Cannot retrieve ""mag.IMAPTestingAnalysis"" from ""%s"".", class(object));
+
+                error("Cannot retrieve ""mag.IMAPTestingAnalysis"" from ""%s"". Data needs to be reprocessed:" + newline() + newline() + ...
+                    ">> mag.IMAPTestingAnalysis.start(Location = ""%s"")", class(object), object.Location);
             end
         end
     end

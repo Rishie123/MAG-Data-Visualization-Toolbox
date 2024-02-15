@@ -103,10 +103,10 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
 
     %% Process Science Data
 
-    for ss = this.ScienceProcessing
+    for is = this.IALiRTProcessing
 
-        primaryData = ss.apply(primaryData, primaryMetaData);
-        secondaryData = ss.apply(secondaryData, secondaryMetaData);
+        primaryData = is.apply(primaryData, primaryMetaData);
+        secondaryData = is.apply(secondaryData, secondaryMetaData);
     end
 
     %% Assign Values
