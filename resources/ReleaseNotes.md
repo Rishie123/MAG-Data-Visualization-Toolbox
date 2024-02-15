@@ -6,6 +6,7 @@
 - Add plot for comparison of I-ALiRT data to science data
 - Add optional global legend to figures generated with `mag.graphics.visualize`
 - Add option to change tile indexing in figures generated with `mag.graphics.visualize`
+- Allow filtering both by time and number of vectors in `mag.process.Filter`
 - Also crop I-ALiRT data when calling `cropScience`
 - Remove check of mistimed packets
 - Remove logic to handle old versions of `mag.IMAPTestingAnalysis` in MAT files
