@@ -11,8 +11,10 @@ function f = visualize(data, styles, options)
         options.Name (1, 1) string = "MAG Time Series"
         options.Title string {mustBeScalarOrEmpty} = string.empty()
         options.Arrangement (1, 2) double = zeros(1, 2)
+        options.GlobalLegend (1, :) string = string.empty()
         options.LinkXAxes (1, 1) logical = false
         options.LinkYAxes (1, 1) logical = false
+        options.TileIndexing (1, 1) string {mustBeMember(options.TileIndexing, ["columnmajor", "rowmajor"])} = "rowmajor"
         options.WindowState (1, 1) string {mustBeMember(options.WindowState, ["normal", "maximized", "minimized", "fullscreen"])} = "normal"
         options.Visible (1, 1) logical = true
     end
@@ -33,7 +35,7 @@ function f = visualize(data, styles, options)
         arrangement = num2cell(options.Arrangement);
     end
 
-    t = tiledlayout(f, arrangement{:}, TileSpacing = "tight");
+    t = tiledlayout(f, arrangement{:}, TileSpacing = "tight", TileIndexing = options.TileIndexing);
     t.Title.String = options.Title;
 
     axes = matlab.graphics.axis.Axes.empty();
@@ -42,6 +44,12 @@ function f = visualize(data, styles, options)
 
         ax = doVisualize(t, data{i}, styles{i});
         axes = horzcat(axes, ax); %#ok<AGROW>
+    end
+
+    if ~isempty(options.GlobalLegend)
+
+        l = legend(ax(end), options.GlobalLegend, Orientation = "horizontal");
+        l.Layout.Tile = "south";
     end
 
     if options.LinkXAxes
