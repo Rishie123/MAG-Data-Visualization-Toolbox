@@ -138,8 +138,14 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 secondaryFilter (1, 1) {mustBeA(secondaryFilter, ["duration", "timerange", "withtol"])} = primaryFilter
             end
 
+            % Filter science.
             this.Primary.crop(primaryFilter);
             this.Secondary.crop(secondaryFilter);
+
+            % Filter I-ALiRT.
+            if this.HasIALiRT
+                this.IALiRT.crop(timerange(this.TimeRange(1), this.TimeRange(2), "closed"));
+            end
         end
 
         function cropToMatch(this, startTime, endTime)
@@ -155,11 +161,6 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             % Filter events.
             if ~isempty(this.Events)
                 this.Events = this.Events(isbetween([this.Events.CommandTimestamp], startTime, endTime, "closed"));
-            end
-
-            % Filter I-ALiRT.
-            if this.HasIALiRT
-                this.IALiRT.crop(timerange(startTime, endTime, "closed"));
             end
 
             % Filter HK.
