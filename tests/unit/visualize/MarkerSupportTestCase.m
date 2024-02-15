@@ -17,10 +17,12 @@ classdef (Abstract) MarkerSupportTestCase < MAGVisualizationTestCase
             % Set up.
             [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
 
+            args = testCase.getExtraArguments();
+
             % Exercise.
             chart = feval(testCase.ClassName, ...
-                MarkerProperties.Name, MarkerProperties.Value, ...
-                YVariables = "Number");
+                args{:}, ...
+                MarkerProperties.Name, MarkerProperties.Value);
 
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 

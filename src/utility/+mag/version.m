@@ -11,14 +11,28 @@ function v = version()
     if isempty(ver)
 
         location = fileparts(mfilename("fullpath"));
-        data = fileread(fullfile(location, "../../../.github/workflows/matlab.yml"));
+        fileName = fullfile(location, "../../../.github/workflows/matlab.yml");
 
-        match = regexp(data, "VERSION: ""(?<version>\d+\.\d+\.\d+)""", "once", "names");
+        if isfile(fileName)
 
-        if isempty(match)
-            ver = "";
+            data = fileread(fileName);
+            match = regexp(data, "VERSION: ""(?<version>\d+\.\d+\.\d+)""", "once", "names");
+
+            if isempty(match)
+                error("Could not determine version from ""matlab.yml"" file.");
+            else
+                ver = match.version;
+            end
         else
-            ver = match.version;
+
+            addOns = matlab.addons.installedAddons();
+            locMAG = addOns.Name == "MAG Data Visualization";
+
+            if any(locMAG) && (nnz(locMAG) == 1)
+                ver = addOns{locMAG, "Version"};
+            else
+                error("Could not determine version from AddOns.");
+            end
         end
     end
 

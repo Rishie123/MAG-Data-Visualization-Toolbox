@@ -2,8 +2,8 @@ classdef Scatterhistogram < mag.graphics.chart.Chart
 % SCATTERHISTOGRAM Definition of chart of "scatterhistogram" type.
 
     properties
-        % GROUPVARIABLE Variable to use to group observations.
-        GroupVariable string {mustBeScalarOrEmpty} = string.empty()
+        % GVARIABLE Variable to use to group observations.
+        GVariable string {mustBeScalarOrEmpty} = string.empty()
     end
 
     methods
@@ -22,7 +22,7 @@ classdef Scatterhistogram < mag.graphics.chart.Chart
 
             arguments (Input)
                 this
-                data {mustBeA(data, ["mag.Data", "table"])}
+                data {mustBeA(data, ["mag.Data", "tabular"])}
                 ~
                 layout (1, 1) matlab.graphics.layout.TiledChartLayout
             end
@@ -34,10 +34,10 @@ classdef Scatterhistogram < mag.graphics.chart.Chart
             xData = this.getXData(data);
             yData = this.getYData(data);
 
-            if isempty(this.GroupVariable)
+            if isempty(this.GVariable)
                 options = {};
             else
-                options = {"GroupData", data{:, this.GroupVariable}, "LegendVisible", "on"};
+                options = {"GroupData", data{:, this.GVariable}, "LegendVisible", "on"};
             end
 
             graph = scatterhistogram(layout, xData, yData, options{:});

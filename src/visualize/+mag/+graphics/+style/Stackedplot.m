@@ -1,4 +1,4 @@
-classdef Stackedplot < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport
+classdef Stackedplot < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport & mag.graphics.mixin.LegendSupport
 % STACKEDPLOT Style options for decoration of figure with multiple y-axis
 % variables to plot.
 
@@ -16,6 +16,7 @@ classdef Stackedplot < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport
             arguments
                 options.?mag.graphics.style.Stackedplot
                 options.Charts (1, 1) mag.graphics.chart.Stackedplot
+                options.LegendLocation (1, 1) string {mustBeMember(options.LegendLocation, ["north", "south", "east", "west"])} = "south"
             end
 
             this.set(options);
@@ -27,7 +28,7 @@ classdef Stackedplot < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport
         function axes = applyStyle(this, axes, graph)
 
             arguments (Input)
-                this
+                this (1, 1) mag.graphics.style.Stackedplot
                 axes (1, 1) matlab.graphics.axis.Axes
                 graph (1, :) matlab.graphics.chart.primitive.Line
             end
@@ -66,6 +67,13 @@ classdef Stackedplot < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport
             end
 
             this.applyGridStyle(axes);
+
+            % Add legend.
+            l = this.applyLegendStyle(axes);
+
+            if ~isempty(l)
+                l.Layout.Tile = this.LegendLocation;
+            end
 
             % Prettify axes appareance to match built-in stackedplot.
             xAxes = [axes(1:end-1).XAxis];

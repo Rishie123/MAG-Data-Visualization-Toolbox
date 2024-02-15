@@ -1,4 +1,4 @@
-classdef (Abstract, HandleCompatible, Hidden) LegendSupport
+classdef (Abstract, HandleCompatible) LegendSupport
 % LEGENDSUPPORT Add support for legend customization for an axis.
 
     properties
@@ -10,12 +10,14 @@ classdef (Abstract, HandleCompatible, Hidden) LegendSupport
 
     methods (Access = protected)
 
-        function applyLegendStyle(this, axes)
+        function l = applyLegendStyle(this, axes)
         % APPLYLEGENDSTYLE Apply specified style to an axis, to customize
         % legend appearance.
 
-            if ~isempty(this.Legend)
-                legend(axes, this.Legend, Location = this.LegendLocation);
+            if isempty(this.Legend)
+                l = matlab.graphics.illustration.Legend.empty();
+            else
+                l = legend(axes, this.Legend, Location = this.LegendLocation);
             end
         end
     end

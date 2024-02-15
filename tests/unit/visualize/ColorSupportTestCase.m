@@ -14,10 +14,12 @@ classdef (Abstract) ColorSupportTestCase < MAGVisualizationTestCase
             % Set up.
             [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
 
+            args = testCase.getExtraArguments();
+
             % Exercise.
             chart = feval(testCase.ClassName, ...
-                ColorProperties.Name, ColorProperties.Value, ...
-                YVariables = "Number");
+                args{:}, ...
+                ColorProperties.Name, ColorProperties.Value);
 
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 

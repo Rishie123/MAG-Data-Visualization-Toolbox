@@ -1,4 +1,4 @@
-classdef (Abstract, HandleCompatible, Hidden) MarkerSupport
+classdef (Abstract, HandleCompatible) MarkerSupport
 % MARKERSUPPORT Add support for marker customization for a chart.
 
     properties

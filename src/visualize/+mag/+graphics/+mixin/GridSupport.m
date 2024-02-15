@@ -1,4 +1,4 @@
-classdef (Abstract, HandleCompatible, Hidden) GridSupport
+classdef (Abstract, HandleCompatible) GridSupport
 % GRIDSUPPORT Add support for grid customization for an axis.
 
     properties

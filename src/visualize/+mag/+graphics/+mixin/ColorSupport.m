@@ -1,4 +1,4 @@
-classdef (Abstract, HandleCompatible, Hidden) ColorSupport
+classdef (Abstract, HandleCompatible) ColorSupport
 % COLORSUPPORT Add support for color customization for a chart.
 
     properties

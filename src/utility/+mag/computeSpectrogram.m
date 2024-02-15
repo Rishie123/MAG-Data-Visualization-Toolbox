@@ -42,7 +42,7 @@ function [f, t, p] = computeSpectrogram(x, y, options)
     end
 
     window = rate * w;
-    overlap = window * options.Overlap;
+    overlap = round(window * options.Overlap);
 
     % Spectrogram.
     y(ismissing(y) | isinf(y)) = 0;

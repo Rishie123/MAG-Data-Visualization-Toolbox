@@ -47,7 +47,7 @@ classdef (Sealed) PackageTask < matlab.buildtool.Task
 
         function packageToolbox(task, ~, version)
         % PACKAGETOOLBOX Package code into toolbox.
-            
+
             arguments
                 task (1, 1) mag.buildtool.task.PackageTask
                 ~
