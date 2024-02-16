@@ -81,6 +81,7 @@ classdef Filter < mag.process.Step
 
         function data = cropDataWithRange(events, data, name, range)
 
+            dt = mode(diff(data.t));
             locEvent = [true; diff(events.(name)) ~= 0];
 
             for t = events.Time(locEvent)'
@@ -89,7 +90,15 @@ classdef Filter < mag.process.Step
                     data{timerange(t + range(1), t + range(2), "closed"), "quality"} = false;
                 else
 
-                    idxTime = find(data.t == t);
+                    tEvent = data(withtol(t, dt), :).t;
+
+                    if isempty(tEvent)
+                        continue;
+                    elseif isscalar(tEvent)
+                        idxTime = find(data.t == tEvent);
+                    else
+                        [~, idxTime] = min(abs(data.t - t));
+                    end
 
                     r = range(1):range(2);
                     r(r == 0) = [];
