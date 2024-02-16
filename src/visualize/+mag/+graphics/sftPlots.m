@@ -19,7 +19,7 @@ function figures = sftPlots(analysis, options)
     if ~isempty(options.Filter)
 
         analysis = analysis.copy();
-        analysis.Results.fillWarmUp(options.Filter);
+        analysis.Results.cropScience(options.Filter);
     end
 
     % Separate modes.

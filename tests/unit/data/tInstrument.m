@@ -70,7 +70,7 @@ classdef tInstrument < matlab.mock.TestCase
             testCase.verifyEqual(instrument.getSensor("Secondary"), mag.meta.Sensor.FOB, "Secondary sensor should be returned when asked.");
         end
 
-        % Test that "cropScience" method calls method of underlying science
+        % Test that "fillWarmUp" method calls method of underlying science
         % data.
         function fillWarmUpMethod(testCase)
 

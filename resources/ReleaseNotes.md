@@ -11,5 +11,6 @@
 - Also crop I-ALiRT data when calling `cropScience`
 - Remove check of mistimed packets
 - Remove logic to handle old versions of `mag.IMAPTestingAnalysis` in MAT files
+- Replace `fillWarpUp` with `cropScience` in SFT plots
 - Fix wrong values for I-ALiRT data and packet frequency
 - Fix issue with too many sensor events being filtered out when processing science
