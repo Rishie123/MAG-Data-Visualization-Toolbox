@@ -5,6 +5,7 @@
 # Software
 
 - Add quality flag to describe data quality and filter data in plots
+- Improve estimate of mode change event timestamp
 - Export I-ALiRT data
 - Add plot for comparison of I-ALiRT and science data and timestamps
 - Add operations to plot composite variables (e.g., difference between variables, convert variable value, etc.)
