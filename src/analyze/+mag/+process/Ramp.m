@@ -26,12 +26,12 @@ classdef Ramp < mag.process.Step
             value = this.Description;
         end
 
-        function data = apply(this, data, ~)
+        function data = apply(this, data, metaData)
 
             arguments
-                this
-                data
-                ~
+                this (1, 1) mag.process.Ramp
+                data tabular
+                metaData (1, 1) mag.meta.Science
             end
 
             % Verify that no data is dropped during ramp mode.
@@ -41,7 +41,7 @@ classdef Ramp < mag.process.Step
                 matches = strfind(dv, this.Pattern);
 
                 if numel(matches) < floor((numel(dv) - 1) / numel(this.Pattern))
-                    warning("Ramp pattern inconsistent along %s-axis.", d);
+                    warning("Ramp pattern inconsistent along %s-axis of %s.", d, metaData.Sensor);
                 end
             end
         end
