@@ -34,7 +34,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % SCIENCEPROCESSING Steps needed to process only strictly
         % science data.
         ScienceProcessing (1, :) mag.process.Step = [
-            mag.process.Filter(OnRangeChange = [-1, 1]), ...
+            mag.process.Filter(OnModeChange = [0, 1], OnRangeChange = [-1, 5]), ...
             mag.process.Range(), ...
             mag.process.Calibration()]
         % IALIRTPROCESSING Steps needed to process only I-ALiRT data.
@@ -296,13 +296,14 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 if isempty(idxRange)
                     period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
                 else
-                    period = timerange(events.Time(idxRange), events.Time(idxRange + 4) - milliseconds(1), "closed");
+                    period = timerange(events.Time(idxRange), events.Time(idxRange + 4), "closedleft");
                 end
             end
 
             rangeCycling = this.applyTimeRangeToInstrument( ...
                 findRangeCyclingPeriod(this.Results.Primary.Events), ...
-                findRangeCyclingPeriod(this.Results.Secondary.Events));
+                findRangeCyclingPeriod(this.Results.Secondary.Events), ...
+                EnforceSizeMatch = true);
         end
 
         function rampMode = getRampMode(this)
@@ -418,7 +419,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % detected events and science data.
         eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents, data)
 
-        function result = applyTimeRangeToInstrument(this, primaryPeriod, secondaryPeriod)
+        function result = applyTimeRangeToInstrument(this, primaryPeriod, secondaryPeriod, options)
         % APPLYTIMERANGETOTABLE Apply timerange to timetable and its
         % events.
 
@@ -426,6 +427,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 this
                 primaryPeriod (1, 1) timerange
                 secondaryPeriod (1, 1) timerange
+                options.EnforceSizeMatch (1, 1) logical = false
             end
 
             arguments (Output)
@@ -442,6 +444,13 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
             if isempty(result.Primary.Data) || isempty(result.Secondary.Data)
                 result = mag.Instrument.empty();
+            elseif options.EnforceSizeMatch
+
+                if numel(result.Primary.Time) > numel(result.Secondary.Time)
+                    result.Primary.Data = result.Primary.Data(1:numel(result.Secondary.Time), :);
+                elseif numel(result.Primary.Time) < numel(result.Secondary.Time)
+                    result.Secondary.Data = result.Secondary.Data(1:numel(result.Primary.Time), :);
+                end
             end
         end
     end
