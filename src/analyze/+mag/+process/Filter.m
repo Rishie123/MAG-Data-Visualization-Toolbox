@@ -89,8 +89,16 @@ classdef Filter < mag.process.Step
                     data(timerange(t + range(1), t + range(2), "closed"), :) = [];
                 else
 
-                    idxTime = find(events.Time == t);
-                    data(idxTime + (range(1):range(2)), :) = [];
+                    idxTime = find(data.t == t);
+
+                    r = range(1):range(2);
+                    r(r == 0) = [];
+                    r(r > 0) = r(r > 0) - 1;
+
+                    idxRemove = idxTime + r;
+                    idxRemove(idxRemove < 1) = [];
+
+                    data(idxRemove, :) = [];
                 end
             end
         end
