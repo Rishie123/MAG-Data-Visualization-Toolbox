@@ -1,3 +1,7 @@
+# App
+
+- Fix issue where save location was taken off edit field, instead of analysis object
+
 # Software
 
 - Add quality flag to describe data quality and filter data in plots
