@@ -72,7 +72,7 @@ classdef Filter < mag.process.Step
             idxConfig = find(locConfig);
 
             if (nnz(locConfig) == 2) && any(contains([events.Label(idxConfig(1):idxConfig(end))], "Ramp"))
-                data(timerange(events.Time(idxConfig(1)), events.Time(idxConfig(end)), "closed"), :) = [];
+                data{timerange(events.Time(idxConfig(1)), events.Time(idxConfig(end)), "closed"), "quality"} = false;
             end
         end
     end
@@ -86,7 +86,7 @@ classdef Filter < mag.process.Step
             for t = events.Time(locEvent)'
 
                 if isa(range, "duration")
-                    data(timerange(t + range(1), t + range(2), "closed"), :) = [];
+                    data{timerange(t + range(1), t + range(2), "closed"), "quality"} = false;
                 else
 
                     idxTime = find(data.t == t);
@@ -98,7 +98,7 @@ classdef Filter < mag.process.Step
                     idxRemove = idxTime + r;
                     idxRemove(idxRemove < 1) = [];
 
-                    data(idxRemove, :) = [];
+                    data{idxRemove, "quality"} = false;
                 end
             end
         end

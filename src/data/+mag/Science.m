@@ -22,6 +22,9 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         Range (:, 1) uint8
         % SEQUENCE Sequence number of vectors.
         Sequence (:, 1) uint16
+        % QUALITY Quality flag denoting whether data is of high quality.
+        % "true" stands for high quality.
+        Quality (:, 1) logical
         % EVENTS Events detected.
         Events eventtable
     end
@@ -77,6 +80,14 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
         function sequence = get.Sequence(this)
             sequence = this.Data.sequence;
+        end
+
+        function set.Quality(this, quality)
+            this.Data.quality = quality;
+        end
+
+        function quality = get.Quality(this)
+            quality = this.Data.quality;
         end
 
         function events = get.Events(this)
