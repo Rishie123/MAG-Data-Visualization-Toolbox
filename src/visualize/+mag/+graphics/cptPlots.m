@@ -24,14 +24,6 @@ function figures = cptPlots(analysis, options)
     modeCycling = analysis.getModeCycling();
     views(end + 1) = mag.graphics.view.Field(modeCycling, Event = "Mode", Name = "Mode Cycling", Title = string.empty());
 
-    %% Final Normal Mode
-
-    finalNormal = analysis.getFinalNormalMode();
-
-    if ~isempty(finalNormal) && finalNormal.HasData
-        views(end + 1) = mag.graphics.view.Field(finalNormal, Name = "Normal Mode (CPT End)", Title = string.empty());
-    end
-
     %% Ranges
 
     rangeCycling = analysis.getRangeCycling();
@@ -65,6 +57,14 @@ function figures = cptPlots(analysis, options)
 
     if ~isempty(rangeCycling) && rangeCycling.HasData
         views(end + 1) = mag.graphics.view.PSD(rangeCycling, Name = "Range Cycling PSD Analysis", Event = "Range");
+    end
+
+    %% Final Normal Mode
+
+    finalNormal = analysis.getFinalNormalMode();
+
+    if ~isempty(finalNormal) && finalNormal.HasData
+        views(end + 1) = mag.graphics.view.Field(finalNormal, Name = "Normal Mode (CPT End)", Title = string.empty());
     end
 
     %% Visualize

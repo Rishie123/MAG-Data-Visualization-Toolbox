@@ -7,12 +7,6 @@ classdef Timestamp < mag.process.Step
         DetailedDescription
     end
 
-    properties (SetAccess = private)
-        % MISTIMEDPACKETS Counter for number of packets with wrong
-        % timestamp.
-        MistimedPackets (1, 1) double = 0
-    end
-
     methods
 
         function value = get.Name(~)
@@ -27,8 +21,7 @@ classdef Timestamp < mag.process.Step
 
             value = this.Description + " Sensor mode is used to determine the time difference between each " + ...
                 "data point (data points in a packet are returned with the same timestamp, which needs to be adjusted). " + ...
-                "Moreover, fine timestamp data is added, to achieve a more precise estimate. This step also checks for " + ...
-                "mistimed packets: " + this.MistimedPackets + " mistimed packet(s) encountered during this processing session.";
+                "Moreover, fine timestamp data is added, to achieve a more precise estimate.";
         end
 
         function data = apply(this, data, metaData)
@@ -61,16 +54,6 @@ classdef Timestamp < mag.process.Step
 
                 corruptPackets = uniqueSequence(diff(idxSequence) ~= vectorsPerPacket);
                 error("The following packets do not contain %d elements:\n    %s", vectorsPerPacket, join(compose("%d, ", corruptPackets)));
-            end
-
-            % Correct coarse time if incorrect.
-            actualPacketFrequency = diff(coarseAndFineTime(:, 1));
-            locMistimed = (actualPacketFrequency ~= 0) & (actualPacketFrequency ~= packetFrequency);
-
-            if any(locMistimed)
-
-                this.MistimedPackets = this.MistimedPackets + nnz(locMistimed);
-                warning("%d packets with wrong timestamp.", nnz(locMistimed));
             end
 
             % Determine time offset to add.

@@ -26,8 +26,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
             mag.process.Missing(Variables = ["x", "y", "z"]), ...
             mag.process.Timestamp(), ...
             mag.process.DateTime(), ...
-            mag.process.SignedInteger(), ...
-            mag.process.Crop(NumberOfVectors = 1)]
+            mag.process.SignedInteger()]
         % WHOLEDATAPROCESSING Steps needed to process all of imported data.
         WholeDataProcessing (1, :) mag.process.Step = [ ...
             mag.process.Sort(), ...
@@ -35,7 +34,13 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % SCIENCEPROCESSING Steps needed to process only strictly
         % science data.
         ScienceProcessing (1, :) mag.process.Step = [
-            mag.process.Filter(OnRangeChange = [-seconds(0.5), seconds(0.5)]), ...
+            mag.process.Filter(OnModeChange = [0, 1], OnRangeChange = [-1, 5]), ...
+            mag.process.Range(), ...
+            mag.process.Calibration()]
+        % IALIRTPROCESSING Steps needed to process only I-ALiRT data.
+        IALiRTProcessing (1, :) mag.process.Step = [
+            mag.process.Filter(OnRangeChange = [0, 1]), ...
+            mag.process.AllZero(Variables = ["x", "y", "z"]), ...
             mag.process.Range(), ...
             mag.process.Calibration()]
         % RAMPPROCESSING Steps needed to process only ramp mode data.
@@ -291,13 +296,14 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 if isempty(idxRange)
                     period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
                 else
-                    period = timerange(events.Time(idxRange), events.Time(idxRange + 4) - milliseconds(1), "closed");
+                    period = timerange(events.Time(idxRange), events.Time(idxRange + 4), "closedleft");
                 end
             end
 
             rangeCycling = this.applyTimeRangeToInstrument( ...
                 findRangeCyclingPeriod(this.Results.Primary.Events), ...
-                findRangeCyclingPeriod(this.Results.Secondary.Events));
+                findRangeCyclingPeriod(this.Results.Secondary.Events), ...
+                EnforceSizeMatch = true);
         end
 
         function rampMode = getRampMode(this)
@@ -413,7 +419,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % detected events and science data.
         eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents, data)
 
-        function result = applyTimeRangeToInstrument(this, primaryPeriod, secondaryPeriod)
+        function result = applyTimeRangeToInstrument(this, primaryPeriod, secondaryPeriod, options)
         % APPLYTIMERANGETOTABLE Apply timerange to timetable and its
         % events.
 
@@ -421,6 +427,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 this
                 primaryPeriod (1, 1) timerange
                 secondaryPeriod (1, 1) timerange
+                options.EnforceSizeMatch (1, 1) logical = false
             end
 
             arguments (Output)
@@ -437,6 +444,13 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
             if isempty(result.Primary.Data) || isempty(result.Secondary.Data)
                 result = mag.Instrument.empty();
+            elseif options.EnforceSizeMatch
+
+                if numel(result.Primary.Time) > numel(result.Secondary.Time)
+                    result.Primary.Data = result.Primary.Data(1:numel(result.Secondary.Time), :);
+                elseif numel(result.Primary.Time) < numel(result.Secondary.Time)
+                    result.Secondary.Data = result.Secondary.Data(1:numel(result.Primary.Time), :);
+                end
             end
         end
     end
@@ -461,52 +475,10 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 for hk = 1:numel(results.HK)
                     results.HK(hk) = mag.hk.dispatchHKType(results.HK(hk).Data, results.HK(hk).MetaData);
                 end
-            elseif isa(object, "struct")
-
-                % Recreate object based on version.
-                if isequal(object.OriginalVersion, 1.0)
-
-                    % Convert object to version 2.0 and recursively
-                    % dispatch it.
-                    loadedObject = struct();
-                    loadedObject.Version = 2.0;
-
-                    for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
-                            "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
-                            "Events", "MetaData", "HK", "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles"]
-
-                        if isfield(object, p)
-                            loadedObject.(p) = object.(p);
-                        end
-                    end
-
-                    mapping = dictionary(Outboard = "Primary", Inboard = "Secondary", OutRamp = "PrimaryRamp", InRamp = "SecondaryRamp");
-
-                    for k = mapping.keys()'
-                        loadedObject.(mapping(k)) = object.(k);
-                    end
-
-                    loadedObject = mag.IMAPTestingAnalysis.loadobj(loadedObject);
-                elseif isequal(object.OriginalVersion, 2.0)
-
-                    % Convert object directly to version 2.5.
-                    loadedObject = mag.IMAPTestingAnalysis();
-                    loadedObject.Results = mag.Instrument();
-
-                    for p = ["Location", "EventPattern", "MetaDataPattern", "SciencePattern", "HKPattern", ...
-                            "PerFileProcessing", "WholeDataProcessing", "ScienceProcessing", "RampProcessing", "HKProcessing", ...
-                            "EventFiles", "MetaDataFiles", "ScienceFiles", "HKFiles", ...
-                            "PrimaryRamp", "SecondaryRamp"]
-
-                        loadedObject.(p) = object.(p);
-                    end
-
-                    for p = ["Events", "MetaData", "Primary", "Secondary", "HK"]
-                        loadedObject.Results.(p) = object.(p);
-                    end
-                end
             else
-                error("Cannot retrieve ""mag.IMAPTestingAnalysis"" from ""%s"".", class(object));
+
+                error("Cannot retrieve ""mag.IMAPTestingAnalysis"" from ""%s"". Data needs to be reprocessed:" + newline() + newline() + ...
+                    ">> mag.IMAPTestingAnalysis.start(Location = ""%s"")", class(object), object.Location);
             end
         end
     end

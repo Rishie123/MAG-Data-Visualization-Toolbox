@@ -34,7 +34,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
             sensorEvents = removevars(sensorEvents, "PrimaryRate");
     end
 
-    % Improve timestamp estimates.
+    % Improve ramp mode timestamp estimates.
     sensorEvents = updateRampModeTimestamps(sensorEvents, data);
 
     % Add automatic transitions.
@@ -59,6 +59,9 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     end
 
     sensorEvents = sortrows(sensorEvents);
+
+    % Improve estimates of mode changes.
+    sensorEvents = findModeChanges(data, sensorEvents);
 
     % Basic structure for events table.
     emptyTime = datetime.empty();
@@ -149,6 +152,26 @@ function events = updateRampModeTimestamps(events, data)
 
         events.Time(idxRamp(1)) = data.t(idxStart);
         events.Time(idxRamp(end)) = data.t(idxEnd + numel(mag.process.Ramp.Pattern) + 1);
+    end
+end
+
+function events = findModeChanges(data, events)
+
+    searchWindow = seconds(5);
+    data = sortrows(data);
+
+    % Update timestamps for mode changes.
+    idxMode = find(diff(events.DataFrequency) ~= 0) + 1;
+
+    for t = events.Time(idxMode)'
+
+        % Find window around event and compute actual timestamp difference.
+        eventWindow = data(withtol(t, searchWindow), :);
+
+        dt = seconds(diff(eventWindow.t));
+        [~, idxChange] = max(diff(dt), [], ComparisonMethod = "abs");
+
+        events.Time(events.Time == t) = eventWindow.t(idxChange + 1);
     end
 end
 

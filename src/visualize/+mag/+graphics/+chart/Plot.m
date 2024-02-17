@@ -12,6 +12,7 @@ classdef Plot < mag.graphics.chart.Chart & mag.graphics.mixin.ColorSupport & mag
 
             arguments
                 options.?mag.graphics.chart.Plot
+                options.MarkerSize (1, 1) double = 6
             end
 
             this.assignProperties(options);

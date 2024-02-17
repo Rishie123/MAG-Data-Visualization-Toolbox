@@ -49,6 +49,20 @@ function export(this, exportStrategy, options)
         exportStrategy.export(exportedData);
     end
 
+    % Export I-ALiRT.
+    iALiRT = this.Results.IALiRT;
+
+    if ~isempty(iALiRT)
+
+        data = {iALiRT.Primary.Data(period, :), iALiRT.Secondary.Data(period, :)};
+        metaData = [iALiRT.Primary.MetaData, iALiRT.Secondary.MetaData];
+
+        exportedData = scienceExportFormat.formatForExport(data, metaData);
+
+        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s %s (%.2f, %.2f)", datestr(metaData(1).Timestamp, "ddmmyy-hhMM"), metaData(1).Mode, metaData(1).DataFrequency, metaData(2).DataFrequency) + extension); %#ok<DATST>
+        exportStrategy.export(exportedData);
+    end
+
     % Export range cycling.
     rangeCycling = this.getRangeCycling();
 

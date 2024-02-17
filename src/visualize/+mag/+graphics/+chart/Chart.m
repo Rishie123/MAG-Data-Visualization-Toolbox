@@ -4,10 +4,33 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
     properties
         % XVARIABLE Name of variable plotted on x-axis. Default is time.
         XVariable string {mustBeScalarOrEmpty}
-        % YVARIABLES Name of variables plotted on y-axis.
-        YVariables (1, :) string
         % FILTER Filter x- and y-axis variables.
         Filter (:, 1) logical = logical.empty()
+    end
+
+    properties (Dependent)
+        % YVARIABLES Name of variables plotted on y-axis.
+        YVariables (1, :) {mustBeA(YVariables, ["string", "mag.graphics.operation.Action"])}
+    end
+
+    properties (GetAccess = protected, SetAccess = private)
+        YVariables_ (1, :) mag.graphics.operation.Action
+    end
+
+    methods
+
+        function yVariables = get.YVariables(this)
+            yVariables = this.YVariables_;
+        end
+
+        function set.YVariables(this, yVariables)
+
+            if isa(yVariables, "string")
+                this.YVariables_ = mag.graphics.operation.Select(Variables = yVariables);
+            else
+                this.YVariables_ = yVariables;
+            end
+        end
     end
 
     methods (Abstract)
@@ -23,7 +46,7 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
         % If no name is provided, use independent variable.
 
             arguments
-                this
+                this (1, 1) mag.graphics.chart.Chart
                 data {mustBeA(data, ["mag.Data", "tabular"])}
             end
 
@@ -46,7 +69,7 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
         % If no name is provided, use dependent variables.
 
             arguments
-                this
+                this (1, 1) mag.graphics.chart.Chart
                 data {mustBeA(data, ["mag.Data", "tabular"])}
             end
 
@@ -58,12 +81,7 @@ classdef (Abstract) Chart < matlab.mixin.Heterogeneous & mag.mixin.SetGet
                     yData = data.DependentVariables;
                 end
             else
-
-                if isa(data, "tabular")
-                    yData = data{:, this.YVariables};
-                else
-                    yData = data.get(this.YVariables);
-                end
+                yData = this.YVariables.applyAll(data);
             end
 
             yData = this.applyFilter(yData);

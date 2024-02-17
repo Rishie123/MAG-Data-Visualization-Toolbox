@@ -6,10 +6,10 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
     end
 
     primaryMetaData = primaryMetaData.copy();
-    primaryMetaData.set(Mode = "I-ALiRT", DataFrequency = 1/8, PacketFrequency = 8);
+    primaryMetaData.set(Mode = "I-ALiRT", DataFrequency = 1/4, PacketFrequency = 4);
 
     secondaryMetaData = secondaryMetaData.copy();
-    secondaryMetaData.set(Mode = "I-ALiRT", DataFrequency = 1/8, PacketFrequency = 8);
+    secondaryMetaData.set(Mode = "I-ALiRT", DataFrequency = 1/4, PacketFrequency = 4);
 
     [~, ~, extension] = fileparts(this.IALiRTPattern);
     rawIALiRT = this.dispatchExtension(extension, ImportFileNames = this.IALiRTFileNames).import();
@@ -38,6 +38,10 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
 
         primary = renamevars(primary, ["x_pri", "y_pri", "z_pri", "rng_pri", "pri_coarse", "pri_fine"], newVariableNames);
         secondary = renamevars(secondary, ["x_sec", "y_sec", "z_sec", "rng_sec", "sec_coarse", "sec_fine"], newVariableNames);
+
+        % Add quality flag.
+        primary.quality = true(height(primary), 1);
+        secondary.quality = true(height(secondary), 1);
 
         % Current file meta data.
         pmd = primaryMetaData.copy();
@@ -103,10 +107,10 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
 
     %% Process Science Data
 
-    for ss = this.ScienceProcessing
+    for is = this.IALiRTProcessing
 
-        primaryData = ss.apply(primaryData, primaryMetaData);
-        secondaryData = ss.apply(secondaryData, secondaryMetaData);
+        primaryData = is.apply(primaryData, primaryMetaData);
+        secondaryData = is.apply(secondaryData, secondaryMetaData);
     end
 
     %% Assign Values

@@ -70,7 +70,7 @@ classdef tInstrument < matlab.mock.TestCase
             testCase.verifyEqual(instrument.getSensor("Secondary"), mag.meta.Sensor.FOB, "Secondary sensor should be returned when asked.");
         end
 
-        % Test that "cropScience" method calls method of underlying science
+        % Test that "fillWarmUp" method calls method of underlying science
         % data.
         function fillWarmUpMethod(testCase)
 
@@ -93,9 +93,10 @@ classdef tInstrument < matlab.mock.TestCase
         function cropScienceMethod(testCase)
 
             % Set up.
-            [instrument, primaryBehavior, secondaryBehavior] = testCase.createTestData();
+            [instrument, primaryBehavior, secondaryBehavior, iALiRTBehavior] = testCase.createTestData();
 
             timeFilter = timerange(datetime("-Inf", TimeZone = "UTC"), datetime("Inf", TimeZone = "UTC"));
+            expectedTimeFilter = timerange(instrument.TimeRange(1), instrument.TimeRange(2), "closed");
 
             % Exercise.
             instrument.cropScience(timeFilter);
@@ -103,6 +104,7 @@ classdef tInstrument < matlab.mock.TestCase
             % Verify.
             testCase.verifyCalled(primaryBehavior.crop(timeFilter), "Primary data should be cropped with same filter.");
             testCase.verifyCalled(secondaryBehavior.crop(timeFilter), "Secondary data should be cropped with same filter.");
+            testCase.verifyCalled(iALiRTBehavior.crop(expectedTimeFilter), "I-ALiRT data should be cropped with expected filter.");
         end
 
         % Test that "crop" method calls method of underlying science data.
@@ -112,7 +114,7 @@ classdef tInstrument < matlab.mock.TestCase
             [instrument, primaryBehavior, secondaryBehavior, iALiRTBehavior] = testCase.createTestData();
 
             timeFilter = timerange(datetime("-Inf", TimeZone = "UTC"), datetime("Inf", TimeZone = "UTC"));
-            expectedTimeFilter = timerange(instrument.TimeRange(1), instrument.TimeRange(end), "closed");
+            expectedTimeFilter = timerange(instrument.TimeRange(1), instrument.TimeRange(2), "closed");
 
             % Exercise.
             instrument.crop(timeFilter);
@@ -122,7 +124,7 @@ classdef tInstrument < matlab.mock.TestCase
             testCase.verifyCalled(secondaryBehavior.crop(timeFilter), "Secondary data should be cropped with same filter.");
             testCase.verifyCalled(iALiRTBehavior.crop(expectedTimeFilter), "I-ALiRT data should be cropped with same filter.");
 
-            testCase.verifyTrue(all(isbetween(instrument.HK.Time, instrument.TimeRange(1), instrument.TimeRange(end), "closed")), "HK data should be cropped with same filter.");
+            testCase.verifyTrue(all(isbetween(instrument.HK.Time, instrument.TimeRange(1), instrument.TimeRange(2), "closed")), "HK data should be cropped with same filter.");
         end
 
         % Test that "resample" method calls method of underlying science
