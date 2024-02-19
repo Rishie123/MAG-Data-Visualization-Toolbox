@@ -37,7 +37,12 @@ classdef SignedInteger < mag.process.Step
         end
 
         function data = apply(this, data, ~)
+
             data{:, this.Variables} = this.convertToSignedInteger(data{:, this.Variables});
+
+            for v = this.Variables
+                data.(v) = cast(data.(v), "double");
+            end
         end
     end
 
