@@ -9,7 +9,7 @@ classdef tConvertToDateTime < MAGAnalysisTestCase
             rightNow = datetime("now", TimeZone = "UTC");
             posixNow = posixtime(rightNow);
 
-            magNow = posixNow - mag.process.DateTime.Epoch;
+            magNow = posixNow - mag.time.Constant.Epoch;
 
             dateTimeStep = mag.process.DateTime();
 

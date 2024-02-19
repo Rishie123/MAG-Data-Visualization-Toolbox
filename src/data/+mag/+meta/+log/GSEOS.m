@@ -54,7 +54,7 @@ classdef GSEOS < mag.meta.log.Type
                 return;
             end
 
-            timestamp = datetime(rawData.Date(1) + rawData.Time(1), TimeZone = mag.process.DateTime.TimeZone, Format = mag.process.DateTime.Format);
+            timestamp = datetime(rawData.Date(1) + rawData.Time(1), TimeZone = mag.time.Constant.TimeZone, Format = mag.time.Constant.Format);
             messages = join(rawData.Message, newline);
 
             % Extract number of activation attempts.

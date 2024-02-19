@@ -34,7 +34,7 @@ function [primaryMetaData, secondaryMetaData, hkMetaData] = loadMetaData(this)
 
         rawData = regexp(this.HKFileNames{hkp}(1), mag.meta.HK.MetaDataFilePattern, "names");
 
-        timestamp = datetime(rawData.date + rawData.time, InputFormat = "yyyyMMddHHmmss", TimeZone = mag.process.DateTime.TimeZone, Format = mag.process.DateTime.Format);
+        timestamp = datetime(rawData.date + rawData.time, InputFormat = "yyyyMMddHHmmss", TimeZone = mag.time.Constant.TimeZone, Format = mag.time.Constant.Format);
         hkMetaData(end + 1) = mag.meta.HK(Type = rawData.type, Timestamp = timestamp); %#ok<AGROW>
     end
 
