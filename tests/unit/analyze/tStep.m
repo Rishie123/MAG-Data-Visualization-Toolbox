@@ -19,7 +19,7 @@ classdef tStep < MAGAnalysisTestCase
             documentation = stepClass.(PropertyName);
 
             % Verify.
-            testCase.assertClass(documentation, "string", "Documentation property type should be ""string"".")
+            testCase.assertClass(documentation, "string", "Documentation property type should be ""string"".");
             testCase.verifyNotEmpty(documentation, "Documentation property value should not be empty.");
         end
     end
@@ -31,6 +31,7 @@ classdef tStep < MAGAnalysisTestCase
             metaPackage = meta.package.fromName("mag.process");
 
             metaClass = metaPackage.ClassList;
+            metaClass = metaClass(metaClass < ?mag.process.Step);
             metaClass([metaClass.Abstract]) = [];
 
             classNames = {metaClass.Name};
