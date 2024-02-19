@@ -22,6 +22,9 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         Range (:, 1) uint8
         % SEQUENCE Sequence number of vectors.
         Sequence (:, 1) uint16
+        % COMPRESSION Compression flag denoting whether data is compressed.
+        % "true" stands for compressed.
+        Compression (:, 1) logical
         % QUALITY Quality flag denoting whether data is of high quality.
         % "true" stands for high quality.
         Quality (:, 1) logical
@@ -29,33 +32,40 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         Events eventtable
     end
 
+    properties (Access = private)
+        % SETTINGS Mapping of "timetable" properties to "mag.Science".
+        Settings (1, 1) mag.setting.Science
+    end
+
     methods
 
-        function this = Science(scienceData, metaData)
+        function this = Science(scienceData, metaData, propertySettings)
 
             arguments
                 scienceData timetable
                 metaData (1, 1) mag.meta.Science
+                propertySettings (1, 1) mag.setting.Science = mag.setting.Science()
             end
 
             this.Data = scienceData;
             this.MetaData = metaData;
+            this.Settings = propertySettings;
         end
 
         function x = get.X(this)
-            x = this.Data.x;
+            x = this.Data.(this.Settings.X);
         end
 
         function y = get.Y(this)
-            y = this.Data.y;
+            y = this.Data.(this.Settings.Y);
         end
 
         function z = get.Z(this)
-            z = this.Data.z;
+            z = this.Data.(this.Settings.Z);
         end
 
         function xyz = get.XYZ(this)
-            xyz = this.Data{:, ["x", "y", "z"]};
+            xyz = this.Data{:, [this.Settings.X, this.Settings.Y, this.Settings.Z]};
         end
 
         function b = get.B(this)
@@ -75,19 +85,23 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function range = get.Range(this)
-            range = this.Data.range;
+            range = this.Data.(this.Settings.Range);
         end
 
         function sequence = get.Sequence(this)
-            sequence = this.Data.sequence;
+            sequence = this.Data.(this.Settings.Sequence);
+        end
+
+        function compression = get.Compression(this)
+            compression = this.Data.(this.Settings.Compression);
         end
 
         function set.Quality(this, quality)
-            this.Data.quality = quality;
+            this.Data.(this.Settings.Quality) = quality;
         end
 
         function quality = get.Quality(this)
-            quality = this.Data.quality;
+            quality = this.Data.(this.Settings.Quality);
         end
 
         function events = get.Events(this)
@@ -114,7 +128,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             if isempty(this.Time)
-                this.MetaData.Timestamp = NaT(TimeZone = mag.process.DateTime.TimeZone);
+                this.MetaData.Timestamp = NaT(TimeZone = mag.time.Constant.TimeZone);
             else
                 this.MetaData.Timestamp = this.Time(1);
             end
