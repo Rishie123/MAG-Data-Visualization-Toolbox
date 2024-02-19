@@ -28,7 +28,7 @@ classdef SignedInteger < mag.process.Step
             value = "Change Signedness";
         end
 
-        function value = get.Description(~)
+        function value = get.Description(this)
             value = "Convert variables " + join(compose("""%s""", this.Variables), ", ") + " from unsigned to signed int16.";
         end
 

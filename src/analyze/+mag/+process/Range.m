@@ -34,7 +34,7 @@ classdef Range < mag.process.Step
             value = "Apply Range-Based Scaling";
         end
 
-        function value = get.Description(~)
+        function value = get.Description(this)
             value = "Apply scale factor to " + join(compose("""%s""", this.Variables), ", ") + " based on range """ + this.RangeVariable + """.";
         end
 
