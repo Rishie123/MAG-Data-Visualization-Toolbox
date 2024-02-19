@@ -99,12 +99,11 @@ classdef Event < mag.graphics.chart.Chart
                 end
             end
 
-            % Turn y-axis logarithmic.
-            [s, l] = bounds(variable);
+            % Fit axes to include text.
+            extents = cell2mat(get(findobj(axes, Type = "Text"), "Extent"));
+            upperPosition = sum(extents(:, [2, 4]), 2);
 
-            if ((l/s) > 10) && (range(variable) > 10)
-                yscale(axes, "log");
-            end
+            ylim(axes, [min(ylim(axes)), max(max(ylim(axes)), max(upperPosition))]);
         end
     end
 
