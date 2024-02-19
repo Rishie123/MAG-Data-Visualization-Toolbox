@@ -229,11 +229,11 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                         continue;
                     end
 
-                    data.Primary.MetaData.Mode = primaryEvents{p, "Mode"};
+                    data.Primary.MetaData.Mode = string(primaryEvents{p, "Mode"});
                     data.Primary.MetaData.DataFrequency = primaryEvents{p, "DataFrequency"};
                     data.Primary.MetaData.PacketFrequency = primaryEvents{p, "PacketFrequency"};
 
-                    data.Secondary.MetaData.Mode = secondaryEvents{p, "Mode"};
+                    data.Secondary.MetaData.Mode = string(secondaryEvents{p, "Mode"});
                     data.Secondary.MetaData.DataFrequency = secondaryEvents{p, "DataFrequency"};
                     data.Secondary.MetaData.PacketFrequency = secondaryEvents{p, "PacketFrequency"};
 
