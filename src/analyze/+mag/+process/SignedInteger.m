@@ -8,14 +8,28 @@ classdef SignedInteger < mag.process.Step
         DetailedDescription
     end
 
+    properties
+        % VARIABLES Variables to be converted to signed integer.
+        Variables (1, :) string
+    end
+
     methods
+
+        function this = SignedInteger(options)
+
+            arguments
+                options.?mag.process.SignedInteger
+            end
+
+            this.assignProperties(options);
+        end
 
         function value = get.Name(~)
             value = "Change Signedness";
         end
 
         function value = get.Description(~)
-            value = "Convert data from unsigned to signed int16.";
+            value = "Convert variables " + join(compose("""%s""", this.Variables), ", ") + " from unsigned to signed int16.";
         end
 
         function value = get.DetailedDescription(this)
@@ -23,7 +37,7 @@ classdef SignedInteger < mag.process.Step
         end
 
         function data = apply(this, data, ~)
-            data{:, ["x", "y", "z"]} = this.convertToSignedInteger(data{:, ["x", "y", "z"]});
+            data{:, this.Variables} = this.convertToSignedInteger(data{:, this.Variables});
         end
     end
 
