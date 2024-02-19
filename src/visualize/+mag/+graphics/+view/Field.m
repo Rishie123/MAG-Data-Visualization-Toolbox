@@ -3,7 +3,7 @@ classdef Field < mag.graphics.view.Science
 
     properties
         % EVENT Event name to show.
-        Event string {mustBeScalarOrEmpty, mustBeMember(Event, ["Mode", "Range"])} = string.empty()
+        Event string {mustBeScalarOrEmpty, mustBeMember(Event, ["Compression", "Mode", "Range"])} = string.empty()
     end
 
     methods
@@ -31,17 +31,23 @@ classdef Field < mag.graphics.view.Science
             secondary = this.Results.Secondary;
 
             switch this.Event
+                case "Compression"
+
+                    numEvents = 1;
+                    eventData = {primary, mag.graphics.style.Default(Title = compose("%s Compression", primarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Compression")), ...
+                        secondary, mag.graphics.style.Default(Title = compose("%s Compression", secondarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Compression"))};
+
                 case "Mode"
 
                     numEvents = 1;
-                    eventData = {primary, mag.graphics.style.Default(Title = compose("%s Modes", primarySensor), YLabel = "mode [-]", YLimits = "padded", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency")), ...
-                        secondary, mag.graphics.style.Default(Title = compose("%s Modes", secondarySensor), YLabel = "mode [-]", YLimits = "padded", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency"))};
+                    eventData = {primary.Events, mag.graphics.style.Default(Title = compose("%s Modes", primarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency")), ...
+                        secondary.Events, mag.graphics.style.Default(Title = compose("%s Modes", secondarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency"))};
 
                 case "Range"
 
                     numEvents = 1;
-                    eventData = {primary, mag.graphics.style.Default(Title = compose("%s Ranges", primarySensor), YLabel = "range [-]", YLimits = "padded", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1)), ...
-                        secondary, mag.graphics.style.Default(Title = compose("%s Ranges", secondarySensor), YLabel = "range [-]", YLimits = "padded", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1))};
+                    eventData = {primary.Events, mag.graphics.style.Default(Title = compose("%s Ranges", primarySensor), YLabel = "range [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1)), ...
+                        secondary.Events, mag.graphics.style.Default(Title = compose("%s Ranges", secondarySensor), YLabel = "range [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1))};
 
                 otherwise
                     [numEvents, eventData] = deal(0, {});

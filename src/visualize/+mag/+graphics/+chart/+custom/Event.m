@@ -26,8 +26,8 @@ classdef Event < mag.graphics.chart.Chart
         function graph = plot(this, data, axes, ~)
 
             arguments (Input)
-                this
-                data {mustBeA(data, ["mag.TimeSeries", "timetable"])}
+                this (1, 1) mag.graphics.chart.custom.Event
+                data {mustBeA(data, ["mag.Science", "timetable"])}
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -36,30 +36,32 @@ classdef Event < mag.graphics.chart.Chart
                 graph (1, :) matlab.graphics.Graphics
             end
 
-            if isa(data, "mag.TimeSeries")
+            if isa(data, "mag.Science")
+
+                eventOfInterest = data.Settings.(this.EventOfInterest);
                 data = data.Data;
+            else
+                eventOfInterest = this.EventOfInterest;
             end
 
             hold(axes, "on");
             resetAxesHold = onCleanup(@() hold(axes, "off"));
 
             % Process data.
-            events = data.Properties.Events;
-
             if this.IgnoreMissing
-                interestingEvents = events(~ismissing(events.(this.EventOfInterest)), :);
+                interestingEvents = data(~ismissing(data.(eventOfInterest)), :);
             else
-                interestingEvents = events;
+                interestingEvents = data;
             end
 
             if this.CombineEvents
 
-                locCombine = ([NaN; diff(interestingEvents.(this.EventOfInterest))] == 0);
+                locCombine = ([NaN; diff(interestingEvents.(eventOfInterest))] == 0);
                 interestingEvents(locCombine, :) = [];
             end
 
-            time = interestingEvents.Time;
-            variable = interestingEvents.(this.EventOfInterest);
+            time = interestingEvents.(interestingEvents.Properties.DimensionNames{1});
+            variable = interestingEvents.(eventOfInterest);
 
             plotTime = repmat(datetime("now", TimeZone = "UTC"), 2 * numel(time), 1);
             plotTime(1:2:end) = time;
@@ -100,7 +102,16 @@ classdef Event < mag.graphics.chart.Chart
             end
 
             % Fit axes to include text.
-            extents = cell2mat(get(findobj(axes, Type = "Text"), "Extent"));
+            txt = findobj(axes, Type = "Text");
+
+            if isempty(txt)
+                return;
+            elseif isscalar(txt)
+                extents = get(txt, "Extent");
+            else
+                extents = cell2mat(get(txt, "Extent"));
+            end
+
             upperPosition = sum(extents(:, [2, 4]), 2);
 
             ylim(axes, [min(ylim(axes)), max(max(ylim(axes)), max(upperPosition))]);

@@ -32,7 +32,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         Events eventtable
     end
 
-    properties (Access = private)
+    properties (SetAccess = immutable)
         % SETTINGS Mapping of "timetable" properties to "mag.Science".
         Settings (1, 1) mag.setting.Science
     end
