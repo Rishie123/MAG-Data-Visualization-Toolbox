@@ -79,7 +79,7 @@ classdef Event < mag.graphics.chart.Chart
             end
 
             % Plot vertical lines between mode changes.
-            xline(axes, time, "--");
+            xline(axes, [time; data.(data.Properties.DimensionNames{1})(end)], "--");
 
             % Plot text annotation.
             for i = 1:numel(graph)
