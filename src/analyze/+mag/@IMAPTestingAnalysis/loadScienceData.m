@@ -14,16 +14,8 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
     for i = 1:numel(rawScience)
         %% Split Data
 
-        idxKeep = 1:size(rawScience{i}, 2);
-        variableNames = rawScience{i}.Properties.VariableNames;
-
-        % Retrieve primary.
-        locPrimaryKeep = contains(variableNames, ["pri", "sequence"]);
-        primary = rawScience{i}(:, idxKeep(locPrimaryKeep));
-
-        % Retrieve secondary.
-        locSecondaryKeep = contains(variableNames, ["sec", "sequence"]);
-        secondary = rawScience{i}(:, idxKeep(locSecondaryKeep));
+        primary = rawScience{i}(:, regexpPattern(".*(pri|sequence).*"));
+        secondary = rawScience{i}(:, regexpPattern(".*(sec|sequence).*"));
 
         %% Process Data
 

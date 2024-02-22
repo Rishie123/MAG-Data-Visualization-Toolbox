@@ -20,16 +20,8 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
     for i = 1:numel(rawIALiRT)
         %% Split Data
 
-        idxKeep = 1:size(rawIALiRT{i}, 2);
-        variableNames = rawIALiRT{i}.Properties.VariableNames;
-
-        % Retrieve primary.
-        locPrimaryKeep = contains(variableNames, ["pri", "sequence"]);
-        primary = rawIALiRT{i}(:, idxKeep(locPrimaryKeep));
-
-        % Retrieve secondary.
-        locSecondaryKeep = contains(variableNames, ["sec", "sequence"]);
-        secondary = rawIALiRT{i}(:, idxKeep(locSecondaryKeep));
+        primary = rawIALiRT{i}(:, regexpPattern(".*(pri|sequence).*"));
+        secondary = rawIALiRT{i}(:, regexpPattern(".*(sec|sequence).*"));
 
         %% Process Data
 
