@@ -27,7 +27,10 @@ function f = visualize(data, styles, options)
     drawnow();
 
     % Create and populate figure.
-    f = figure(Name = options.Name, NumberTitle = "off", WindowState = options.WindowState, Visible = matlab.lang.OnOffSwitchState(options.Visible));
+    % Make sure figure is hidden while being populated, and only shown, if
+    % requested, at the end.
+    f = figure(Name = options.Name, NumberTitle = "off", WindowState = options.WindowState, Visible = "off");
+    setVisibility = onCleanup(@() set(f, Visible = matlab.lang.OnOffSwitchState(options.Visible)));
 
     if isequal(options.Arrangement, zeros(1, 2))
         arrangement = {"flow"};
