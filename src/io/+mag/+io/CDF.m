@@ -51,7 +51,7 @@ classdef CDF < mag.io.Type
             globalAttributes.Logical_source = sprintf('imap_L1b_mag%s', lower(data.MetaData.Mode{:}(1)));
             globalAttributes.Logical_file_id = char(this.ExportFileName);
             globalAttributes.Logical_source_description = sprintf('IMAP Magnetometer Level %s %s Mode Data in %s coordinates.', options.Level, data.MetaData.Mode, "S/C");
-            globalAttributes.Generation_date = replace(char(datetime("now", Format = "yyyy-MM-dd HH:mm:SS")), " ", "T");
+            globalAttributes.Generation_date = char(datetime("now", Format = "yyyy-MM-dd'T'HH:mm:SS"));
             globalAttributes.Software_version = char(metaData.ASW);
 
             globalAttributes.Distribution = 'Internal to Imperial College London';
@@ -61,8 +61,8 @@ classdef CDF < mag.io.Type
 
             variableAttributes = cdfInfo.VariableAttributes;
 
-            variableAttributes.SCALEMAX{1,2} = spdfdatenumtott2000(datenum(data.Time(1))); %#ok<*DATNM>
-            variableAttributes.SCALEMIN{1,2} = spdfdatenumtott2000(datenum(data.Time(end)));
+            variableAttributes.SCALEMAX{1, 2} = spdfdatenumtott2000(datenum(data.Time(1))); %#ok<*DATNM>
+            variableAttributes.SCALEMIN{1, 2} = spdfdatenumtott2000(datenum(data.Time(end)));
 
             %% Values
 

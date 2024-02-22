@@ -117,7 +117,7 @@ function loadEventsData(this)
         for i = 1:numel(acknowledgeEvents)
 
             acknowledgeEvents(i).timestamp = datetime(acknowledgeEvents(i).timestamp, Format = eventTimeFormat, TimeZone = "UTC");
-            acknowledgeEvents(i).coarse = datetime(mag.process.DateTime.Epoch + str2double(acknowledgeEvents(i).coarse), ConvertFrom = "posixtime", TimeZone = mag.process.DateTime.TimeZone);
+            acknowledgeEvents(i).coarse = datetime(mag.time.Constant.Epoch + str2double(acknowledgeEvents(i).coarse), ConvertFrom = "posixtime", TimeZone = mag.time.Constant.TimeZone);
         end
     end
 
@@ -139,7 +139,7 @@ function loadEventsData(this)
         for i = 1:numel(completedEvents)
 
             completedEvents(i).timestamp = datetime(completedEvents(i).timestamp, Format = eventTimeFormat, TimeZone = "UTC");
-            completedEvents(i).coarse = datetime(mag.process.DateTime.Epoch + str2double(completedEvents(i).coarse), ConvertFrom = "posixtime", TimeZone = mag.process.DateTime.TimeZone);
+            completedEvents(i).coarse = datetime(mag.time.Constant.Epoch + str2double(completedEvents(i).coarse), ConvertFrom = "posixtime", TimeZone = mag.time.Constant.TimeZone);
         end
     end
 

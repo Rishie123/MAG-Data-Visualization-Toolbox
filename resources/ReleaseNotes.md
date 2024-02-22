@@ -1,28 +1,15 @@
-# App
-
-- Fix issue where save location was taken off edit field, instead of analysis object
-
 # Software
 
-## I-ALiRT
-
-- Add plot for comparison of I-ALiRT and science data and timestamps
-- Export I-ALiRT data
-- Separate `ScienceProcessing` and `IALiRTProcessing` in `mag.IMAPTestingAnalysis`
-- Also crop I-ALiRT data when calling `cropScience`
-- Fix wrong values for I-ALiRT data and packet frequency
-
-## Other
-
-- Add quality flag to describe data quality and filter data in plots
-- Improve estimate of mode change event timestamp
-- Allow filtering both by time and number of vectors in `mag.process.Filter`
-- Add operations to plot composite variables (e.g., difference between variables, convert variable value, etc.)
-- Add optional global legend to figures generated with `mag.graphics.visualize`
-- Add option to change tile indexing in figures generated with `mag.graphics.visualize`
-- Add sensor name in "ramp inconsistent" warning
-- Remove check of mistimed packets
-- Remove logic to handle old versions of `mag.IMAPTestingAnalysis` in MAT files
-- Replace `fillWarpUp` with `cropScience` in SFT plots
-- Make sure range cycling primary and secondary science data are of the same size
-- Fix issue with too many sensor events being filtered out when processing science
+- Add compression flag to `mag.Science`
+- Add settings file to specify name of `timetable` properties for `mag.Science`
+- Add `Compression` property to supported events for plotting
+- Add `YAxisLocation` for `mag.graphics.style.Default` and `mag.graphics.style.Stackedplot`
+- Shift `YAxisLocation` to "right" for plots on right-hand side of some views: `mag.graphics.view.Field`, `mag.graphics.view.Frequency`, `mag.graphics.view.HK`, `mag.graphics.view.IALiRT`, and `mag.graphics.view.RampMode`
+- Do not show figure until it is fully populated in `mag.graphics.visualize`
+- Create `mag.meta.Mode` enumeration to capture sensor science mode
+- Move definition of time constants to shared utility file `mag.time.Constant`
+- Make `mag.process.Range` and `mag.process.SignedInteger` more flexible to custom variable names
+- Make sure converted values in `mag.process.SignedInteger` are returned as `double`
+- Fix [#10](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/issues/10)
+- Fix [#19](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/issues/19)
+- Add tests for processing step documentation properties

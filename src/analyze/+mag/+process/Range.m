@@ -12,14 +12,30 @@ classdef Range < mag.process.Step
         ScaleFactors (1, 4) double = [2.13618, 0.072, 0.01854, 0.00453]
     end
 
+    properties
+        % RANGEVARIABLE Name of range variable.
+        RangeVariable (1, 1) string
+        % VARIABLES Variables to be converted using range information.
+        Variables (1, :) string
+    end
+
     methods
+
+        function this = Range(options)
+
+            arguments
+                options.?mag.process.Range
+            end
+
+            this.assignProperties(options);
+        end
 
         function value = get.Name(~)
             value = "Apply Range-Based Scaling";
         end
 
-        function value = get.Description(~)
-            value = "Apply scale factor based on range value.";
+        function value = get.Description(this)
+            value = "Apply scale factor to " + join(compose("""%s""", this.Variables), ", ") + " based on range """ + this.RangeVariable + """.";
         end
 
         function value = get.DetailedDescription(this)
@@ -29,7 +45,7 @@ classdef Range < mag.process.Step
         end
 
         function data = apply(this, data, ~)
-            data{:, ["x", "y", "z"]} = this.applyRange(data{:, ["x", "y", "z"]}, data.range);
+            data{:, this.Variables} = this.applyRange(data{:, this.Variables}, data.(this.RangeVariable));
         end
     end
 

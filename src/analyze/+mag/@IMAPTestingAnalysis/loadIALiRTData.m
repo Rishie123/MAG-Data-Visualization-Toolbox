@@ -39,7 +39,10 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
         primary = renamevars(primary, ["x_pri", "y_pri", "z_pri", "rng_pri", "pri_coarse", "pri_fine"], newVariableNames);
         secondary = renamevars(secondary, ["x_sec", "y_sec", "z_sec", "rng_sec", "sec_coarse", "sec_fine"], newVariableNames);
 
-        % Add quality flag.
+        % Add compression and quality flags.
+        primary.compression = false(height(primary), 1);
+        secondary.compression = false(height(secondary), 1);
+
         primary.quality = true(height(primary), 1);
         secondary.quality = true(height(secondary), 1);
 

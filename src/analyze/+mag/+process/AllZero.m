@@ -43,7 +43,7 @@ classdef AllZero < mag.process.Step
                 ~
             end
 
-            locTime = data.Properties.RowTimes <= datetime(mag.process.DateTime.Epoch, ConvertFrom = "posix", TimeZone = "UTC");
+            locTime = data.Properties.RowTimes <= datetime(mag.time.Constant.Epoch, ConvertFrom = "posix", TimeZone = "UTC");
             locData = all(data{:, this.Variables} == 0, 2);
 
             data(locTime & locData, :) = [];

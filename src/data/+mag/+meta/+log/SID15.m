@@ -58,8 +58,8 @@ classdef SID15 < mag.meta.log.Type
             instrumentMetaData.Attemps = [fobAttempts, fibAttempts];
 
             instrumentMetaData.Timestamp = rawData{1, "SHCOARSE"};
-            instrumentMetaData.Timestamp.TimeZone = mag.process.DateTime.TimeZone;
-            instrumentMetaData.Timestamp.Format = mag.process.DateTime.Format;
+            instrumentMetaData.Timestamp.TimeZone = mag.time.Constant.TimeZone;
+            instrumentMetaData.Timestamp.Format = mag.time.Constant.Format;
         end
     end
 end

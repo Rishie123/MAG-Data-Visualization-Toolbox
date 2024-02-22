@@ -9,6 +9,8 @@ classdef Default < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport & ma
         XScale (1, 1) string {mustBeMember(XScale, ["linear", "log"])} = "linear"
         % YSCALE Scale of y-axis.
         YScale (1, 1) string {mustBeMember(YScale, ["linear", "log"])} = "linear"
+        % YLIMITS Limits of y-axis.
+        YAxisLocation (1, 1) string {mustBeMember(YAxisLocation, ["left", "right"])} = "left"
     end
 
     methods
@@ -28,7 +30,7 @@ classdef Default < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport & ma
         function axes = applyStyle(this, axes, ~)
 
             arguments (Input)
-                this
+                this (1, 1) mag.graphics.style.Default
                 axes (1, 1) matlab.graphics.axis.Axes
                 ~
             end
@@ -45,6 +47,8 @@ classdef Default < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport & ma
 
             xscale(axes, this.XScale);
             yscale(axes, this.YScale);
+
+            set(axes, YAxisLocation = this.YAxisLocation);
 
             if ~isempty(this.Title)
                 title(axes, this.Title);

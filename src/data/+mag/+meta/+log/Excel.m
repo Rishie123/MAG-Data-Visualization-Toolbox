@@ -78,7 +78,7 @@ classdef Excel < mag.meta.log.Type
             instrumentMetaData.Attemps = [attempts.fob, attempts.fib];
             instrumentMetaData.Operator = rawData{1, "Var3"};
             instrumentMetaData.Description = rawData{4, "Var7"};
-            instrumentMetaData.Timestamp = datetime(rawData{4, "Var3"}, TimeZone = "local", Format = mag.process.DateTime.Format) + ...
+            instrumentMetaData.Timestamp = datetime(rawData{4, "Var3"}, TimeZone = "local", Format = mag.time.Constant.Format) + ...
                 duration(regexp(data, "^Time: ([\w:]+)$", "once", "tokens", "dotexceptnewline", "lineanchors"), InputFormat = "hh:mm");
 
             % Enhance primary and secondary meta data.
