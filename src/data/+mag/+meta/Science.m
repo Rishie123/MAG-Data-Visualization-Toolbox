@@ -10,7 +10,9 @@ classdef Science < mag.meta.Data
         Model string {mustBeScalarOrEmpty, mustMatchRegex(Model, "^[LEF]M\d$")}
         % FEE FEE id.
         FEE string {mustBeScalarOrEmpty, mustMatchRegex(FEE, "^FEE\d$")}
-        % CAN Can holding sensor.
+        % HARNESS Harness connecting sensor to electronics box.
+        Harness string {mustBeScalarOrEmpty}
+        % CAN Can containing sensor.
         Can string {mustBeScalarOrEmpty}
         % SENSOR Sensor type.
         Sensor mag.meta.Sensor {mustBeScalarOrEmpty}

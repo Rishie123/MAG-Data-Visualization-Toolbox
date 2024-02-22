@@ -7,7 +7,7 @@ classdef Excel < mag.meta.log.Type
         % start up the sensors.
         ActivationPattern (1, 1) string = "^\s*FOB:\s*(?<fob>\d+)?.*?FIB:\s*(?<fib>\d+)?.*?Repeat activation\?:\s*(:?y\/n)?\s*(?<repeat>.*?)?\s*$"
         % SENSORPATTERN Regex pattern to extract sensor meta data.
-        SensorPattern (1, 1) string = "(?<fee>FEE\d).*?,.+?,.*?(?<model>[LEF]M\d)\s*(?<can>\(.*?\))?"
+        SensorPattern (1, 1) string = "(?<fee>FEE\d).*?,\s*(?<harness>.+?)\s*,.*?(?<model>[LEF]M\d)\s*(?<can>\(.*?\))?"
     end
 
     methods
@@ -40,13 +40,15 @@ classdef Excel < mag.meta.log.Type
             end
 
             % Read meta data file.
-            rawData = readtable(this.FileName, Sheet = "Sheet1", ReadVariableNames = false, TextType = "string");
+            importOptions = spreadsheetImportOptions(NumVariables = 9, VariableTypes = repmat("string", 1, 9), Sheet = "Sheet1");
+
+            rawData = readtable(this.FileName, importOptions);
             rawData = rmmissing(rawData, 1, MinNumMissing = size(rawData, 2));
             rawData = rmmissing(rawData, 2, MinNumMissing = size(rawData, 1));
 
             % Extract sensor meta data.
-            primaryDetails = regexp(string(rawData{1, "Var6"}), this.SensorPattern, "once", "names");
-            secondaryDetails = regexp(string(rawData{2, "Var6"}), this.SensorPattern, "once", "names");
+            primaryDetails = regexp(rawData{3, "Var6"}, this.SensorPattern, "once", "names");
+            secondaryDetails = regexp(rawData{4, "Var6"}, this.SensorPattern, "once", "names");
 
             assert(~isempty(primaryDetails), "No meta data detected for FOB.");
             assert(~isempty(secondaryDetails), "No meta data detected for FIB.");
@@ -72,18 +74,19 @@ classdef Excel < mag.meta.log.Type
             end
 
             % Assign instrument meta data.
-            instrumentMetaData.Model = extract(rawData{2, "Var3"}, regexpPattern("[LEF]M"));
-            instrumentMetaData.BSW = rawData{3, "Var3"};
-            instrumentMetaData.ASW = rawData{3, "Var7"};
+            instrumentMetaData.Model = extract(rawData{4, "Var3"}, regexpPattern("[LEF]M"));
+            instrumentMetaData.BSW = rawData{5, "Var3"};
+            instrumentMetaData.ASW = rawData{5, "Var7"};
             instrumentMetaData.Attemps = [attempts.fob, attempts.fib];
-            instrumentMetaData.Operator = rawData{1, "Var3"};
-            instrumentMetaData.Description = rawData{4, "Var7"};
-            instrumentMetaData.Timestamp = datetime(rawData{4, "Var3"}, TimeZone = "local", Format = mag.time.Constant.Format) + ...
+            instrumentMetaData.Operator = rawData{3, "Var3"};
+            instrumentMetaData.Description = rawData{6, "Var7"};
+            instrumentMetaData.Timestamp = datetime(rawData{6, "Var3"}, TimeZone = "local", Format = mag.time.Constant.Format) + ...
                 duration(regexp(data, "^Time: ([\w:]+)$", "once", "tokens", "dotexceptnewline", "lineanchors"), InputFormat = "hh:mm");
 
             % Enhance primary and secondary meta data.
             [primaryMetaData.Model] = deal(primaryDetails.model);
             [primaryMetaData.FEE] = deal(primaryDetails.fee);
+            [primaryMetaData.Harness] = deal(primaryDetails.harness);
 
             if isfield(primaryDetails, "can")
 
@@ -93,6 +96,7 @@ classdef Excel < mag.meta.log.Type
 
             [secondaryMetaData.Model] = deal(secondaryDetails.model);
             [secondaryMetaData.FEE] = deal(secondaryDetails.fee);
+            [secondaryMetaData.Harness] = deal(secondaryDetails.harness);
 
             if isfield(primaryDetails, "can")
 
