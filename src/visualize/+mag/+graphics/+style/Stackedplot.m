@@ -5,6 +5,8 @@ classdef Stackedplot < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport 
     properties
         % YLABELS Display names of y-axes.
         YLabels (1, :) string
+        % YLIMITS Limits of y-axis.
+        YAxisLocation (1, 1) string {mustBeMember(YAxisLocation, ["left", "right"])} = "left"
         % ROTATELABELS Rotate y-axes labels.
         RotateLabels (1, 1) logical = false
     end
@@ -61,6 +63,7 @@ classdef Stackedplot < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport 
             end
 
             ylim(axes, this.YLimits);
+            set(axes, YAxisLocation = this.YAxisLocation);
 
             if ~isempty(this.Title)
                 title(axes(1), this.Title);

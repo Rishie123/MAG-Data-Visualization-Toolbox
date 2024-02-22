@@ -68,8 +68,6 @@ classdef LeftRight < mag.graphics.style.Axes & mag.graphics.mixin.GridSupport & 
             ylabel(axes, this.RightLabel);
             ylim(axes, this.RLimits);
 
-            grid(axes, string(matlab.lang.OnOffSwitchState(this.Grid)));
-
             if ~isempty(this.Title)
                 title(axes, this.Title);
             end
