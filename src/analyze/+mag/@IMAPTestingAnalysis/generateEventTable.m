@@ -98,6 +98,13 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
         eventTable = joinEventTables(eventTable, sensorEvents);
     end
 
+    % Add sensor shutdown.
+    shutDownTable = array2timetable(repmat(missing(), [1, numel(eventTable.Properties.VariableNames)]), RowTimes = max(data.t), VariableNames = eventTable.Properties.VariableNames);
+    shutDownTable.Label = primaryOrSecondary + " Shutdown";
+    shutDownTable.Reason = "Command";
+
+    eventTable = [eventTable; shutDownTable];
+
     % Process variables.
     fillVariables = ["Mode", "DataFrequency", "PacketFrequency", "Range"];
     eventTable(:, fillVariables) = fillmissing(eventTable(:, fillVariables), "previous");

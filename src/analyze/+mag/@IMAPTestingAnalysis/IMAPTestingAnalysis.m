@@ -346,7 +346,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
 
                 if any(events{end-2:end, "Mode"} == "Normal")
 
-                    events = events((events.Mode == "Normal") & (events.DataFrequency == 2), :);
+                    events = events((events.Mode == "Normal") & (events.DataFrequency == 2) & ~contains(events.Label, "Shutdown"), :);
                     period = timerange(events.Time(end), endTime, "closed");
                 else
                     period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
