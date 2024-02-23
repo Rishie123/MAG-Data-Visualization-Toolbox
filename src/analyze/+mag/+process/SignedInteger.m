@@ -9,6 +9,8 @@ classdef SignedInteger < mag.process.Step
     end
 
     properties
+        % COMPRESSIONVARIABLE Name of compression variable.
+        CompressionVariable (1, 1) string
         % VARIABLES Variables to be converted to signed integer.
         Variables (1, :) string
     end
@@ -38,7 +40,13 @@ classdef SignedInteger < mag.process.Step
 
         function data = apply(this, data, ~)
 
-            data{:, this.Variables} = this.convertToSignedInteger(data{:, this.Variables});
+            rf = rowfilter(data);
+
+            uncompressed = rf.(this.CompressionVariable) == false;
+            compressed = rf.(this.CompressionVariable) == true;
+
+            data{uncompressed, this.Variables} = this.convertToSignedInteger(data{uncompressed, this.Variables}, 16);
+            data{compressed, this.Variables} = this.convertToSignedInteger(data{compressed, this.Variables}, 18);
 
             for v = this.Variables
                 data.(v) = cast(data.(v), "double");
@@ -48,36 +56,22 @@ classdef SignedInteger < mag.process.Step
 
     methods (Hidden)
 
-        function signedData = convertToSignedInteger(this, unsignedData)
+        function signedData = convertToSignedInteger(~, unsignedData, signedBit)
 
             arguments (Input)
-                this
-                unsignedData (:, :) double
+                ~
+                unsignedData {mustBeNumeric}
+                signedBit (1, 1) double = 16
             end
 
-            arguments (Output)
-                signedData (:, :) double
+            if isa(unsignedData, "double")
+                assumedType = {"int16"};
+            else
+                assumedType = {};
             end
 
-            try
-                signedData = this.doConvert(unsignedData);
-            catch exception
-
-                if isequal(exception.identifier, "MATLAB:bitget:outOfRange")
-                    signedData = this.doConvert(unsignedData, "int16");
-                else
-                    exception.rethrow();
-                end
-            end
-        end
-    end
-
-    methods (Static, Access = private)
-
-        function signedData = doConvert(unsignedData, varargin)
-
-            isNegative = bitget(unsignedData, 16, varargin{:});
-            signedData = bitset(unsignedData, 16, 0, varargin{:}) + ((-2 ^ 15) * isNegative);
+            isNegative = bitget(unsignedData, signedBit, assumedType{:});
+            signedData = bitset(unsignedData, signedBit, 0, assumedType{:}) + ((-2 ^ (signedBit - 1)) * isNegative);
         end
     end
 end
