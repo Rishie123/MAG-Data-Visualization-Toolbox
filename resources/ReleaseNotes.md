@@ -12,6 +12,7 @@
 - Add variable continuity definition for science variables in `timetable`
 - Add shutdown event as final event in `mag.Science` event table
 - Add property `Harness` in `mag.meta.Science` to describe sensor harness
+- Add ability to specify final event end time in `mag.graphics.view.Field`
 - Simplify how columns are filtered in loading science and I-ALiRT
 - Make `mag.process.Calibration` more flexible to custom variable names
 - Allow plotting more than one event in `mag.graphics.view.Field`
