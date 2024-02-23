@@ -3,6 +3,7 @@
 ## Compression
 
 - Add processing step `mag.process.Compression` to correct for compression factor
+- Allow filtering around compression changes in `mag.process.Filter`
 - Fix issue in `mag.process.SignedInteger` with compression still using 16th bit for signedness, instead of 18th
 - Fix typos in compression event plot
 
