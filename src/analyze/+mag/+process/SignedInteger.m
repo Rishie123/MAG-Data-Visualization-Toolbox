@@ -70,8 +70,13 @@ classdef SignedInteger < mag.process.Step
                 assumedType = {};
             end
 
-            isNegative = bitget(unsignedData, signedBit, assumedType{:});
-            signedData = bitset(unsignedData, signedBit, 0, assumedType{:}) + ((-2 ^ (signedBit - 1)) * isNegative);
+            if isempty(unsignedData)
+                signedData = unsignedData;
+            else
+
+                isNegative = bitget(unsignedData, signedBit, assumedType{:});
+                signedData = bitset(unsignedData, signedBit, 0, assumedType{:}) + ((-2 ^ (signedBit - 1)) * isNegative);
+            end
         end
     end
 end
