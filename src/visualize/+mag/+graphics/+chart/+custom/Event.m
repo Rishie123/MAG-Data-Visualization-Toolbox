@@ -72,12 +72,7 @@ classdef Event < mag.graphics.chart.Chart
             plotTime(2:2:end) = [time(2:end); data.(data.Properties.DimensionNames{1})(end)];
             plotTime = reshape(plotTime, 2, []);
 
-            plotVariable = cell(2 * numel(variable), 1);
-            plotVariable{1:2:end} = variable;
-            plotVariable{2:2:end} = variable;
-
-            plotVariable = vertcat(plotVariable{:});
-            plotVariable = reshape(plotVariable, 2, []);
+            plotVariable = [variable, variable]';
 
             % Plot lines.
             plotColors = this.getColors(variable);
