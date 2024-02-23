@@ -7,6 +7,12 @@
 - Fix issue in `mag.process.SignedInteger` with compression still using 16th bit for signedness, instead of 18th
 - Fix typos in compression event plot
 
+## Export
+
+- Export formats are defined in `mag.io.Type`
+- Export formats accept data structures `mag.Instrument` and `mag.HK`, instead of custom structure
+- Also export `PROCSTAT` HK
+
 ## Other
 
 - Add variable continuity definition for science variables in `timetable`

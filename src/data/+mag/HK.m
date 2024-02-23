@@ -61,7 +61,7 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function hkType = getHKType(this, type)
-            % GETHKTYPE Get specific type of HK. Default is power HK.
+        % GETHKTYPE Get specific type of HK. Default is power HK.
 
             arguments
                 this mag.HK

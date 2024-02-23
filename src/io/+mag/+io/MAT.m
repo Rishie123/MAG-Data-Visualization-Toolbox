@@ -5,6 +5,11 @@ classdef MAT < mag.io.Type
         Extension = ".mat"
     end
 
+    properties (Dependent)
+        ScienceExportFormat
+        HKExportFormat
+    end
+
     properties
         % APPEND Append data to existing MAT file.
         Append (1, 1) logical = false
@@ -23,6 +28,14 @@ classdef MAT < mag.io.Type
             if ~isempty(args)
                 this.set(args{:});
             end
+        end
+
+        function scienceExportFormat = get.ScienceExportFormat(~)
+            scienceExportFormat = mag.io.format.ScienceMAT();
+        end
+
+        function hkExportFormat = get.HKExportFormat(~)
+            hkExportFormat = mag.io.format.HKMAT();
         end
     end
 

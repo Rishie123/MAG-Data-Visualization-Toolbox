@@ -5,6 +5,11 @@ classdef CDF < mag.io.Type
         Extension = ".cdf"
     end
 
+    properties (Dependent)
+        ScienceExportFormat
+        HKExportFormat
+    end
+
     methods
 
         function this = CDF(options)
@@ -18,6 +23,14 @@ classdef CDF < mag.io.Type
             if ~isempty(args)
                 this.set(args{:});
             end
+        end
+
+        function scienceExportFormat = get.ScienceExportFormat(~)
+            scienceExportFormat = [];
+        end
+
+        function hkExportFormat = get.HKExportFormat(~)
+            hkExportFormat = [];
         end
     end
 

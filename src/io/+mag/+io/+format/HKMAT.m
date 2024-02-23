@@ -3,41 +3,38 @@ classdef HKMAT < mag.io.format.Data
 
     methods
 
-        function exportedData = formatForExport(this, data, metaData)
+        function exportedData = formatForExport(this, data)
 
             arguments
                 this
-                data (1, :) cell
-                metaData (1, :) mag.meta.HK
+                data (1, :) mag.HK
             end
 
             exportedData = struct();
 
-            exportedData = this.addHKData(exportedData, data, metaData, "PWR", "PW");
-            exportedData = this.addHKData(exportedData, data, metaData, "SID15");
-            exportedData = this.addHKData(exportedData, data, metaData, "STATUS");
+            exportedData = this.addHKData(exportedData, data.getHKType("PW"), "PWR");
+            exportedData = this.addHKData(exportedData, data.getHKType("SID15"), "SID15");
+            exportedData = this.addHKData(exportedData, data.getHKType("STATUS"), "STATUS");
+            exportedData = this.addHKData(exportedData, data.getHKType("PROCSTAT"), "PROCSTAT");
         end
     end
 
     methods (Static, Access = private)
 
-        function exportedData = addHKData(exportedData, data, metaData, matTypeName, dataTypeName)
+        function exportedData = addHKData(exportedData, data, matTypeName)
 
             arguments
                 exportedData (1, 1) struct
-                data (1, :) cell
-                metaData (1, :) mag.meta.HK
+                data (1, 1) mag.HK
                 matTypeName (1, 1) string
-                dataTypeName (1, 1) string = matTypeName
             end
 
-            selectedData = data{[metaData.Type] == dataTypeName};
-            exportedData.HK.(matTypeName).Time = selectedData.t;
+            exportedData.HK.(matTypeName).Time = data.Time;
 
-            for p = string(selectedData.Properties.VariableNames)
+            for p = string(data.Data.Properties.VariableNames)
 
                 if (~isequal(p, "t") && ~isequal(p, "timestamp"))
-                    exportedData.HK.(matTypeName).(p) = selectedData.(p);
+                    exportedData.HK.(matTypeName).(p) = data.Data.(p);
                 end
             end
         end

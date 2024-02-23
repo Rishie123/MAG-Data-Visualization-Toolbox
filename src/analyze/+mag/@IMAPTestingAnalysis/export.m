@@ -18,34 +18,19 @@ function export(this, exportStrategy, options)
 
     period = timerange(options.StartTime, options.EndTime, "closed");
 
-    switch exportStrategy.Extension
-        case ".mat"
-
-            scienceExportFormat = mag.io.format.ScienceMAT();
-            hkExportFormat = mag.io.format.HKMAT();
-            extension = ".mat";
-
-        case ".dat"
-
-            scienceExportFormat = mag.io.format.ScienceDAT();
-            hkExportFormat = [];
-            extension = ".dat";
-
-        otherwise
-            error("Unsupported export format.");
-    end
+    extension = exportStrategy.Extension;
+    scienceExportFormat = exportStrategy.ScienceExportFormat;
+    hkExportFormat = exportStrategy.HKExportFormat;
 
     % Export each mode.
     modes = this.getAllModes();
 
-    for i = 1:numel(modes)
+    for m = modes
 
-        data = {modes(i).Primary.Data(period, :), modes(i).Secondary.Data(period, :)};
-        metaData = [modes(i).Primary.MetaData, modes(i).Secondary.MetaData];
+        m.crop(period);
+        exportedData = scienceExportFormat.formatForExport(m);
 
-        exportedData = scienceExportFormat.formatForExport(data, metaData);
-
-        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s %s (%d, %d)", datestr(metaData(1).Timestamp, "ddmmyy-hhMM"), metaData(1).Mode, metaData(1).DataFrequency, metaData(2).DataFrequency) + extension); %#ok<DATST>
+        exportStrategy.ExportFileName = fullfile(options.Location, compose("%s %s (%d, %d)", datestr(m.Primary.MetaData.Timestamp, "ddmmyy-hhMM"), m.Primary.MetaData.Mode, m.Primary.MetaData.DataFrequency, m.Secondary.MetaData.DataFrequency) + extension); %#ok<DATST>
         exportStrategy.export(exportedData);
     end
 
@@ -54,13 +39,11 @@ function export(this, exportStrategy, options)
 
     if ~isempty(iALiRT)
 
-        data = {iALiRT.Primary.Data(period, :), iALiRT.Secondary.Data(period, :)};
-        metaData = [iALiRT.Primary.MetaData, iALiRT.Secondary.MetaData];
+        iALiRT.crop(period);
+        iALiRTData = scienceExportFormat.formatForExport(iALiRT);
 
-        exportedData = scienceExportFormat.formatForExport(data, metaData);
-
-        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s %s (%.2f, %.2f)", datestr(metaData(1).Timestamp, "ddmmyy-hhMM"), metaData(1).Mode, metaData(1).DataFrequency, metaData(2).DataFrequency) + extension); %#ok<DATST>
-        exportStrategy.export(exportedData);
+        exportStrategy.ExportFileName = fullfile(options.Location, compose("%s %s (%.2f, %.2f)", datestr(m.Primary.MetaData.Timestamp, "ddmmyy-hhMM"), m.Primary.MetaData.Mode, m.Primary.MetaData.DataFrequency, m.Secondary.MetaData.DataFrequency) + extension); %#ok<DATST>
+        exportStrategy.export(iALiRTData);
     end
 
     % Export range cycling.
@@ -68,9 +51,9 @@ function export(this, exportStrategy, options)
 
     if ~isempty(rangeCycling)
 
-        rangeData = scienceExportFormat.formatForExport({rangeCycling.Primary.Data, rangeCycling.Secondary.Data}, [rangeCycling.Primary.MetaData, rangeCycling.Secondary.MetaData]);
+        rangeData = scienceExportFormat.formatForExport(rangeCycling);
 
-        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s Range Cycling", datestr(rangeCycling.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
+        exportStrategy.ExportFileName = fullfile(options.Location, compose("%s Range Cycling", datestr(rangeCycling.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
         exportStrategy.export(rangeData);
     end
 
@@ -79,23 +62,22 @@ function export(this, exportStrategy, options)
 
     if ~isempty(rampMode)
 
-        rampData = scienceExportFormat.formatForExport({rampMode.Primary.Data, rampMode.Secondary.Data}, [rampMode.Primary.MetaData, rampMode.Secondary.MetaData]);
+        rampData = scienceExportFormat.formatForExport(rampMode);
 
-        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s Ramp Mode", datestr(rampMode.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
+        exportStrategy.ExportFileName = fullfile(options.Location, compose("%s Ramp Mode", datestr(rampMode.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
         exportStrategy.export(rampData);
     end
 
     % Export HK data.
     if ~isempty(hkExportFormat) && ~isempty(this.Results.HK)
 
-        hkMetaData = [this.Results.HK.MetaData];
+        hk = this.Results.HK.copy();
+        hk.crop(period);
 
-        hkData = {this.Results.HK.Data};
-        hkData = cellfun(@(d) d(period, :), hkData, UniformOutput = false);
-
-        hkData = hkExportFormat.formatForExport(hkData, hkMetaData);
+        hkData = hkExportFormat.formatForExport(hk);
+        hkMetaData = [hk.MetaData];
     
-        exportStrategy.ExportFileName = fullfile(options.Location, sprintf("%s HK", datestr(min([hkMetaData.Timestamp]), "ddmmyy-hhMM")) + extension); %#ok<DATST>
+        exportStrategy.ExportFileName = fullfile(options.Location, compose("%s HK", datestr(min([hkMetaData.Timestamp]), "ddmmyy-hhMM")) + extension); %#ok<DATST>
         exportStrategy.export(hkData);
     end
 end
