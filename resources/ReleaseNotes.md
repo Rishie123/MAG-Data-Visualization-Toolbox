@@ -11,7 +11,8 @@
 
 - Export formats are defined in `mag.io.Type`
 - Export formats accept data structures `mag.Instrument` and `mag.HK`, instead of custom structure
-- Also export `PROCSTAT` HK
+- Add `Compression` flag to science export
+- Add `PROCSTAT` to HK export
 
 ## Other
 
