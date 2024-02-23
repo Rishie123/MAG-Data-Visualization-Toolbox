@@ -1,5 +1,6 @@
 # Software
 
+- Add variable continuity definition for science variables in `timetable`
 - Add processing step `mag.process.Compression` to correct for compression factor
 - Simplify how columns are filtered in loading science and I-ALiRT
 - Make `mag.process.Calibration` more flexible to custom variable names

@@ -59,6 +59,12 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
         secondaryData = vertcat(secondaryData, table2timetable(secondary, RowTimes = "t")); %#ok<AGROW>
     end
 
+    % Add continuity information, for simpler interpolation.
+    % Property order:
+    %     sequence, x, y, z, range, coarse, fine, compression, quality
+    [primaryData.Properties.VariableContinuity, secondaryData.Properties.VariableContinuity] = ...
+        deal(["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step"]);
+
     %% Amend Timestamp
 
     [startTime, endTime] = bounds(primaryData.t);
