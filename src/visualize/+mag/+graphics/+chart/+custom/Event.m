@@ -56,21 +56,27 @@ classdef Event < mag.graphics.chart.Chart
 
             if this.CombineEvents
 
-                locCombine = ([NaN; diff(interestingEvents.(eventOfInterest))] == 0);
+                locCombine = [false; [diff(interestingEvents.(eventOfInterest))] == 0];
                 interestingEvents(locCombine, :) = [];
             end
 
             time = interestingEvents.(interestingEvents.Properties.DimensionNames{1});
             variable = interestingEvents.(eventOfInterest);
 
+            if ~isnumeric(variable)
+                variable = categorical(variable);
+            end
+
             plotTime = repmat(datetime("now", TimeZone = "UTC"), 2 * numel(time), 1);
             plotTime(1:2:end) = time;
             plotTime(2:2:end) = [time(2:end); data.(data.Properties.DimensionNames{1})(end)];
             plotTime = reshape(plotTime, 2, []);
 
-            plotVariable = zeros(2 * numel(variable), 1);
-            plotVariable(1:2:end) = variable;
-            plotVariable(2:2:end) = variable;
+            plotVariable = cell(2 * numel(variable), 1);
+            plotVariable{1:2:end} = variable;
+            plotVariable{2:2:end} = variable;
+
+            plotVariable = vertcat(plotVariable{:});
             plotVariable = reshape(plotVariable, 2, []);
 
             % Plot lines.
@@ -84,8 +90,11 @@ classdef Event < mag.graphics.chart.Chart
             xline(axes, [time; data.(data.Properties.DimensionNames{1})(end)], "--");
 
             % Plot text annotation.
-            for i = 1:numel(graph)
-                text(axes, mean(graph(i).XData), this.YOffset + variable(i), num2str(variable(i)), HorizontalAlignment = "center", VerticalAlignment = "bottom");
+            if ~iscategorical(variable)
+
+                for i = 1:numel(graph)
+                    text(axes, mean(graph(i).XData), this.YOffset + variable(i), string(variable(i)), HorizontalAlignment = "center", VerticalAlignment = "bottom");
+                end
             end
 
             % Plot ramp mode.
