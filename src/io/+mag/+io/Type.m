@@ -6,6 +6,13 @@ classdef (Abstract) Type < mag.mixin.SetGet
         Extension (1, 1) string
     end
 
+    properties (Abstract, Dependent)
+        % SCIENCEEXPORTFORMAT Science export format.
+        ScienceExportFormat (1, 1) mag.io.format.Data
+        % HKEXPORTFORMAT Housekeeping export format.
+        HKExportFormat (1, 1) mag.io.format.Data
+    end
+
     properties
         % IMPORTFILENAMES One or more files to import.
         ImportFileNames (1, :) string {mustBeFile}

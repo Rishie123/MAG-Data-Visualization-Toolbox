@@ -3,12 +3,22 @@ function savePlots(figures, location, options)
 
     arguments
         figures (1, :) matlab.ui.Figure
-        location (1, 1) string {mustBeFolder} = "results"
+        location (1, 1) string = "results"
         options.ColonReplacement (1, 1) string = ""
         options.DotReplacement (1, 1) string = "_"
         options.SlashReplacement (1, 1) string = "_"
         options.SaveAsFig (1, 1) logical = true
+        options.CreateDirectory (1, 1) logical = false
     end
+
+    if options.CreateDirectory
+
+        if ~isfolder(location)
+            mkdir(location);
+        end
+    end
+
+    mustBeFolder(location);
 
     for f = figures
 

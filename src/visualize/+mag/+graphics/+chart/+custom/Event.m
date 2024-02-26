@@ -4,6 +4,8 @@ classdef Event < mag.graphics.chart.Chart
     properties
         % EVENTOFINTEREST Event name to plot.
         EventOfInterest (1, 1) string
+        % ENDTIME Final event end time.
+        EndTime datetime {mustBeScalarOrEmpty} = datetime.empty()
         % YOFFSET Offset of label describing y-axis value.
         YOffset (1, 1) double = 1
         % IGNOREMISSING Ignore missing values.
@@ -56,22 +58,29 @@ classdef Event < mag.graphics.chart.Chart
 
             if this.CombineEvents
 
-                locCombine = ([NaN; diff(interestingEvents.(eventOfInterest))] == 0);
+                locCombine = [false; [diff(interestingEvents.(eventOfInterest))] == 0];
                 interestingEvents(locCombine, :) = [];
+            end
+
+            if isempty(this.EndTime)
+                endTime = data.(data.Properties.DimensionNames{1})(end);
+            else
+                endTime = this.EndTime;
             end
 
             time = interestingEvents.(interestingEvents.Properties.DimensionNames{1});
             variable = interestingEvents.(eventOfInterest);
 
+            if ~isnumeric(variable)
+                variable = categorical(variable);
+            end
+
             plotTime = repmat(datetime("now", TimeZone = "UTC"), 2 * numel(time), 1);
             plotTime(1:2:end) = time;
-            plotTime(2:2:end) = [time(2:end); data.(data.Properties.DimensionNames{1})(end)];
+            plotTime(2:2:end) = [time(2:end); endTime];
             plotTime = reshape(plotTime, 2, []);
 
-            plotVariable = zeros(2 * numel(variable), 1);
-            plotVariable(1:2:end) = variable;
-            plotVariable(2:2:end) = variable;
-            plotVariable = reshape(plotVariable, 2, []);
+            plotVariable = [variable, variable]';
 
             % Plot lines.
             plotColors = this.getColors(variable);
@@ -81,11 +90,14 @@ classdef Event < mag.graphics.chart.Chart
             end
 
             % Plot vertical lines between mode changes.
-            xline(axes, [time; data.(data.Properties.DimensionNames{1})(end)], "--");
+            xline(axes, [time; endTime], "--");
 
             % Plot text annotation.
-            for i = 1:numel(graph)
-                text(axes, mean(graph(i).XData), this.YOffset + variable(i), num2str(variable(i)), HorizontalAlignment = "center", VerticalAlignment = "bottom");
+            if ~iscategorical(variable)
+
+                for i = 1:numel(graph)
+                    text(axes, mean(graph(i).XData), this.YOffset + variable(i), string(variable(i)), HorizontalAlignment = "center", VerticalAlignment = "bottom");
+                end
             end
 
             % Plot ramp mode.

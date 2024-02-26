@@ -25,7 +25,7 @@ classdef tCalibration < MAGAnalysisTestCase
             metaData = mag.meta.Science(Model = string.empty());
 
             % Exercise.
-            calibrationStep = mag.process.Calibration();
+            calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"]);
             calibratedData = calibrationStep.apply(uncalibratedData, metaData);
 
             % Verify.
@@ -41,7 +41,7 @@ classdef tCalibration < MAGAnalysisTestCase
             metaData = mag.meta.Science(Model = "EM1");
 
             % Exercise.
-            calibrationStep = mag.process.Calibration();
+            calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"]);
             calibratedData = calibrationStep.apply(uncalibratedData, metaData);
 
             % Verify.
@@ -61,7 +61,7 @@ classdef tCalibration < MAGAnalysisTestCase
             expectedData{:, "z"} = -0.001174 - 0.004159 + 1.053048;
 
             % Exercise.
-            calibrationStep = mag.process.Calibration();
+            calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"]);
             calibratedData = calibrationStep.apply(uncalibratedData, metaData);
 
             % Verify.
@@ -82,7 +82,7 @@ classdef tCalibration < MAGAnalysisTestCase
             expectedData{:, "z"} = 0.000553 - 0.005064 + 0.995464;
 
             % Exercise.
-            calibrationStep = mag.process.Calibration();
+            calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"]);
             calibratedData = calibrationStep.apply(uncalibratedData, metaData);
 
             % Verify.
@@ -103,7 +103,7 @@ classdef tCalibration < MAGAnalysisTestCase
             expectedData{:, "z"} = -0.001196 - 0.003928 + 1.053087;
 
             % Exercise.
-            calibrationStep = mag.process.Calibration(Temperature = "Cool");
+            calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"], Temperature = "Cool");
             calibratedData = calibrationStep.apply(uncalibratedData, metaData);
 
             % Verify.
@@ -125,7 +125,7 @@ classdef tCalibration < MAGAnalysisTestCase
             expectedData{:, "z"} = 0.001770 - 0.004966 + 0.997683;
 
             % Exercise.
-            calibrationStep = mag.process.Calibration(Temperature = "Cold");
+            calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"], Temperature = "Cold");
             calibratedData = calibrationStep.apply(uncalibratedData, metaData);
 
             % Verify.

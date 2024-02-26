@@ -14,16 +14,8 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
     for i = 1:numel(rawScience)
         %% Split Data
 
-        idxKeep = 1:size(rawScience{i}, 2);
-        variableNames = rawScience{i}.Properties.VariableNames;
-
-        % Retrieve primary.
-        locPrimaryKeep = contains(variableNames, ["pri", "sequence"]);
-        primary = rawScience{i}(:, idxKeep(locPrimaryKeep));
-
-        % Retrieve secondary.
-        locSecondaryKeep = contains(variableNames, ["sec", "sequence"]);
-        secondary = rawScience{i}(:, idxKeep(locSecondaryKeep));
+        primary = rawScience{i}(:, regexpPattern(".*(pri|sequence).*"));
+        secondary = rawScience{i}(:, regexpPattern(".*(sec|sequence).*"));
 
         %% Process Data
 
@@ -66,6 +58,12 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
         primaryData = vertcat(primaryData, table2timetable(primary, RowTimes = "t")); %#ok<AGROW>
         secondaryData = vertcat(secondaryData, table2timetable(secondary, RowTimes = "t")); %#ok<AGROW>
     end
+
+    % Add continuity information, for simpler interpolation.
+    % Property order:
+    %     sequence, x, y, z, range, coarse, fine, compression, quality
+    [primaryData.Properties.VariableContinuity, secondaryData.Properties.VariableContinuity] = ...
+        deal(["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step"]);
 
     %% Amend Timestamp
 

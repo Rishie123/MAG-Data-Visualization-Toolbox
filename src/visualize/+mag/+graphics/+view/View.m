@@ -24,8 +24,13 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
         function figures = visualizeAll(this)
         % VISUALIZEALL Visualize all views in array and return figures.
 
-            arrayfun(@(v) v.visualize(), this);
-            figures = [this.Figures];
+            if isempty(this)
+                figures = matlab.ui.Figure.empty();
+            else
+
+                arrayfun(@(v) v.visualize(), this);
+                figures = [this.Figures];
+            end
         end
     end
 

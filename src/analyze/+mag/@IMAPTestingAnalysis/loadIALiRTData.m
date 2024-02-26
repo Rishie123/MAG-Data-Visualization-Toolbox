@@ -20,16 +20,8 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
     for i = 1:numel(rawIALiRT)
         %% Split Data
 
-        idxKeep = 1:size(rawIALiRT{i}, 2);
-        variableNames = rawIALiRT{i}.Properties.VariableNames;
-
-        % Retrieve primary.
-        locPrimaryKeep = contains(variableNames, ["pri", "sequence"]);
-        primary = rawIALiRT{i}(:, idxKeep(locPrimaryKeep));
-
-        % Retrieve secondary.
-        locSecondaryKeep = contains(variableNames, ["sec", "sequence"]);
-        secondary = rawIALiRT{i}(:, idxKeep(locSecondaryKeep));
+        primary = rawIALiRT{i}(:, regexpPattern(".*(pri|sequence).*"));
+        secondary = rawIALiRT{i}(:, regexpPattern(".*(sec|sequence).*"));
 
         %% Process Data
 
@@ -67,6 +59,12 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
         primaryData = vertcat(primaryData, table2timetable(primary, RowTimes = "t")); %#ok<AGROW>
         secondaryData = vertcat(secondaryData, table2timetable(secondary, RowTimes = "t")); %#ok<AGROW>
     end
+
+    % Add continuity information, for simpler interpolation.
+    % Property order:
+    %     sequence, x, y, z, range, coarse, fine, compression, quality
+    [primaryData.Properties.VariableContinuity, secondaryData.Properties.VariableContinuity] = ...
+        deal(["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step"]);
 
     %% Amend Timestamp
 

@@ -19,6 +19,9 @@ classdef Calibration < mag.process.Step
         % DEFAULTCALIBRATIONFILE Default file containing scale factor,
         % misalignment and offset information.
         DefaultCalibrationFile (1, 1) string {mustBeFile} = fullfile(mag.process.Calibration.FileLocation, "default.txt")
+        % VARIABLES Variables to be converted using calibration
+        % information.
+        Variables (1, :) string
     end
 
     methods
@@ -36,8 +39,8 @@ classdef Calibration < mag.process.Step
             value = "Calibration";
         end
 
-        function value = get.Description(~)
-            value = "Calibrate science data by applying scale factor, misalignment and offset.";
+        function value = get.Description(this)
+            value = "Calibrate " + join(compose("""%s""", this.Variables), ", ") + " data by applying scale factor, misalignment and offset.";
         end
 
         function value = get.DetailedDescription(this)
@@ -62,7 +65,7 @@ classdef Calibration < mag.process.Step
                 locRange = data.range == r;
 
                 calibrationFile = this.getFileName(r, metaData.Model);
-                data{locRange, ["x", "y", "z"]} = this.applyCalibration(data{locRange, ["x", "y", "z"]}, calibrationFile);
+                data{locRange, this.Variables} = this.applyCalibration(data{locRange, this.Variables}, calibrationFile);
             end
         end
     end

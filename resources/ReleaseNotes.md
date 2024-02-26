@@ -1,15 +1,29 @@
 # Software
 
-- Add compression flag to `mag.Science`
-- Add settings file to specify name of `timetable` properties for `mag.Science`
-- Add `Compression` property to supported events for plotting
-- Add `YAxisLocation` for `mag.graphics.style.Default` and `mag.graphics.style.Stackedplot`
-- Shift `YAxisLocation` to "right" for plots on right-hand side of some views: `mag.graphics.view.Field`, `mag.graphics.view.Frequency`, `mag.graphics.view.HK`, `mag.graphics.view.IALiRT`, and `mag.graphics.view.RampMode`
-- Do not show figure until it is fully populated in `mag.graphics.visualize`
-- Create `mag.meta.Mode` enumeration to capture sensor science mode
-- Move definition of time constants to shared utility file `mag.time.Constant`
-- Make `mag.process.Range` and `mag.process.SignedInteger` more flexible to custom variable names
-- Make sure converted values in `mag.process.SignedInteger` are returned as `double`
-- Fix [#10](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/issues/10)
-- Fix [#19](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/issues/19)
-- Add tests for processing step documentation properties
+## Compression
+
+- Add processing step `mag.process.Compression` to correct for compression factor
+- Allow filtering around compression changes in `mag.process.Filter`
+- Fix issue in `mag.process.SignedInteger` with compression still using 16th bit for signedness, instead of 18th
+- Fix typos in compression event plot
+
+## Export
+
+- Export formats are defined in `mag.io.Type`
+- Export formats accept data structures `mag.Instrument` and `mag.HK`, instead of custom structure
+- Add `Compression` flag to science export
+- Add `PROCSTAT` to HK export
+
+## Other
+
+- Add variable continuity definition for science variables in `timetable`
+- Add shutdown event as final event in `mag.Science` event table
+- Add property `Harness` in `mag.meta.Science` to describe sensor harness
+- Add ability to specify final event end time in `mag.graphics.view.Field`
+- Simplify how columns are filtered in loading science and I-ALiRT
+- Make `mag.process.Calibration` more flexible to custom variable names
+- Allow plotting more than one event in `mag.graphics.view.Field`
+- Change event type to `categorical` when data is not numeric
+- Add option to create folder in `mag.graphics.savePlots`
+- Fix issue with loading Excel files containing sensor meta data
+- Fix issue in custom events chart when event value is not `double` or `single`

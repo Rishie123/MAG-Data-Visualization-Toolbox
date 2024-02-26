@@ -3,7 +3,7 @@ classdef Field < mag.graphics.view.Science
 
     properties
         % EVENT Event name to show.
-        Event string {mustBeScalarOrEmpty, mustBeMember(Event, ["Compression", "Mode", "Range"])} = string.empty()
+        Event (1, :) string {mustBeMember(Event, ["Compression", "Mode", "Range"])} = string.empty()
     end
 
     methods
@@ -30,28 +30,7 @@ classdef Field < mag.graphics.view.Science
             primary = this.Results.Primary;
             secondary = this.Results.Secondary;
 
-            switch this.Event
-                case "Compression"
-
-                    numEvents = 1;
-                    eventData = {primary, mag.graphics.style.Default(Title = compose("%s Compression", primarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Compression", YOffset = 0.1)), ...
-                        secondary, mag.graphics.style.Default(Title = compose("%s Compression", secondarySensor), YLabel = "mode [-]", YLimits = "manual", YAxisLocation = "right", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Compression", YOffset = 0.1))};
-
-                case "Mode"
-
-                    numEvents = 1;
-                    eventData = {primary.Events, mag.graphics.style.Default(Title = compose("%s Modes", primarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency")), ...
-                        secondary.Events, mag.graphics.style.Default(Title = compose("%s Modes", secondarySensor), YLabel = "mode [-]", YLimits = "manual", YAxisLocation = "right", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency"))};
-
-                case "Range"
-
-                    numEvents = 1;
-                    eventData = {primary.Events, mag.graphics.style.Default(Title = compose("%s Ranges", primarySensor), YLabel = "range [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1)), ...
-                        secondary.Events, mag.graphics.style.Default(Title = compose("%s Ranges", secondarySensor), YLabel = "range [-]", YLimits = "manual", YAxisLocation = "right", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.1))};
-
-                otherwise
-                    [numEvents, eventData] = deal(0, {});
-            end
+            [numEvents, eventData] = this.getEventData(primary, secondary, primarySensor, secondarySensor);
 
             if isempty(hk)
 
@@ -77,6 +56,43 @@ classdef Field < mag.graphics.view.Science
                     Arrangement = [4 + numEvents, 2], ...
                     LinkXAxes = true, ...
                     WindowState = "maximized");
+            end
+        end
+    end
+
+    methods (Access = private)
+
+        function [numEvents, eventData] = getEventData(this, primary, secondary, primarySensor, secondarySensor)
+
+            numEvents = 0;
+            eventData = {};
+
+            for e = this.Event
+
+                switch e
+                    case "Compression"
+
+                        numEvents = numEvents + 1;
+                        ed = {primary, mag.graphics.style.Default(Title = compose("%s Compression", primarySensor), YLabel = "compressed [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Compression")), ...
+                            secondary, mag.graphics.style.Default(Title = compose("%s Compression", secondarySensor), YLabel = "compressed [-]", YLimits = "manual", YAxisLocation = "right", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Compression"))};
+
+                    case "Mode"
+
+                        numEvents = numEvents + 1;
+                        ed = {primary.Events, mag.graphics.style.Default(Title = compose("%s Modes", primarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency", EndTime = primary.Time(end))), ...
+                            secondary.Events, mag.graphics.style.Default(Title = compose("%s Modes", secondarySensor), YLabel = "mode [-]", YLimits = "manual", YAxisLocation = "right", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency", EndTime = secondary.Time(end)))};
+
+                    case "Range"
+
+                        numEvents = numEvents + 1;
+                        ed = {primary, mag.graphics.style.Default(Title = compose("%s Ranges", primarySensor), YLabel = "range [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.25)), ...
+                            secondary, mag.graphics.style.Default(Title = compose("%s Ranges", secondarySensor), YLabel = "range [-]", YLimits = "manual", YAxisLocation = "right", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "Range", YOffset = 0.25))};
+
+                    otherwise
+                        error("Unrecognized event ""%s"".");
+                end
+
+                eventData = [eventData, ed]; %#ok<AGROW>
             end
         end
     end
