@@ -51,18 +51,18 @@ classdef Range < mag.process.Step
 
     methods (Hidden)
 
-        function unscaledData = applyRange(this, unscaledData, ranges)
+        function data = applyRange(this, data, ranges)
 
             arguments (Input)
                 this
-                unscaledData (:, :) double
+                data (:, :) double
                 ranges (:, 1) double
             end
 
             for sf = 0:3
 
                 locScaleFactor = ranges == sf;
-                unscaledData(locScaleFactor, :) = this.ScaleFactors(sf + 1) * unscaledData(locScaleFactor, :);
+                data(locScaleFactor, :) = this.ScaleFactors(sf + 1) * data(locScaleFactor, :);
             end
         end
     end
