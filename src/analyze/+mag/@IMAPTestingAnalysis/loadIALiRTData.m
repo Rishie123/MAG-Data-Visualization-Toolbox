@@ -6,10 +6,10 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
     end
 
     primaryMetaData = primaryMetaData.copy();
-    primaryMetaData.set(Mode = "I-ALiRT", DataFrequency = 1/4, PacketFrequency = 4);
+    primaryMetaData.set(Mode = "IALiRT", DataFrequency = 1/4, PacketFrequency = 4);
 
     secondaryMetaData = secondaryMetaData.copy();
-    secondaryMetaData.set(Mode = "I-ALiRT", DataFrequency = 1/4, PacketFrequency = 4);
+    secondaryMetaData.set(Mode = "IALiRT", DataFrequency = 1/4, PacketFrequency = 4);
 
     [~, ~, extension] = fileparts(this.IALiRTPattern);
     rawIALiRT = this.dispatchExtension(extension, ImportFileNames = this.IALiRTFileNames).import();
