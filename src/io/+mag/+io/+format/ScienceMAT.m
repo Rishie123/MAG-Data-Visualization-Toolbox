@@ -7,7 +7,7 @@ classdef ScienceMAT < mag.io.format.Data
 
             arguments
                 ~
-                data (1, 1) mag.Instrument
+                data (1, 1) {mustBeA(data, ["mag.Instrument", "mag.IALiRT"])}
             end
 
             exportedData.B.P.Time = data.Primary.Time;
