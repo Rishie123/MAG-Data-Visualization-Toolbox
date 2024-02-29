@@ -1,4 +1,4 @@
-classdef (Abstract) PropertiesTestCase < MAGVisualizationTestCase
+classdef (Abstract) PropertiesTestCase < MAGChartTestCase
 % PROPERTIESTESTCASE Base class for all charts that support extra
 % properties.
 
@@ -11,7 +11,7 @@ classdef (Abstract) PropertiesTestCase < MAGVisualizationTestCase
         function setSimpleProperty(testCase, Properties)
 
             % Set up.
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             args = testCase.getExtraArguments();
 
@@ -23,11 +23,11 @@ classdef (Abstract) PropertiesTestCase < MAGVisualizationTestCase
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 
             % Verify.
-            graph = GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
+            graph = mag.test.GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
 
             testCase.verifySameHandle(assembledGraph, graph, "Chart should return assembled graph.");
 
-            [verifiableName, verifiableValue] = GraphicsTestUtilities.getVerifiables(Properties);
+            [verifiableName, verifiableValue] = mag.test.GraphicsTestUtilities.getVerifiables(Properties);
             testCase.verifyEqual(graph.(verifiableName), verifiableValue, compose("""%s"" property value should match.", Properties.Name));
         end
     end

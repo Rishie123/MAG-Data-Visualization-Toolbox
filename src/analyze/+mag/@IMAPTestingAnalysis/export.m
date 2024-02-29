@@ -42,7 +42,7 @@ function export(this, exportStrategy, options)
         iALiRT.crop(period);
         iALiRTData = scienceExportFormat.formatForExport(iALiRT);
 
-        exportStrategy.ExportFileName = fullfile(options.Location, compose("%s %s (%.2f, %.2f)", datestr(m.Primary.MetaData.Timestamp, "ddmmyy-hhMM"), m.Primary.MetaData.Mode, m.Primary.MetaData.DataFrequency, m.Secondary.MetaData.DataFrequency) + extension); %#ok<DATST>
+        exportStrategy.ExportFileName = fullfile(options.Location, compose("%s %s (%.2f, %.2f)", datestr(iALiRT.Primary.MetaData.Timestamp, "ddmmyy-hhMM"), iALiRT.Primary.MetaData.Mode, iALiRT.Primary.MetaData.DataFrequency, iALiRT.Secondary.MetaData.DataFrequency) + extension); %#ok<DATST>
         exportStrategy.export(iALiRTData);
     end
 

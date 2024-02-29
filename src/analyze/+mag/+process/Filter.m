@@ -21,6 +21,9 @@ classdef Filter < mag.process.Step
         % ONCOMPRESSIONCHANGE How many vectors to remove when compression
         % changes.
         OnCompressionChange (1, 2) {mustBeA(OnCompressionChange, ["double", "duration"])} = zeros(1, 2)
+        % ONLONGPAUSE How many vectors to remove when long pause in the
+        % data is detected.
+        OnLongPause (1, 2) {mustBeA(OnLongPause, ["double", "duration"])} = zeros(1, 2)
     end
 
     methods
@@ -71,17 +74,30 @@ classdef Filter < mag.process.Step
 
             % Filter data points at mode changes.
             if ~isequal(this.OnModeChange, zeros(1, 2))
-                data = this.cropDataWithRange(events, data, this.ModeVariable, this.OnModeChange);
+                data = this.cropDataWithEvents(events, data, this.ModeVariable, this.OnModeChange);
             end
 
             % Filter duration at range changes.
             if ~isequal(this.OnRangeChange, zeros(1, 2))
-                data = this.cropDataWithRange(events, data, this.RangeVariable, this.OnRangeChange);
+                data = this.cropDataWithEvents(events, data, this.RangeVariable, this.OnRangeChange);
             end
 
             % Filter duration at compression changes.
             if ~isequal(this.OnCompressionChange, zeros(1, 2))
-                data = this.cropDataWithRange(data, data, this.CompressionVariable, this.OnCompressionChange);
+                data = this.cropDataWithEvents(data, data, this.CompressionVariable, this.OnCompressionChange);
+            end
+
+            % Filter out after long pauses.
+            if ~isequal(this.OnLongPause, zeros(1, 2))
+
+                times = data.Properties.RowTimes;
+
+                locTimes = diff(times) > seconds(1);
+                locTimes = [false; locTimes];
+
+                times = times(locTimes);
+
+                data = this.cropDataWithRange(data, times', this.OnLongPause);
             end
 
             % Filter out between config and ramp mode.
@@ -101,14 +117,22 @@ classdef Filter < mag.process.Step
         end
     end
 
+    methods (Access = private)
+
+        function data = cropDataWithEvents(this, events, data, name, range)
+
+            locEvent = [false; diff(events.(name)) ~= 0];
+            this.cropDataWithRange(data, events.Properties.RowTimes(locEvent)', range);
+        end
+    end
+
     methods (Static, Access = private)
 
-        function data = cropDataWithRange(events, data, name, range)
+        function data = cropDataWithRange(data, times, range)
 
             dt = mode(diff(data.Properties.RowTimes));
-            locEvent = [false; diff(events.(name)) ~= 0];
 
-            for t = events.Properties.RowTimes(locEvent)'
+            for t = times
 
                 if isa(range, "duration")
                     data{timerange(t + range(1), t + range(2), "closed"), "quality"} = false;

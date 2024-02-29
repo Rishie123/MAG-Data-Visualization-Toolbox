@@ -15,7 +15,7 @@ classdef tStackedplot < MarkerSupportTestCase
             % Set up.
             data = testCase.createTestDataWithEvents(SetDuration = false, SetEndTime = false);
 
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             % Exercise.
             chart = mag.graphics.chart.Stackedplot(YVariables = ["A", "B", "C"], EventsVisible = true);
@@ -47,7 +47,7 @@ classdef tStackedplot < MarkerSupportTestCase
             % Set up.
             data = testCase.createTestDataWithEvents(SetDuration = true, SetEndTime = false);
 
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             % Exercise.
             chart = mag.graphics.chart.Stackedplot(YVariables = ["A", "B", "C"], EventsVisible = true);
@@ -82,7 +82,7 @@ classdef tStackedplot < MarkerSupportTestCase
             % Set up.
             data = testCase.createTestDataWithEvents(SetDuration = false, SetEndTime = true);
 
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             % Exercise.
             chart = mag.graphics.chart.Stackedplot(YVariables = ["A", "B", "C"], EventsVisible = true);
@@ -114,14 +114,14 @@ classdef tStackedplot < MarkerSupportTestCase
         function setColorProperty(testCase)
 
             % Set up.
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             % Exercise.
             chart = feval(testCase.ClassName, Color = [1, 0, 1], YVariables = "Number");
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 
             % Verify.
-            graph = GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
+            graph = mag.test.GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
 
             testCase.verifySameHandle(assembledGraph, graph, "Chart should return assembled graph.");
             testCase.verifyEqual(graph.Color, [1, 0, 1], """Color"" property value should match.");
@@ -131,7 +131,7 @@ classdef tStackedplot < MarkerSupportTestCase
         function setColorProperty_error(testCase)
 
             % Set up.
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             % Exercise and verify.
             chart = feval(testCase.ClassName, Color = double.empty(), YVariables = "Number");

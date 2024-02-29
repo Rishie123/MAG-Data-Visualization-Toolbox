@@ -1,4 +1,4 @@
-classdef (Abstract) MarkerSupportTestCase < MAGVisualizationTestCase
+classdef (Abstract) MarkerSupportTestCase < MAGChartTestCase
 % MARKERSUPPORTTESTCASE Base class for all charts that support markers.
 
     properties (TestParameter)
@@ -15,7 +15,7 @@ classdef (Abstract) MarkerSupportTestCase < MAGVisualizationTestCase
         function setMarkerProperty(testCase, MarkerProperties)
 
             % Set up.
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             args = testCase.getExtraArguments();
 
@@ -27,11 +27,11 @@ classdef (Abstract) MarkerSupportTestCase < MAGVisualizationTestCase
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 
             % Verify.
-            graph = GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
+            graph = mag.test.GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
 
             testCase.verifySameHandle(assembledGraph, graph, "Chart should return assembled graph.");
 
-            [verifiableName, verifiableValue] = GraphicsTestUtilities.getVerifiables(MarkerProperties);
+            [verifiableName, verifiableValue] = mag.test.GraphicsTestUtilities.getVerifiables(MarkerProperties);
             testCase.verifyEqual(graph.(verifiableName), verifiableValue, compose("""%s"" property value should match.", MarkerProperties.Name));
         end
     end

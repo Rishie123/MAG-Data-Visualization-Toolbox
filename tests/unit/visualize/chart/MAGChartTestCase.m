@@ -1,5 +1,5 @@
-classdef (Abstract) MAGVisualizationTestCase < matlab.unittest.TestCase
-% MAGVISUALIZATIONTESTCASE Base class for all MAG visualization tests.
+classdef (Abstract) MAGChartTestCase < matlab.unittest.TestCase
+% MAGCHARTTESTCASE Base class for all MAG chart tests.
 
     properties (Constant)
         % DATA Test data.

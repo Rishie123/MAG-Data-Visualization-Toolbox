@@ -4,6 +4,8 @@ classdef Convert < mag.graphics.operation.Action
     properties
         % CONVERSION Conversion variable to use.
         Conversion (1, 1) function_handle = @sqrt
+        % ARGUMENTS Other arguments for conversion function.
+        Arguments (1, :) cell = cell.empty()
     end
 
     methods
@@ -24,7 +26,7 @@ classdef Convert < mag.graphics.operation.Action
                 originalData
             end
 
-            plottableData = this.Conversion(originalData);
+            plottableData = this.Conversion(originalData, this.Arguments{:});
         end
     end
 end

@@ -1,4 +1,4 @@
-classdef tScatterhistogram < MAGVisualizationTestCase
+classdef tScatterhistogram < MAGChartTestCase
 % TSCATTERHISTOGRAM Unit tests for "mag.graphics.chart.Scatterhistogram"
 % class.
 
@@ -13,7 +13,7 @@ classdef tScatterhistogram < MAGVisualizationTestCase
         function setGroupVariable_empty(testCase)
 
             % Set up.
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             % Exercise.
             chart = mag.graphics.chart.Scatterhistogram(XVariable = "Categorical", ...
@@ -37,7 +37,7 @@ classdef tScatterhistogram < MAGVisualizationTestCase
         function setGroupVariable(testCase)
 
             % Set up.
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             % Exercise.
             chart = mag.graphics.chart.Scatterhistogram(XVariable = "Categorical", ...
