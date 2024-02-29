@@ -1,4 +1,4 @@
-classdef (Abstract) ColorSupportTestCase < MAGVisualizationTestCase
+classdef (Abstract) ColorSupportTestCase < MAGChartTestCase
 % COLORSUPPORTTESTCASE Base class for all charts that support colors.
 
     properties (TestParameter)

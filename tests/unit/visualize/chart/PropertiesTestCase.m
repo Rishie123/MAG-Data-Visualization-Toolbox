@@ -1,4 +1,4 @@
-classdef (Abstract) PropertiesTestCase < MAGVisualizationTestCase
+classdef (Abstract) PropertiesTestCase < MAGChartTestCase
 % PROPERTIESTESTCASE Base class for all charts that support extra
 % properties.
 

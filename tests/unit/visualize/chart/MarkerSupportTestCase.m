@@ -1,4 +1,4 @@
-classdef (Abstract) MarkerSupportTestCase < MAGVisualizationTestCase
+classdef (Abstract) MarkerSupportTestCase < MAGChartTestCase
 % MARKERSUPPORTTESTCASE Base class for all charts that support markers.
 
     properties (TestParameter)

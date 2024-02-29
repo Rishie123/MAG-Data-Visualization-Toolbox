@@ -1,4 +1,4 @@
-classdef tScatterhistogram < MAGVisualizationTestCase
+classdef tScatterhistogram < MAGChartTestCase
 % TSCATTERHISTOGRAM Unit tests for "mag.graphics.chart.Scatterhistogram"
 % class.
 
