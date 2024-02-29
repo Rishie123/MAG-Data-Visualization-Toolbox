@@ -12,7 +12,7 @@ classdef (Abstract) ColorSupportTestCase < MAGChartTestCase
         function setColorProperty(testCase, ColorProperties)
 
             % Set up.
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             args = testCase.getExtraArguments();
 
@@ -24,11 +24,11 @@ classdef (Abstract) ColorSupportTestCase < MAGChartTestCase
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 
             % Verify.
-            graph = GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
+            graph = mag.test.GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
 
             testCase.verifySameHandle(assembledGraph, graph, "Chart should return assembled graph.");
 
-            [~, verifiableValue] = GraphicsTestUtilities.getVerifiables(ColorProperties);
+            [~, verifiableValue] = mag.test.GraphicsTestUtilities.getVerifiables(ColorProperties);
             testCase.verifyEqual(graph.(testCase.getColorPropertyName()), verifiableValue, compose("""%s"" property value should match.", ColorProperties.Name));
         end
     end

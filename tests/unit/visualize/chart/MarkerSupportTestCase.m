@@ -15,7 +15,7 @@ classdef (Abstract) MarkerSupportTestCase < MAGChartTestCase
         function setMarkerProperty(testCase, MarkerProperties)
 
             % Set up.
-            [tl, ax] = GraphicsTestUtilities.createFigure(testCase);
+            [tl, ax] = mag.test.GraphicsTestUtilities.createFigure(testCase);
 
             args = testCase.getExtraArguments();
 
@@ -27,11 +27,11 @@ classdef (Abstract) MarkerSupportTestCase < MAGChartTestCase
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 
             % Verify.
-            graph = GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
+            graph = mag.test.GraphicsTestUtilities.getChildrenGraph(testCase, tl, ax, testCase.GraphClassName);
 
             testCase.verifySameHandle(assembledGraph, graph, "Chart should return assembled graph.");
 
-            [verifiableName, verifiableValue] = GraphicsTestUtilities.getVerifiables(MarkerProperties);
+            [verifiableName, verifiableValue] = mag.test.GraphicsTestUtilities.getVerifiables(MarkerProperties);
             testCase.verifyEqual(graph.(verifiableName), verifiableValue, compose("""%s"" property value should match.", MarkerProperties.Name));
         end
     end
