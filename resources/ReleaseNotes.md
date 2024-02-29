@@ -6,3 +6,4 @@
 - Allow adding input arguments to conversion function in `mag.graphics.operation.Convert`
 - Fix issue with setting I-ALiRT mode when loading
 - Fix issues with exporting I-ALiRT data
+- Add tests for `mag.graphics.style.Colormap` and `mag.graphics.style.Default`
