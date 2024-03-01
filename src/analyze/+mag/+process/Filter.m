@@ -122,7 +122,7 @@ classdef Filter < mag.process.Step
         function data = cropDataWithEvents(this, events, data, name, range)
 
             locEvent = [false; diff(events.(name)) ~= 0];
-            this.cropDataWithRange(data, events.Properties.RowTimes(locEvent)', range);
+            data = this.cropDataWithRange(data, events.Properties.RowTimes(locEvent)', range);
         end
     end
 
