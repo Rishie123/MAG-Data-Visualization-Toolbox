@@ -85,7 +85,7 @@ classdef Calibration < mag.process.Step
             end
 
             [scale, misalignment, offset] = this.readCalibrationData(calibrationFile);
-            calibratedData = (misalignment * (scale .* uncalibratedData)')' + offset;
+            calibratedData = offset + (misalignment * (scale .* uncalibratedData)')';
         end
     end
 
@@ -96,7 +96,12 @@ classdef Calibration < mag.process.Step
             fileName = fullfile(this.FileLocation, compose("%s_r%d_t%s.txt", lower(modelName), range, lower(this.Temperature)));
 
             if isempty(fileName) || ~isfile(fileName)
-                fileName = this.DefaultCalibrationFile;
+
+                fileName = fullfile(this.FileLocation, compose("%s_tany.txt", lower(extract(modelName, lettersPattern()))));
+
+                if isempty(fileName) || ~isfile(fileName)
+                    fileName = this.DefaultCalibrationFile;
+                end
             end
         end
     end
