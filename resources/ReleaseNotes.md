@@ -1,9 +1,7 @@
 # Software
 
-- Add I-ALiRT plot to compare full science to I-ALiRT
-- Add processing step to cast variable data type (`mag.process.Cast`)
-- Add option to filter out data after a long pause in measurements in `mag.process.Filter`
-- Allow adding input arguments to conversion function in `mag.graphics.operation.Convert`
-- Fix issue with setting I-ALiRT mode when loading
-- Fix issues with exporting I-ALiRT data
-- Add tests for `mag.graphics.style.Colormap` and `mag.graphics.style.Default`
+- Add rotation for LM sensors in `mag.process.Calibration`
+- Fix loading of Normal and Burst mode change events when `UNCHANGED` is used
+- Fix detection of start time of test from Excel when there is more information after the time
+- Fix filtering of events in `mag.process.Filter`
+- Fix issue with plotting HK with field in `mag.graphics.view.Field` when no HK data is present
