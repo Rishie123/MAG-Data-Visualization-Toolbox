@@ -1,3 +1,8 @@
+# App
+
+- Add button to close generated figures
+- Fix issue with assigning value of `DebugStatus` when more than one breakpoint is set
+
 # Software
 
 - Add description of both Normal and Burst mode in `mag.event.ModeChange`, regardless of the active mode
