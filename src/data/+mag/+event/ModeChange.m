@@ -52,7 +52,7 @@ classdef ModeChange < mag.event.Event
                 case "Burst"
                     activePrimaryRate = this.PrimaryBurstRate;
                 otherwise
-                    activePrimaryRate = missing();
+                    activePrimaryRate = NaN;
             end
         end
 
@@ -64,7 +64,7 @@ classdef ModeChange < mag.event.Event
                 case "Burst"
                     activeSecondaryRate = this.SecondaryBurstRate;
                 otherwise
-                    activeSecondaryRate = missing();
+                    activeSecondaryRate = NaN;
             end
         end
 
@@ -76,7 +76,7 @@ classdef ModeChange < mag.event.Event
                 case "Burst"
                     activePacketFrequency = this.PacketBurstFrequency;
                 otherwise
-                    activePacketFrequency = missing();
+                    activePacketFrequency = NaN;
             end
         end
     end
