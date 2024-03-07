@@ -25,14 +25,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
         sensorEvents = removevars(sensorEvents, "Sensor");
     end
 
-    switch primaryOrSecondary
-        case "Primary"
-            sensorEvents = renamevars(sensorEvents, "PrimaryRate", "DataFrequency");
-            sensorEvents = removevars(sensorEvents, "SecondaryRate");
-        case "Secondary"
-            sensorEvents = renamevars(sensorEvents, "SecondaryRate", "DataFrequency");
-            sensorEvents = removevars(sensorEvents, "PrimaryRate");
-    end
+    sensorEvents = removeUninterestingVariables(sensorEvents, primaryOrSecondary);
 
     % Improve ramp mode timestamp estimates.
     sensorEvents = updateRampModeTimestamps(sensorEvents, data);
@@ -117,6 +110,37 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
 
     % Convert to event table.
     eventTable = eventtable(eventTable, EventLabelsVariable = "Label");
+end
+
+function sensorEvents = removeUninterestingVariables(sensorEvents, primaryOrSecondary)
+
+    % Remove uninteresting sensor events and rename selected sensor ones.
+    switch primaryOrSecondary
+        case "Primary"
+
+            sensorEvents = renamevars(sensorEvents, ["PrimaryNormalRate", "PrimaryBurstRate"], ["DataNormalFrequency", "DataBurstFrequency"]);
+            sensorEvents = removevars(sensorEvents, regexpPattern("Secondary\w*"));
+        case "Secondary"
+
+            sensorEvents = renamevars(sensorEvents, ["SecondaryNormalRate", "SecondaryBurstRate"], ["DataNormalFrequency", "DataBurstFrequency"]);
+            sensorEvents = removevars(sensorEvents, regexpPattern("Primary\w*"));
+    end
+
+    % Only select active mode data and packet frequency.
+    sensorEvents.DataFrequency = zeros([height(sensorEvents), 1]);
+    sensorEvents.PacketFrequency = zeros([height(sensorEvents), 1]);
+
+    filter = rowfilter(sensorEvents);
+
+    sensorEvents{filter.Mode == "Normal", "DataFrequency"} = sensorEvents{filter.Mode == "Normal", "DataNormalFrequency"};
+    sensorEvents{filter.Mode == "Burst", "DataFrequency"} = sensorEvents{filter.Mode == "Burst", "DataBurstFrequency"};
+
+    sensorEvents{filter.Mode == "Normal", "PacketFrequency"} = sensorEvents{filter.Mode == "Normal", "PacketNormalFrequency"};
+    sensorEvents{filter.Mode == "Burst", "PacketFrequency"} = sensorEvents{filter.Mode == "Burst", "PacketBurstFrequency"};
+
+    % Rearrange variables.
+    sensorEvents = removevars(sensorEvents, regexpPattern("(Data|Packet)\w+Frequency"));
+    sensorEvents = movevars(sensorEvents, ["DataFrequency", "PacketFrequency"], After = "Mode");
 end
 
 function events = updateRampModeTimestamps(events, data)
