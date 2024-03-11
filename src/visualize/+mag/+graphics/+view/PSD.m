@@ -52,13 +52,21 @@ classdef PSD < mag.graphics.view.View
             for i = 1:size(interestingEvents, 1)
 
                 % Find when event takes place.
+                startTime = interestingEvents.Time(i);
+
                 if i == size(interestingEvents, 1)
                     endTime = data.Time(end);
                 else
                     endTime = interestingEvents.Time(i + 1);
                 end
 
-                startTime = interestingEvents.Time(i);
+                % Remove 30 seconds to avoid spikes during transitions.
+                if (endTime - startTime) > minutes(2)
+
+                    startTime = startTime + seconds(30);
+                    endTime = endTime - seconds(30);
+                end
+
                 duration = endTime - startTime;
 
                 if duration > 0

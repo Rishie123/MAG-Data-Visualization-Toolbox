@@ -12,3 +12,4 @@
 - Improve algorithm to find closest science and I-ALiRT timestamps
 - Fix issue with `UNCHANGED` data frequency appearing as `NaN` in event log
 - Fix issue with filtering I-ALiRT secondary data in `mag.graphics.view.IALiRT`
+- Fix issue with PSDs showing large noise in mode and range cycling
