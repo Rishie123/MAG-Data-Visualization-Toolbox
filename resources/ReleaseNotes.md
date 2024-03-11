@@ -7,6 +7,7 @@
 
 - Add description of both Normal and Burst mode in `mag.event.ModeChange`, regardless of the active mode
 - Add mode events in I-ALiRT timestamp comparison plot in `mag.graphics.view.IALiRT`
+- Allow specifying multiple labels and label alignment in `mag.graphics.chart.Line`
 - Move removal of all-zero vectors in data after removal of missing data
 - Improve algorithm to find closest science and I-ALiRT timestamps
 - Fix issue with `UNCHANGED` data frequency appearing as `NaN` in event log
