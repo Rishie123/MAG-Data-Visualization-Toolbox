@@ -37,7 +37,9 @@ classdef IALiRT < mag.graphics.view.Science
             secondaryScience = this.Results.Secondary;
 
             primaryOverlay = this.generateOverlayGraph(primaryScience, primaryIALiRT);
+
             secondaryOverlay = this.generateOverlayGraph(secondaryScience, secondaryIALiRT);
+            [secondaryOverlay{2}.YAxisLocation] = deal("right");
 
             this.Figures(2) = mag.graphics.visualize( ...
                 primaryOverlay{:}, secondaryOverlay{:}, ...
@@ -55,7 +57,9 @@ classdef IALiRT < mag.graphics.view.Science
                 timetable(secondaryScience.Time, secondaryScience.X, secondaryScience.Y, secondaryScience.Z, secondaryScience.Quality, VariableNames = ["xs", "ys", "zs", "qs"]), "first", "nearest");
 
             primaryGraphs = this.generateComparisonGraph(primaryIALiRT, primaryComparison);
+
             secondaryGraphs = this.generateComparisonGraph(secondaryIALiRT, secondaryComparison);
+            [secondaryGraphs.YAxisLocation] = deal("right");
 
             this.Figures(3) = mag.graphics.visualize( ...
                 primaryComparison, primaryGraphs, secondaryComparison, secondaryGraphs, ...
