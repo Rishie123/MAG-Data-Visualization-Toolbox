@@ -38,6 +38,8 @@ classdef Event < mag.graphics.chart.Chart
                 graph (1, :) matlab.graphics.Graphics
             end
 
+            graph = matlab.graphics.Graphics.empty();
+
             if isa(data, "mag.Science")
 
                 eventOfInterest = data.Settings.(this.EventOfInterest);
@@ -58,7 +60,7 @@ classdef Event < mag.graphics.chart.Chart
 
             if this.CombineEvents
 
-                locCombine = [false; [diff(interestingEvents.(eventOfInterest))] == 0];
+                locCombine = [false; diff(interestingEvents.(eventOfInterest)) == 0];
                 interestingEvents(locCombine, :) = [];
             end
 
@@ -95,7 +97,7 @@ classdef Event < mag.graphics.chart.Chart
             % Plot text annotation.
             if ~iscategorical(variable)
 
-                for i = 1:numel(graph)
+                for i = 1:numel(variable)
                     text(axes, mean(graph(i).XData), this.YOffset + variable(i), string(variable(i)), HorizontalAlignment = "center", VerticalAlignment = "bottom");
                 end
             end
@@ -125,7 +127,6 @@ classdef Event < mag.graphics.chart.Chart
             end
 
             upperPosition = sum(extents(:, [2, 4]), 2);
-
             ylim(axes, [min(ylim(axes)), max(max(ylim(axes)), max(upperPosition))]);
         end
     end

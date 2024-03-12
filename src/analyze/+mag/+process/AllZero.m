@@ -39,14 +39,12 @@ classdef AllZero < mag.process.Step
 
             arguments
                 this (1, 1) mag.process.AllZero
-                data timetable
+                data tabular
                 ~
             end
 
-            locTime = data.Properties.RowTimes <= datetime(mag.time.Constant.Epoch, ConvertFrom = "posix", TimeZone = "UTC");
             locData = all(data{:, this.Variables} == 0, 2);
-
-            data(locTime & locData, :) = [];
+            data(locData, :) = [];
         end
     end
 end

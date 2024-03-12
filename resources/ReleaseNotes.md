@@ -1,7 +1,16 @@
+# App
+
+- Add button to close generated figures
+- Fix issue with assigning value of `DebugStatus` when more than one breakpoint is set
+
 # Software
 
-- Add rotation for LM sensors in `mag.process.Calibration`
-- Fix loading of Normal and Burst mode change events when `UNCHANGED` is used
-- Fix detection of start time of test from Excel when there is more information after the time
-- Fix filtering of events in `mag.process.Filter`
-- Fix issue with plotting HK with field in `mag.graphics.view.Field` when no HK data is present
+- Add description of both Normal and Burst mode in `mag.event.ModeChange`, regardless of the active mode
+- Add mode events in I-ALiRT timestamp comparison plot in `mag.graphics.view.IALiRT`
+- Allow specifying multiple labels and label alignment in `mag.graphics.chart.Line`
+- Move removal of all-zero vectors in data after removal of missing data
+- Improve algorithm to find closest science and I-ALiRT timestamps
+- Make sure all I-ALiRT right-hand side graphs have `YAxisLocation` set to `right`
+- Fix issue with `UNCHANGED` data frequency appearing as `NaN` in event log
+- Fix issue with filtering I-ALiRT secondary data in `mag.graphics.view.IALiRT`
+- Fix issue with PSDs showing large noise in mode and range cycling

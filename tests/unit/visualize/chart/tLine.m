@@ -17,4 +17,11 @@ classdef tLine < PropertiesTestCase & ColorSupportTestCase
             struct(Name = "Label", Value = 'Ciao', VerifiableName = "Label"), ...
             struct(Name = "Label", Value = '你好', VerifiableName = "Label")}
     end
+
+    methods (Access = protected)
+
+        function args = getExtraArguments(this)
+            args = [getExtraArguments@MAGChartTestCase(this), {"Value"}, 0];
+        end
+    end
 end
