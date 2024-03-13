@@ -25,8 +25,12 @@ classdef HKMAT < mag.io.format.Data
 
             arguments
                 exportedData (1, 1) struct
-                data (1, 1) mag.HK
+                data mag.HK {mustBeScalarOrEmpty}
                 matTypeName (1, 1) string
+            end
+
+            if isempty(data)
+                return;
             end
 
             exportedData.HK.(matTypeName).Time = data.Time;
