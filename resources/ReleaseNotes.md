@@ -1,3 +1,7 @@
+# App
+
+- Make sure to reset everything when "Reset" button is pressed
+
 # Software
 
 - Fix issue with exporting empty HK
