@@ -38,7 +38,13 @@ function f = visualize(data, styles, options)
         arrangement = num2cell(options.Arrangement);
     end
 
-    t = tiledlayout(f, arrangement{:}, TileSpacing = "tight", TileIndexing = options.TileIndexing);
+    if isequal(options.TileIndexing, "columnmajor")
+        spacing = "compact";
+    else
+        spacing = "tight";
+    end
+
+    t = tiledlayout(f, arrangement{:}, TileSpacing = spacing, TileIndexing = options.TileIndexing);
     t.Title.String = options.Title;
 
     axes = matlab.graphics.axis.Axes.empty();
