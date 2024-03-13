@@ -262,13 +262,18 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
                 idxFirst = find(modeEvents.Mode == "Normal", 1);
                 idxLast = find(diff(modeEvents.Mode == "Normal") == 0, 1);
 
-                finalTime = events(find([events.Time] == modeEvents.Time(idxLast), 1) + 1, :).Time;
-                modeEvents = modeEvents(idxFirst:idxLast, :);
-
-                if isempty(modeEvents)
+                if isempty(modeEvents) && isempty(idxFirst) && isempty(idxLast)
                     period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
                 else
-                    period = timerange(modeEvents.Time(1), finalTime, "closedleft");
+
+                    finalTime = events(find([events.Time] == modeEvents.Time(idxLast), 1) + 1, :).Time;
+                    modeEvents = modeEvents(idxFirst:idxLast, :);
+
+                    if isempty(modeEvents)
+                        period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
+                    else
+                        period = timerange(modeEvents.Time(1), finalTime, "closedleft");
+                    end
                 end
             end
 

@@ -22,7 +22,12 @@ function figures = cptPlots(analysis, options)
     %% Modes
 
     modeCycling = analysis.getModeCycling();
-    views(end + 1) = mag.graphics.view.Field(modeCycling, Event = "Mode", Name = "Mode Cycling", Title = string.empty());
+
+    if ~isempty(modeCycling)
+
+        views(end + 1) = mag.graphics.view.Field(modeCycling, Event = "Mode", Name = "Mode Cycling", Title = string.empty());
+        views(end + 1) = mag.graphics.view.PSD(modeCycling, Name = "Mode Cycling PSD Analysis", Event = "DataFrequency");
+    end
 
     %% Ranges
 
@@ -30,8 +35,9 @@ function figures = cptPlots(analysis, options)
 
     if ~isempty(rangeCycling) && rangeCycling.HasData
 
-        % Plot all ranges.
+        % Plot all ranges and PSDs.
         views(end + 1) = mag.graphics.view.Field(rangeCycling, Event = "Range", Name = "Range Cycling", Title = string.empty());
+        views(end + 1) = mag.graphics.view.PSD(rangeCycling, Name = "Range Cycling PSD Analysis", Event = "Range");
 
         % Plot ranges without range 0.
         locNoRangeZero = (rangeCycling.Primary.Range ~= 0) & (rangeCycling.Secondary.Range ~= 0);
@@ -49,14 +55,9 @@ function figures = cptPlots(analysis, options)
     %% Ramp
 
     rampMode = analysis.getRampMode();
-    views(end + 1) = mag.graphics.view.RampMode(rampMode);
 
-    %% PSD
-
-    views(end + 1) = mag.graphics.view.PSD(modeCycling, Name = "Mode Cycling PSD Analysis", Event = "DataFrequency");
-
-    if ~isempty(rangeCycling) && rangeCycling.HasData
-        views(end + 1) = mag.graphics.view.PSD(rangeCycling, Name = "Range Cycling PSD Analysis", Event = "Range");
+    if ~isempty(rampMode)
+        views(end + 1) = mag.graphics.view.RampMode(rampMode);
     end
 
     %% Final Normal Mode
