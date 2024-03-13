@@ -2,7 +2,12 @@
 
 [![MATLAB Tests](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/actions/workflows/matlab.yml/badge.svg)](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/actions/workflows/matlab.yml)
 
-This repository contains utilities for processing and visualizing MAG science and HK data. The supported MATLAB releases are MATLAB R2023b and later.
+This repository contains utilities for processing and visualizing MAG science and HK data. The supported MATLAB releases are MATLAB R2023b and later. The following MATLAB toolboxes are required to use the toolbox:
+
+* MATLAB
+* Signal Processing Toolbox
+* Statistics and Machine Learning Toolbox
+* Text Analytics Toolbox
 
 ## Getting Started
 
