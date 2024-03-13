@@ -36,7 +36,6 @@ classdef CSV < mag.io.Type
 
             % Import data as tables.
             data = cell.empty();
-            useParallel = ~isempty(gcp("nocreate"));
 
             for i = 1:numel(this.ImportFileNames)
 
@@ -46,7 +45,7 @@ classdef CSV < mag.io.Type
                 end
 
                 dataStore = tabularTextDatastore(this.ImportFileNames(i), FileExtensions = this.Extension);
-                data{i} = dataStore.readall(UseParallel = useParallel);
+                data{i} = dataStore.readall(UseParallel = mag.internal.useParallel());
             end
         end
 

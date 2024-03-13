@@ -42,7 +42,7 @@ classdef SID15 < mag.meta.log.Type
 
             % Load data.
             dataStore = tabularTextDatastore(this.FileName, TextType = "string", FileExtensions = this.Extensions, SelectedVariableNames = ["SHCOARSE", "ISV_FOB_ACTTRIES", "ISV_FIB_ACTTRIES"]);
-            rawData = dataStore.readall(UseParallel = ~isempty(gcp("nocreate")));
+            rawData = dataStore.readall(UseParallel = mag.internal.useParallel());
 
             rawData = sortrows(rawData, "SHCOARSE");
 
