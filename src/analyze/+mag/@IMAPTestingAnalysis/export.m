@@ -22,16 +22,28 @@ function export(this, exportStrategy, options)
     scienceExportFormat = exportStrategy.ScienceExportFormat;
     hkExportFormat = exportStrategy.HKExportFormat;
 
+    % Export full science.
+    if this.Results.HasScience
+
+        r = this.Results.copy();
+        r.crop(period);
+
+        scienceData = scienceExportFormat.formatForExport(r);
+
+        exportStrategy.ExportFileName = fullfile(options.Location, compose("%s %s (%d, %d)", datestr(r.Primary.MetaData.Timestamp, "ddmmyy-hhMM"), r.Primary.MetaData.Mode, r.Primary.MetaData.DataFrequency, r.Secondary.MetaData.DataFrequency) + extension); %#ok<DATST>
+        exportStrategy.export(scienceData);
+    end
+
     % Export each mode.
     modes = this.getAllModes();
 
     for m = modes
 
         m.crop(period);
-        exportedData = scienceExportFormat.formatForExport(m);
+        modeData = scienceExportFormat.formatForExport(m);
 
         exportStrategy.ExportFileName = fullfile(options.Location, compose("%s %s (%d, %d)", datestr(m.Primary.MetaData.Timestamp, "ddmmyy-hhMM"), m.Primary.MetaData.Mode, m.Primary.MetaData.DataFrequency, m.Secondary.MetaData.DataFrequency) + extension); %#ok<DATST>
-        exportStrategy.export(exportedData);
+        exportStrategy.export(modeData);
     end
 
     % Export I-ALiRT.
