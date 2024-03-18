@@ -120,7 +120,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 if timeFilter >= 0
                     timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
                 else
-                    timePeriod = timerange(this.Time(1), this.Time(end) - timeFilter, "closed");
+                    timePeriod = timerange(this.Time(1), this.Time(end) + timeFilter, "closed");
                 end
             elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
                 timePeriod = timeFilter;
