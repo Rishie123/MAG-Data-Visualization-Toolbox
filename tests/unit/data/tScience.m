@@ -73,8 +73,9 @@ classdef tScience < matlab.unittest.TestCase
             testCase.verifyTrue(ismissing(actualDerivative(end)), "Last element in derivative should be missing.");
         end
 
-        % Test that "crop" method crops data based on a "duration" object.
-        function cropMethod_duration(testCase)
+        % Test that "crop" method crops data based on a positive "duration"
+        % object.
+        function cropMethod_duration_positive(testCase)
 
             % Set up.
             science = testCase.createTestData();
@@ -83,6 +84,22 @@ classdef tScience < matlab.unittest.TestCase
             expectedData = science.DependentVariables(2:end, :);
 
             timeFilter = minutes(1);
+
+            % Exercise and verify.
+            testCase.cropAndVerify(science, timeFilter, expectedTimes, expectedData);
+        end
+
+        % Test that "crop" method crops data based on a negative "duration"
+        % object.
+        function cropMethod_duration_negative(testCase)
+
+            % Set up.
+            science = testCase.createTestData();
+
+            expectedTimes = science.Time(1:end-1);
+            expectedData = science.DependentVariables(1:end-1, :);
+
+            timeFilter = minutes(-1);
 
             % Exercise and verify.
             testCase.cropAndVerify(science, timeFilter, expectedTimes, expectedData);
@@ -198,7 +215,8 @@ classdef tScience < matlab.unittest.TestCase
             testCase.verifyError(@() science.resample(0.12345), "", "Resampling should error when frequencies do not match.");
         end
 
-        % Test that "downsample" method can downsample to a lower frequency.
+        % Test that "downsample" method can downsample to a lower
+        % frequency.
         function downsampleMethod_lowerFrequency(testCase)
 
             % Set up.
