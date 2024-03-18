@@ -4,3 +4,4 @@
 - Convert addition of missing row at end of file data into a processing step (`mag.process.Separate`)
 - Add `mag.process.Separate` to HK processing
 - Add export of whole science data
+- Fix issue with processing data ready time in `mag.process.Units` when not enough digits are present
