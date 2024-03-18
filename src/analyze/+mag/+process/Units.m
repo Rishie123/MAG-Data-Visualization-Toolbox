@@ -141,6 +141,10 @@ classdef Units < mag.process.Step
 
             binRT = dec2bin(readyTime);
 
+            if width(binRT) < 24
+                binRT = char(pad(string(binRT), 25, "left", "0"));
+            end
+
             fineTime = bin2dec(binRT(:, end-23:end));
             fineTime = fineTime / (2^24-1);
 

@@ -1,12 +1,11 @@
 classdef (Abstract) MAGAnalysisTestCase < matlab.unittest.TestCase
 % MAGANALYSISTESTCASE Base class for all MAG analysis tests.
 
-    methods (Access = protected)
+    methods (Static, Access = protected)
 
-        function data = createTestData(~, options)
+        function data = createTestData(options)
 
             arguments
-                ~
                 options.XYZ (:, 3) double = ones(3, 3)
                 options.Range (:, 1) double = zeros(3, 1)
                 options.Sequence (:, 1) double = [1; 2; 3]

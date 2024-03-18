@@ -1,10 +1,8 @@
-# App
-
-- Make sure to reset everything when "Reset" button is pressed
-
 # Software
 
-- Fix issue with exporting empty HK
-- Fix issue with plotting CPT data with no mode cycling information
-- Fix issue with `tiledlayout` spacing when tile indexing is column-major
-- Fix issue with naming HK close up figure
+- Make dependence on Parallel Computing Toolbox optional
+- Convert addition of missing row at end of file data into a processing step (`mag.process.Separate`)
+- Add `mag.process.Separate` to HK processing
+- Add export of whole science data
+- Fix issue with processing data ready time in `mag.process.Units` when not enough digits are present
+- Fix issue with plotting last event mode and range in `mag.graphics.view.HK` when data is cropped

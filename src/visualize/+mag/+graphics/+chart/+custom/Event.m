@@ -88,7 +88,7 @@ classdef Event < mag.graphics.chart.Chart
             plotColors = this.getColors(variable);
 
             for i = 1:numel(variable)
-                graph(i) = plot(axes, plotTime(:, i), plotVariable(:, i), Color = plotColors(i, :), LineWidth = 3.5); %#ok<AGROW>
+                graph(i) = plot(axes, plotTime(:, i), plotVariable(:, i), Color = plotColors(i, :), LineWidth = 3.5);
             end
 
             % Plot vertical lines between mode changes.

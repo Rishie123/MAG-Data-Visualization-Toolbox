@@ -48,7 +48,7 @@ classdef GSEOS < mag.meta.log.Type
             end
 
             dataStore = tabularTextDatastore(this.FileName, FileExtensions = this.Extensions, TextType = "string", VariableNames = this.Names, TextscanFormats = this.Formats);
-            rawData = dataStore.readall(UseParallel = ~isempty(gcp("nocreate")));
+            rawData = dataStore.readall(UseParallel = mag.internal.useParallel());
 
             if isempty(rawData)
                 return;
