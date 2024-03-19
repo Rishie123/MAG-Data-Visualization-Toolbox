@@ -1,3 +1,9 @@
+# App
+
+- Add drop down and text field to browse and view all processing steps separately
+- Add check box to select whether to plot PSD
+- Add tooltips for meta data text areas and toolstrip buttons
+
 # Software
 
 - Allow cropping of `mag.Science` with negative duration (filters from the end)
