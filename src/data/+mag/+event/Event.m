@@ -70,6 +70,36 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
             timetableThis{contains(timetableThis.Label, "Config"), ["PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency", "Duration"]} = missing();
             timetableThis{contains(timetableThis.Label, "Ramp"), "Range"} = missing();
         end
+
+        function eventtableThis = eventtable(this)
+        % EVENTTABLE Convert evnets to eventtable.
+
+            eventtableThis = this.timetable();
+            eventtableThis.Reason = repmat("Command", height(eventtableThis), 1);
+
+            locTimedCommand = ~ismissing(eventtableThis.Duration) & (eventtableThis.Duration ~= 0);
+
+            idxTimedCommand = find(locTimedCommand);
+            idxBaselineCommand = find(~locTimedCommand);
+
+            for i = idxTimedCommand(:)'
+
+                idx = idxBaselineCommand(idxBaselineCommand < i);
+
+                if isempty(idx)
+                    error("Cannot determine initial event.");
+                end
+
+                autoEvent = eventtableThis(idx(end), :);
+                autoEvent.Time = eventtableThis.Time(i) + seconds(eventtableThis.Duration(i));
+                autoEvent.Reason = "Auto";
+
+                eventtableThis = [eventtableThis; autoEvent]; %#ok<AGROW>
+            end
+
+            eventtableThis = sortrows(eventtableThis);
+            eventtableThis = eventtable(eventtableThis, EventLabelsVariable = "Label");
+        end
     end
 
     methods (Abstract, Access = protected)

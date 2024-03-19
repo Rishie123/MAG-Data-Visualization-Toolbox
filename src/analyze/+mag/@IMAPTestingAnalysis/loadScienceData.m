@@ -75,7 +75,7 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
 
     %% Add Mode and Range Change Events
 
-    sensorEvents = timetable(this.Results.Events);
+    sensorEvents = eventtable(this.Results.Events);
     sensorEvents = sensorEvents(timerange(startTime - seconds(1), endTime, "closed"), :);
 
     primaryData.Properties.Events = this.generateEventTable("Primary", sensorEvents, primaryData);
