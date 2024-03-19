@@ -85,14 +85,19 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
             for i = idxTimedCommand(:)'
 
                 idx = idxBaselineCommand(idxBaselineCommand < i);
+                assert(~isempty(idx), "Cannot determine initial event.");
 
-                if isempty(idx)
-                    error("Cannot determine initial event.");
-                end
-
-                autoEvent = eventtableThis(idx(end), :);
+                autoEvent = eventtableThis(i, :);
                 autoEvent.Time = eventtableThis.Time(i) + seconds(eventtableThis.Duration(i));
+                autoEvent.Mode = eventtableThis.Mode(idx(end));
+                autoEvent.Duration = 0;
                 autoEvent.Reason = "Auto";
+
+                if isequal(autoEvent.Mode, "Normal")
+                    autoEvent.Label = compose("Normal (%d, %d)", autoEvent.PrimaryNormalRate, autoEvent.SecondaryNormalRate);
+                else
+                    autoEvent.Label = compose("Burst (%d, %d)", autoEvent.PrimaryBurstRate, autoEvent.SecondaryBurstRate);
+                end
 
                 eventtableThis = [eventtableThis; autoEvent]; %#ok<AGROW>
             end
