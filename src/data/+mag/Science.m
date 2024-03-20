@@ -26,8 +26,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         % "true" stands for compressed.
         Compression (:, 1) logical
         % QUALITY Quality flag denoting whether data is of high quality.
-        % "true" stands for high quality.
-        Quality (:, 1) logical
+        Quality (:, 1) mag.meta.Quality
         % EVENTS Events detected.
         Events eventtable
     end

@@ -48,6 +48,23 @@ classdef tSeparate < MAGAnalysisTestCase
 
             testCase.verifyGreaterThanOrEqual(data{end, "Discriminator"}, processedData{end, "Discriminator"}, "Discrimination variable should be increased.");
         end
+
+        % Test that quality flag is set to "Artificial" if quality variable
+        % name is provided.
+        function qualityFlag(testCase)
+
+            % Set up.
+            data = testCase.createTestData();
+            data.Quality = repmat(mag.meta.Quality.Regular, height(data), 1);
+
+            % Exercise.
+            separateStep = mag.process.Separate(DiscriminationVariable = "Discriminator", QualityVariable = "Quality",  Variables = ["Doubles", "Strings"]);
+            processedData = separateStep.apply(data);
+
+            % Verify.
+            testCase.assertSize(processedData, [height(data) + 1, width(data)], "Separation row should have been added.");
+            testCase.verifyEqual(processedData{end, "Quality"}, mag.meta.Quality.Artificial, "Quality flag should be set.");
+        end
     end
 
     methods (Static, Access = protected)

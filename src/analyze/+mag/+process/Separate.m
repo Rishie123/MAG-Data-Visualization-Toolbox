@@ -11,6 +11,8 @@ classdef Separate < mag.process.Step
     properties
         % DISCRIMINATIONVARIABLE Name of variable to increase in row.
         DiscriminationVariable (1, 1) string
+        % QUALITYVARIABLE Name of quality variable.
+        QualityVariable string {mustBeScalarOrEmpty}
         % VARIABLES Variables to be set to missing.
         Variables (1, :) string
     end
@@ -57,8 +59,13 @@ classdef Separate < mag.process.Step
             end
 
             finalRow = data(end, :);
+
             finalRow.(this.DiscriminationVariable) = finalRow.(this.DiscriminationVariable) + eps();
             finalRow{:, variables} = missing();
+
+            if ~isempty(this.QualityVariable)
+                finalRow.(this.QualityVariable) = mag.meta.Quality.Artificial;
+            end
 
             data = [data; finalRow];
         end
