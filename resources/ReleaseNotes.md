@@ -12,4 +12,5 @@
 - Allow cropping of I-ALiRT with separate filter for primary and secondary
 - Add conversion method `eventtable` in `mag.event.Event` to simplify logic in science analysis
 - Derivative of `mag.TimeSeries` variables now has missing value as first element instead of last
+- Delete unused processing steps
 - Add tests for `mag.event.Event`, `mag.event.ModeChange`, `mag.event.RangeChange` and `mag.event.RampMode`
