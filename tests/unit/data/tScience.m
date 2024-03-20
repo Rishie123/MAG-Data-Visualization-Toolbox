@@ -69,8 +69,8 @@ classdef tScience < matlab.unittest.TestCase
             actualDerivative = science.(DerivativeVariable);
 
             % Verify.
-            testCase.verifyEqual(actualDerivative(1:end-1), expectedDerivative, "Derivative should match expected value.");
-            testCase.verifyTrue(ismissing(actualDerivative(end)), "Last element in derivative should be missing.");
+            testCase.verifyEqual(actualDerivative(2:end), expectedDerivative, "Derivative should match expected value.");
+            testCase.verifyTrue(ismissing(actualDerivative(1)), "First element in derivative should be missing.");
         end
 
         % Test that "crop" method crops data based on a positive "duration"

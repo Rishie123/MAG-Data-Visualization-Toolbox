@@ -51,7 +51,7 @@ classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
             if isempty(x)
                 dx = diff(x);
             else
-                dx = vertcat(diff(x), missing());
+                dx = vertcat(missing(), diff(x));
             end
         end
     end
