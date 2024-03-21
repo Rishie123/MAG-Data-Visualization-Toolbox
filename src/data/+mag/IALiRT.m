@@ -21,10 +21,16 @@ classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
             this.Secondary = secondaryData;
         end
 
-        function crop(this, timeFilter)
+        function crop(this, primaryFilter, secondaryFilter)
 
-            this.Primary.crop(timeFilter);
-            this.Secondary.crop(timeFilter);
+            arguments
+                this (1, 1) mag.IALiRT
+                primaryFilter
+                secondaryFilter = primaryFilter
+            end
+
+            this.Primary.crop(primaryFilter);
+            this.Secondary.crop(secondaryFilter);
         end
     end
 

@@ -17,8 +17,6 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     sensor = string(this.Results.getSensor(primaryOrSecondary));
 
     % Adapt existing event properties.
-    sensorEvents.Reason = repmat("Command", height(sensorEvents), 1);
-
     if contains("Sensor", sensorEvents.Properties.VariableNames)
 
         sensorEvents = sensorEvents(ismissing([sensorEvents.Sensor]) | ([sensorEvents.Sensor] == sensor), :);
@@ -29,29 +27,6 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
 
     % Improve ramp mode timestamp estimates.
     sensorEvents = updateRampModeTimestamps(sensorEvents, data);
-
-    % Add automatic transitions.
-    locTimedCommand = ~ismissing(sensorEvents.Duration) & (sensorEvents.Duration ~= 0);
-
-    idxTimedCommand = find(locTimedCommand);
-    idxBaselineCommand = find(~locTimedCommand);
-
-    for i = idxTimedCommand(:)'
-
-        idx = idxBaselineCommand(idxBaselineCommand < i);
-
-        if isempty(idx)
-            error("Cannot determine initial event.");
-        end
-
-        autoEvent = sensorEvents(idx(end), :);
-        autoEvent.Time = sensorEvents.Time(i) + seconds(sensorEvents.Duration(i));
-        autoEvent.Reason = "Auto";
-
-        sensorEvents = [sensorEvents; autoEvent]; %#ok<AGROW>
-    end
-
-    sensorEvents = sortrows(sensorEvents);
 
     % Improve estimates of mode changes.
     sensorEvents = findModeChanges(data, sensorEvents);

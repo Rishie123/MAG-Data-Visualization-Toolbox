@@ -7,7 +7,7 @@ classdef (Abstract, HandleCompatible) SaveLoad
         Version (1, 1) string
     end
 
-    properties (GetAccess = protected, SetAccess = private)
+    properties (Hidden, SetAccess = private)
         % ORIGINALVERSION Original version for save/load compatibility.
         OriginalVersion (1, 1) string
     end

@@ -35,8 +35,8 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
         primary.compression = false(height(primary), 1);
         secondary.compression = false(height(secondary), 1);
 
-        primary.quality = true(height(primary), 1);
-        secondary.quality = true(height(secondary), 1);
+        primary.quality = repmat(mag.meta.Quality.Regular, height(primary), 1);
+        secondary.quality = repmat(mag.meta.Quality.Regular, height(secondary), 1);
 
         % Current file meta data.
         pmd = primaryMetaData.copy();
@@ -90,7 +90,8 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
         Duration = double.empty(0, 1), ...
         Range = double.empty(0, 1), ...
         Sensor = string.empty(0, 1), ...
-        Label = string.empty(0, 1)));
+        Label = string.empty(0, 1), ...
+        Reason = string.empty(0, 1)));
     sensorEvents = table2timetable(sensorEvents, RowTimes = "Time");
 
     primaryData.Properties.Events = this.generateEventTable("Primary", sensorEvents, primaryData);

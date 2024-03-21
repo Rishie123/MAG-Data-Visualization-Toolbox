@@ -26,8 +26,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         % "true" stands for compressed.
         Compression (:, 1) logical
         % QUALITY Quality flag denoting whether data is of high quality.
-        % "true" stands for high quality.
-        Quality (:, 1) logical
+        Quality (:, 1) mag.meta.Quality
         % EVENTS Events detected.
         Events eventtable
     end
@@ -116,7 +115,12 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             if isa(timeFilter, "duration")
-                timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
+
+                if timeFilter >= 0
+                    timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
+                else
+                    timePeriod = timerange(this.Time(1), this.Time(end) + timeFilter, "closed");
+                end
             elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
                 timePeriod = timeFilter;
             end

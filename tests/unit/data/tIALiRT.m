@@ -12,7 +12,7 @@ classdef tIALiRT < matlab.mock.TestCase
             timeFilter = timerange(datetime("-Inf"), datetime("Inf"));
 
             % Exercise.
-            iALiRT.crop(timeFilter);
+            iALiRT.crop(timeFilter, timeFilter);
 
             % Verify.
             testCase.verifyCalled(primaryBehavior.crop(timeFilter), "Primary data should be cropped with same filter.");

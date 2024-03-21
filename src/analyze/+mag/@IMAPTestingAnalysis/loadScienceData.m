@@ -29,8 +29,8 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
         primary.compression = false(height(primary), 1);
         secondary.compression = false(height(secondary), 1);
 
-        primary.quality = true(height(primary), 1);
-        secondary.quality = true(height(secondary), 1);
+        primary.quality = repmat(mag.meta.Quality.Regular, height(primary), 1);
+        secondary.quality = repmat(mag.meta.Quality.Regular, height(secondary), 1);
 
         % Current file meta data.
         [mode, primaryFrequency, secondaryFrequency, packetFrequency] = extractFileMetaData(this.ScienceFileNames(i));
@@ -75,7 +75,7 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
 
     %% Add Mode and Range Change Events
 
-    sensorEvents = timetable(this.Results.Events);
+    sensorEvents = eventtable(this.Results.Events);
     sensorEvents = sensorEvents(timerange(startTime - seconds(1), endTime, "closed"), :);
 
     primaryData.Properties.Events = this.generateEventTable("Primary", sensorEvents, primaryData);
