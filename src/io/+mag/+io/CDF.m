@@ -26,34 +26,41 @@ classdef CDF < mag.io.Type
         end
 
         function scienceExportFormat = get.ScienceExportFormat(~)
-            scienceExportFormat = [];
+            scienceExportFormat = mag.io.format.ScienceCDF();
         end
 
         function hkExportFormat = get.HKExportFormat(~)
-            hkExportFormat = [];
+            hkExportFormat = mag.io.format.HKCDF();
         end
     end
 
     methods
 
-        function data = import(this, options) %#ok<STOUT,INUSD>
-            error("Unsupported import from CDF.");
-        end
-
-        function export(this, data, metaData, options)
+        function data = import(this, options)
 
             arguments
-                this
-                data (1, 1) mag.Science
-                metaData (1, 1) mag.meta.Instrument
+                this (1, 1) mag.io.CDF
+                options.SkeletonLocation (1, 1) string {mustBeFolder}
+                options.Level (1, 1) string = "1b"
+                options.Version (1, 1) string = "V01"
+            end
+
+
+        end
+
+        function export(this, data, options)
+
+            arguments
+                this (1, 1) mag.io.CDF
+                data (1, 1) mag.io.format.CDF
                 options.SkeletonLocation (1, 1) string {mustBeFolder} = fullfile("process/cdf")
                 options.Level (1, 1) string = "1b"
                 options.Version (1, 1) string = "V01"
             end
 
             % Load CDF information from skeleton.
-            [~, sensor] = regexp(data.MetaData.Sensor, "F(\w+)B", "once", "match", "tokens");
-            skeletonCDF = fullfile(options.SkeletonLocation, sprintf("imap_L%s_mag%s_skeletontable_%s.cdf", options.Level, lower(sensor), options.Version));
+            [~, sensor] = regexp(data.Sensor, "F(\w+)B", "once", "match", "tokens");
+            skeletonCDF = fullfile(options.SkeletonLocation, sprintf("imap_mag_L%s_skeletontable_%s.cdf", options.Level, lower(sensor), options.Version));
 
             cdfInfo = spdfcdfinfo(skeletonCDF);
 

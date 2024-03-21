@@ -3,6 +3,9 @@ classdef (Abstract) Data < mag.mixin.SetGet
 
     methods (Abstract)
 
+        % FORMATFROMIMPORT Format imported data to "mag.Data".
+        exportedData = formatFromImport(this, data)
+
         % FORMATFOREXPORT Format data ready for export.
         exportedData = formatForExport(this, data)
     end
