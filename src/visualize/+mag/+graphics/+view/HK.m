@@ -27,7 +27,7 @@ classdef HK < mag.graphics.view.View
             [primarySensor, secondarySensor] = this.getSensorNames();
             pwr = this.getHKType("PW");
 
-            if isempty(pwr)
+            if isempty(pwr) || ~pwr.HasData
                 return;
             end
 

@@ -11,6 +11,27 @@ classdef tHK < matlab.unittest.TestCase
 
     methods (Test)
 
+        % Test that "HasData" property returns "true" when data is present.
+        function hasData(testCase)
+
+            % Set up.
+            hk = mag.hk.Power(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.HK());
+
+            % Exercise and verify.
+            testCase.verifyTrue(hk.HasData, """HasData"" property should be ""true"".");
+        end
+
+        % Test that "HasData" property returns "false" when table has no
+        % data.
+        function hasData_noData(testCase)
+
+            % Set up.
+            hk = mag.hk.Power(timetable.empty(), mag.meta.HK());
+
+            % Exercise and verify.
+            testCase.verifyFalse(hk.HasData, """HasData"" property should be ""false"".");
+        end
+
         % Test that "crop" method crops data based on a "timerange" object.
         function cropMethod_timerange(testCase)
 
