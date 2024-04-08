@@ -75,12 +75,10 @@ classdef IALiRT < mag.graphics.view.Science
 
                 [primarySensor, secondarySensor] = this.getSensorNames();
 
-                tolerance = 4 / (24 * 60 * 60); % 4 seconds
+                primaryScienceTime = this.retrieveMatchingTimestamps(primaryIALiRT.Time, primaryScience.Time);
+                secondaryScienceTime = this.retrieveMatchingTimestamps(secondaryIALiRT.Time, secondaryScience.Time);
 
-                [locPri, idxPriMin] = ismembertol(datenum(primaryIALiRT.Time), datenum(primaryScience.Time), tolerance); %#ok<DATNM>
-                [locSec, idxSecMin] = ismembertol(datenum(secondaryIALiRT.Time), datenum(secondaryScience.Time), tolerance); %#ok<DATNM>
-
-                timestampComparison = table(primaryScience.Time(idxPriMin(idxPriMin ~= 0)), primaryIALiRT.Time(locPri), secondaryScience.Time(idxSecMin(idxSecMin ~= 0)), secondaryIALiRT.Time(locSec), ...
+                timestampComparison = table(primaryScienceTime, primaryIALiRT.Time, secondaryScienceTime, secondaryIALiRT.Time, ...
                     VariableNames = ["ps", "pi", "ss", "si"]);
 
                 this.Figures(4) = mag.graphics.visualize( ...
@@ -126,6 +124,33 @@ classdef IALiRT < mag.graphics.view.Science
     end
 
     methods (Static, Access = private)
+
+        function matchedScienceTime = retrieveMatchingTimestamps(iALiRTTime, scienceTime)
+
+            % Pre-allocate array.
+            matchedScienceTime = repmat(datetime("Inf", TimeZone = "UTC"), [numel(iALiRTTime), 1]);
+
+            % Find location of first match.
+            [~, idxMin] = min(abs(iALiRTTime(1) - scienceTime));
+            matchedScienceTime(1) = scienceTime(idxMin);
+
+            % Loop over all subsequent matches, now that we know the first
+            % one.
+            for i = 2:numel(iALiRTTime)
+
+                prevIdxMin = idxMin;
+                idxEnd = (idxMin + 1e3);
+
+                if idxEnd > numel(scienceTime)
+                    idxEnd = numel(scienceTime);
+                end
+
+                [~, idxMin] = min(abs(iALiRTTime(i) - scienceTime(idxMin:idxEnd)));
+                idxMin = idxMin + prevIdxMin - 1;
+
+                matchedScienceTime(i) = scienceTime(idxMin);
+            end
+        end
 
         function action = getTimingOperation(y1, y2)
 
