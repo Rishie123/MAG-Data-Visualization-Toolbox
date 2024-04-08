@@ -157,7 +157,7 @@ classdef tScience < matlab.unittest.TestCase
             science = testCase.createTestData();
 
             % Exercise.
-            science.crop(timerange(datetime("Inf", TimeZone = "local"), datetime("-Inf", TimeZone = "local")));
+            science.crop(timerange(datetime("Inf", TimeZone = "UTC"), datetime("-Inf", TimeZone = "UTC")));
 
             % Verify.
             testCase.verifyEmpty(science.IndependentVariable, "All data should be cropped out.");

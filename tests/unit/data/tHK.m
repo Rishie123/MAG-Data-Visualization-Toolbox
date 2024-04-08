@@ -33,7 +33,7 @@ classdef tHK < matlab.unittest.TestCase
             hk = testCase.createTestData();
 
             % Exercise.
-            hk.crop(timerange(datetime("Inf", TimeZone = "local"), datetime("-Inf", TimeZone = "local")));
+            hk.crop(timerange(datetime("Inf", TimeZone = "UTC"), datetime("-Inf", TimeZone = "UTC")));
 
             % Verify.
             for i = 1:numel(hk)
