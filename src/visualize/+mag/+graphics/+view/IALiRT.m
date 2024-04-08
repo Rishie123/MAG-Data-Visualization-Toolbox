@@ -75,8 +75,10 @@ classdef IALiRT < mag.graphics.view.Science
 
                 [primarySensor, secondarySensor] = this.getSensorNames();
 
-                [locPri, idxPriMin] = ismembertol(datenum(primaryIALiRT.Time), datenum(primaryScience.Time)); %#ok<DATNM>
-                [locSec, idxSecMin] = ismembertol(datenum(secondaryIALiRT.Time), datenum(secondaryScience.Time)); %#ok<DATNM>
+                tolerance = 4 / (24 * 60 * 60); % 4 seconds
+
+                [locPri, idxPriMin] = ismembertol(datenum(primaryIALiRT.Time), datenum(primaryScience.Time), tolerance); %#ok<DATNM>
+                [locSec, idxSecMin] = ismembertol(datenum(secondaryIALiRT.Time), datenum(secondaryScience.Time), tolerance); %#ok<DATNM>
 
                 timestampComparison = table(primaryScience.Time(idxPriMin(idxPriMin ~= 0)), primaryIALiRT.Time(locPri), secondaryScience.Time(idxSecMin(idxSecMin ~= 0)), secondaryIALiRT.Time(locSec), ...
                     VariableNames = ["ps", "pi", "ss", "si"]);
