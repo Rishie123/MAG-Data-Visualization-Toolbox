@@ -1,3 +1,7 @@
+# App
+
+- Rename `Analysis` and `MAT` options to clearer names
+
 # Software
 
 - Add support for reading Word documents containing meta data
