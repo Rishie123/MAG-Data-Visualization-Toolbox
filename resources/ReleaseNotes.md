@@ -1,6 +1,7 @@
 # App
 
 - Rename `Analysis` and `MAT` options to clearer names
+- Ask user whether to overwrite `analysis` variable in workspace
 
 # Software
 
