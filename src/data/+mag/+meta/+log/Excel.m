@@ -2,7 +2,7 @@ classdef Excel < mag.meta.log.Type
 % EXCEL Load meta data from Excel files.
 
     properties (Constant)
-        Extensions = [".xlsx", ".xls"]
+        Extensions = ".xlsx"
         % ACTIVATIONPATTERN Regex pattern to extract number of attempts to
         % start up the sensors.
         ActivationPattern (1, 1) string = "^\s*FOB:\s*(?<fob>\d+)?.*?FIB:\s*(?<fib>\d+)?.*?Repeat activation\?:\s*(:?y\/n)?\s*(?<repeat>.*?)?\s*$"
@@ -98,7 +98,7 @@ classdef Excel < mag.meta.log.Type
             [secondaryMetaData.FEE] = deal(secondaryDetails.fee);
             [secondaryMetaData.Harness] = deal(secondaryDetails.harness);
 
-            if isfield(primaryDetails, "can")
+            if isfield(secondaryDetails, "can")
 
                 [secondaryMetaData.Can] = deal(secondaryDetails.can);
                 [secondaryMetaData.Can] = extractBetween([secondaryMetaData.Can], "(", ")");
