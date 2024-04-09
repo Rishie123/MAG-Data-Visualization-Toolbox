@@ -7,6 +7,8 @@ classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
     end
 
     properties (Dependent)
+        % HASDATA Boolean denoting whether data is present.
+        HasData (1, 1) logical
         % TIME Timestamp of data.
         Time (:, 1) datetime
         % DT Time derivative.
@@ -16,6 +18,10 @@ classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
     end
 
     methods
+
+        function hasData = get.HasData(this)
+            hasData = ~isempty(this.Data);
+        end
 
         function time = get.Time(this)
             time = this.Data.(this.Data.Properties.DimensionNames{1});

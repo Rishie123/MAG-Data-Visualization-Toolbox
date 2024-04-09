@@ -3,6 +3,47 @@ classdef tIALiRT < matlab.mock.TestCase
 
     methods (Test)
 
+        % Test that "HasData" property returns "true" when data is present.
+        function hasData(testCase)
+
+            % Set up.
+            primary = mag.Science(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.Science());
+            secondary = mag.Science(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.Science());
+
+            iALiRT = mag.IALiRT(primary, secondary);
+
+            % Exercise and verify.
+            testCase.verifyTrue(iALiRT.HasData, """HasData"" property should be ""true"".");
+        end
+
+        % Test that "HasData" property returns "false" when primary has
+        % no data.
+        function hasData_primaryNoData(testCase)
+
+            % Set up.
+            primary = mag.Science(timetable.empty(), mag.meta.Science());
+            secondary = mag.Science(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.Science());
+
+            iALiRT = mag.IALiRT(primary, secondary);
+
+            % Exercise and verify.
+            testCase.verifyFalse(iALiRT.HasData, """HasData"" property should be ""false"".");
+        end
+
+        % Test that "HasData" property returns "false" when secondary has
+        % no data.
+        function hasData_secondaryNoData(testCase)
+
+            % Set up.
+            primary = mag.Science(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.Science());
+            secondary = mag.Science(timetable.empty(), mag.meta.Science());
+
+            iALiRT = mag.IALiRT(primary, secondary);
+
+            % Exercise and verify.
+            testCase.verifyFalse(iALiRT.HasData, """HasData"" property should be ""false"".");
+        end
+
         % Test that "crop" method calls method of underlying science data.
         function cropMethod(testCase)
 

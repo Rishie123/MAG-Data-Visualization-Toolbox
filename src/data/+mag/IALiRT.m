@@ -8,6 +8,11 @@ classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
         Secondary mag.Science {mustBeScalarOrEmpty}
     end
 
+    properties (Dependent)
+        % HASDATA Boolean denoting whether data is present.
+        HasData (1, 1) logical
+    end
+
     methods
 
         function this = IALiRT(primaryData, secondaryData)
@@ -19,6 +24,12 @@ classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
 
             this.Primary = primaryData;
             this.Secondary = secondaryData;
+        end
+
+        function hasData = get.HasData(this)
+
+            hasData = ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
+                this.Primary.HasData && this.Secondary.HasData;
         end
 
         function crop(this, primaryFilter, secondaryFilter)
