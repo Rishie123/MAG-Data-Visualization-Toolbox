@@ -18,15 +18,15 @@ function figures = sftPlots(analysis, options)
     % Crop data.
     if ~isempty(options.Filter)
 
-        analysis = analysis.copy();
-        analysis.Results.cropScience(options.Filter);
+        croppedAnalysis = analysis.copy();
+        croppedAnalysis.Results.cropScience(options.Filter);
     end
 
     % Separate modes.
-    modes = analysis.getAllModes();
+    modes = croppedAnalysis.getAllModes();
 
     if ~options.SeparateModes || isempty(modes)
-        modes = analysis.Results;
+        modes = croppedAnalysis.Results;
     end
 
     % Show science and frequency.
@@ -40,8 +40,8 @@ function figures = sftPlots(analysis, options)
     end
 
     % Show I-ALiRT.
-    if ~isempty(analysis.Results.IALiRT)
-        views(end + 1) = mag.graphics.view.IALiRT(analysis.Results);
+    if ~isempty(croppedAnalysis.Results.IALiRT)
+        views(end + 1) = mag.graphics.view.IALiRT(croppedAnalysis.Results);
     end
 
     % Show HK.
