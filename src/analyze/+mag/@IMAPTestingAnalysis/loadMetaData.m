@@ -17,8 +17,12 @@ function [primaryMetaData, secondaryMetaData, hkMetaData] = loadMetaData(this)
                 loader = mag.meta.log.GSEOS(FileName = mdf);
             case cellstr(mag.meta.log.Excel.Extensions)
                 loader = mag.meta.log.Excel(FileName = mdf);
+            case cellstr(mag.meta.log.Word.Extensions)
+                loader = mag.meta.log.Word(FileName = mdf);
             case cellstr(mag.meta.log.SID15.Extensions)
                 loader = mag.meta.log.SID15(FileName = mdf);
+            otherwise
+                error("Unsupported meta data extension ""%s"".", extension);
         end
 
         [metaData, primaryMetaData, secondaryMetaData] = loader.load(metaData, primaryMetaData, secondaryMetaData);
