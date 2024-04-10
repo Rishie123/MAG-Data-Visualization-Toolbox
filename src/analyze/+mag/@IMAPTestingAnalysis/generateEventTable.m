@@ -210,6 +210,14 @@ function [rangeTable, events] = findRangeChanges(ranges, events, primaryOrSecond
     rangeTable(idxDelete, :) = [];
     events{~contains(events.Label, "Range"), "Range"} = missing();
 
+    % If the first range change is after the first event (and they are
+    % close to each other) update its range.
+    firstRange = events(withtol(rangeTable.Time(1), seconds(0.5)), :);
+
+    if ~isempty(firstRange) && ismissing(firstRange.Range) && ~contains(firstRange.Label, "Range")
+        events{withtol(rangeTable.Time(1), seconds(0.5)), "Range"} = rangeTable.Range(1);
+    end
+
     % Complete automatic range changes.
     rangeTable.Label = compose("%s Range %d", primaryOrSecondary, [rangeTable.Range]);
     rangeTable.Reason = repmat("Auto", size(rangeTable, 1), 1);
