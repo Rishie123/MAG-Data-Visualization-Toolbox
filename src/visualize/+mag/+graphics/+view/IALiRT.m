@@ -138,15 +138,19 @@ classdef IALiRT < mag.graphics.view.Science
             % one.
             for i = 2:numel(iALiRTTime)
 
-                prevIdxMin = idxMin;
-                idxEnd = (idxMin + 1e3);
+                idxStart = idxMin - 1e3;
+                idxEnd = idxMin + 1e3;
+
+                if idxStart < 1
+                    idxStart = 1;
+                end
 
                 if idxEnd > numel(scienceTime)
                     idxEnd = numel(scienceTime);
                 end
 
-                [~, idxMin] = min(abs(iALiRTTime(i) - scienceTime(idxMin:idxEnd)));
-                idxMin = idxMin + prevIdxMin - 1;
+                [~, idxMin] = min(abs(iALiRTTime(i) - scienceTime(idxStart:idxEnd)));
+                idxMin = idxMin + idxStart - 1;
 
                 matchedScienceTime(i) = scienceTime(idxMin);
             end
