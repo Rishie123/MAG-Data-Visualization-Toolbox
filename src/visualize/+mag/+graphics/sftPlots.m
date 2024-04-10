@@ -20,6 +20,8 @@ function figures = sftPlots(analysis, options)
 
         croppedAnalysis = analysis.copy();
         croppedAnalysis.Results.cropScience(options.Filter);
+    else
+        croppedAnalysis = analysis;
     end
 
     % Separate modes.
