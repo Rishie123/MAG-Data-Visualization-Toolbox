@@ -102,8 +102,8 @@ function sensorEvents = removeUninterestingVariables(sensorEvents, primaryOrSeco
     end
 
     % Only select active mode data and packet frequency.
-    sensorEvents.DataFrequency = zeros([height(sensorEvents), 1]);
-    sensorEvents.PacketFrequency = zeros([height(sensorEvents), 1]);
+    sensorEvents.DataFrequency = NaN([height(sensorEvents), 1]);
+    sensorEvents.PacketFrequency = NaN([height(sensorEvents), 1]);
 
     filter = rowfilter(sensorEvents);
 
@@ -169,15 +169,18 @@ function events = findModeChanges(data, events)
     % Update timestamps for mode changes.
     idxMode = find(diff(events.DataFrequency) ~= 0) + 1;
 
-    for t = events.Time(idxMode)'
+    for i = idxMode'
 
         % Find window around event and compute actual timestamp difference.
+        t = events.Time(i);
         eventWindow = data(withtol(t, searchWindow), :);
 
         dt = seconds(diff(eventWindow.t));
         [~, idxChange] = max(diff(dt), [], ComparisonMethod = "abs");
 
-        events.Time(events.Time == t) = eventWindow.t(idxChange + 1);
+        if ~isempty(eventWindow)
+            events.Time(i) = eventWindow.t(idxChange + 1);
+        end
     end
 end
 

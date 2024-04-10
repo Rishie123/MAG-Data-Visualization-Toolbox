@@ -11,7 +11,7 @@ classdef (Sealed) IMAPTestingAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet
         % EVENTPATTERN Pattern of event files.
         EventPattern (1, :) string = fullfile("*", "Event", "*.html")
         % METADATAPATTERN Pattern of meta data files.
-        MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-*.xlsx")]
+        MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-061*.xlsx"), fullfile("IMAP-MAG-TE-ICL-071*.docx")]
         % SCIENCEPATTERN Pattern of science data files.
         SciencePattern (1, :) string = fullfile("MAGScience-*-(*)-*.csv")
         % IALIRTPATTERN Pattern of I-ALiRT data files.

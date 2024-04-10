@@ -105,7 +105,15 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
         secondaryData = ps.apply(secondaryData, secondaryMetaData);
     end
 
-    %% Process Science Data
+    %% Remove Ramp Mode (If Any)
+
+    if ~isempty(this.PrimaryRamp) && ~isempty(this.SecondaryRamp)
+
+        primaryData(timerange(this.PrimaryRamp.Time(1), this.PrimaryRamp.Time(end), "closed"), :) = [];
+        secondaryData(timerange(this.SecondaryRamp.Time(1), this.SecondaryRamp.Time(end), "closed"), :) = [];
+    end
+
+    %% Process I-ALiRT Data
 
     for is = this.IALiRTProcessing
 
