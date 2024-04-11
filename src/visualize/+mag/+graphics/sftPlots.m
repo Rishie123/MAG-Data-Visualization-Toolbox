@@ -2,7 +2,7 @@ function figures = sftPlots(analysis, options)
 % SFTPLOTS Create plots for SFT results.
 
     arguments (Input)
-        analysis (1, 1) mag.IMAPTestingAnalysis
+        analysis (1, 1) mag.IMAPAnalysis
         options.Filter duration {mustBeScalarOrEmpty} = duration.empty()
         options.PSDStart datetime {mustBeScalarOrEmpty} = datetime.empty()
         options.PSDDuration (1, 1) duration = hours(1)
@@ -18,15 +18,17 @@ function figures = sftPlots(analysis, options)
     % Crop data.
     if ~isempty(options.Filter)
 
-        analysis = analysis.copy();
-        analysis.Results.cropScience(options.Filter);
+        croppedAnalysis = analysis.copy();
+        croppedAnalysis.Results.cropScience(options.Filter);
+    else
+        croppedAnalysis = analysis;
     end
 
     % Separate modes.
-    modes = analysis.getAllModes();
+    modes = croppedAnalysis.getAllModes();
 
     if ~options.SeparateModes || isempty(modes)
-        modes = analysis.Results;
+        modes = croppedAnalysis.Results;
     end
 
     % Show science and frequency.
@@ -40,8 +42,8 @@ function figures = sftPlots(analysis, options)
     end
 
     % Show I-ALiRT.
-    if ~isempty(analysis.Results.IALiRT)
-        views(end + 1) = mag.graphics.view.IALiRT(analysis.Results);
+    if ~isempty(croppedAnalysis.Results.IALiRT)
+        views(end + 1) = mag.graphics.view.IALiRT(croppedAnalysis.Results);
     end
 
     % Show HK.

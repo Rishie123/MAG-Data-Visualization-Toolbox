@@ -53,7 +53,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         function value = get.HasScience(this)
 
             value = ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
-                ~isempty(this.Primary.Data) && ~isempty(this.Secondary.Data);
+                this.Primary.HasData && this.Secondary.HasData;
         end
 
         function value = get.HasIALiRT(this)
@@ -61,7 +61,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function value = get.HasHK(this)
-            value = ~isempty(this.HK);
+            value = ~isempty(this.HK) && this.HK.HasData;
         end
 
         function value = get.TimeRange(this)

@@ -1,16 +1,6 @@
-# App
-
-- Add drop down and text field to browse and view all processing steps separately
-- Add check box to select whether to plot PSD
-- Add tooltips for meta data text areas and toolstrip buttons
-
 # Software
 
-- Add fine-grained definitions of quality flags (see `mag.meta.Quality`)
-- Update previous uses of quality flag
-- Allow cropping of `mag.Science` with negative duration (filters from the end)
-- Allow cropping of I-ALiRT with separate filter for primary and secondary
-- Add conversion method `eventtable` in `mag.event.Event` to simplify logic in science analysis
-- Derivative of `mag.TimeSeries` variables now has missing value as first element instead of last
-- Delete unused processing steps
-- Add tests for `mag.event.Event`, `mag.event.ModeChange`, `mag.event.RangeChange` and `mag.event.RampMode`
+- Rename `mag.IMAPTestingAnalysis` to `mag.IMAPAnalysis`
+- Fix issue with mode being mistakenly confused for "Ramp" when first range is `NaN`
+- Fix issue in `mag.graphics.sftPlots` with cropped analysis not defined when `Filter` is empty
+- Add system and unit tests for `mag.IMAPAnalysis`

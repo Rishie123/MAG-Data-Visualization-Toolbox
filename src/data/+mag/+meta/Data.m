@@ -14,7 +14,7 @@ classdef (Abstract) Data < matlab.mixin.Copyable & matlab.mixin.Heterogeneous & 
     methods
 
         function set.Timestamp(this, value)
-            this.Timestamp = datetime(value, TimeZone = "local");
+            this.Timestamp = datetime(value, TimeZone = "UTC");
         end
     end
 

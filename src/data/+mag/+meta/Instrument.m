@@ -10,6 +10,8 @@ classdef Instrument < mag.meta.Data
         BSW string {mustBeScalarOrEmpty}
         % ASW App software version.
         ASW string {mustBeScalarOrEmpty}
+        % GSE GSE software version.
+        GSE string {mustBeScalarOrEmpty}
         % OPERATOR Operator running experiment.
         Operator string {mustBeScalarOrEmpty}
         % ATTEMPTS Number of attempts to start FOB and FIB.

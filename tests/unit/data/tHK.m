@@ -11,6 +11,27 @@ classdef tHK < matlab.unittest.TestCase
 
     methods (Test)
 
+        % Test that "HasData" property returns "true" when data is present.
+        function hasData(testCase)
+
+            % Set up.
+            hk = mag.hk.Power(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.HK());
+
+            % Exercise and verify.
+            testCase.verifyTrue(hk.HasData, """HasData"" property should be ""true"".");
+        end
+
+        % Test that "HasData" property returns "false" when table has no
+        % data.
+        function hasData_noData(testCase)
+
+            % Set up.
+            hk = mag.hk.Power(timetable.empty(), mag.meta.HK());
+
+            % Exercise and verify.
+            testCase.verifyFalse(hk.HasData, """HasData"" property should be ""false"".");
+        end
+
         % Test that "crop" method crops data based on a "timerange" object.
         function cropMethod_timerange(testCase)
 
@@ -33,7 +54,7 @@ classdef tHK < matlab.unittest.TestCase
             hk = testCase.createTestData();
 
             % Exercise.
-            hk.crop(timerange(datetime("Inf", TimeZone = "local"), datetime("-Inf", TimeZone = "local")));
+            hk.crop(timerange(datetime("Inf", TimeZone = "UTC"), datetime("-Inf", TimeZone = "UTC")));
 
             % Verify.
             for i = 1:numel(hk)
@@ -129,7 +150,7 @@ classdef tHK < matlab.unittest.TestCase
         function dependentProperties(~, HKTypes)
 
             % Set up.
-            fileName = fullfile(fileparts(mfilename("fullpath")), "../../data", HKTypes + ".csv");
+            fileName = fullfile(fileparts(mfilename("fullpath")), "data", HKTypes + ".csv");
 
             hk = readtimetable(fileName);
             hk.Properties.DimensionNames{1} = 't';
