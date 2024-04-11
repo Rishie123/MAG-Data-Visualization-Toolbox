@@ -7,9 +7,9 @@ classdef Science < mag.meta.Data
 
     properties
         % MODEL Sensor model type and number.
-        Model string {mustBeScalarOrEmpty, mustMatchRegex(Model, "^[LEF]M\d$")}
+        Model string {mustBeScalarOrEmpty, mag.validator.mustMatchRegex(Model, "^[LEF]M\d$")}
         % FEE FEE id.
-        FEE string {mustBeScalarOrEmpty, mustMatchRegex(FEE, "^FEE\d$")}
+        FEE string {mustBeScalarOrEmpty, mag.validator.mustMatchRegex(FEE, "^FEE\d$")}
         % HARNESS Harness connecting sensor to electronics box.
         Harness string {mustBeScalarOrEmpty}
         % CAN Can containing sensor.
@@ -37,12 +37,5 @@ classdef Science < mag.meta.Data
 
             this.assignProperties(options);
         end
-    end
-end
-
-function mustMatchRegex(value, pattern)
-
-    if ~isempty(value) && ~matches(value, regexpPattern(pattern))
-        error("Value ""%s"" does not match patter ""%s"".", value, pattern);
     end
 end
