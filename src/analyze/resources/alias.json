@@ -1,7 +1,10 @@
 {
     "Aliases": {
-        "NewName": "mag.IMAPTestingAnalysis",
-        "OldNames": "mag.AutomatedAnalysis",
+        "NewName": "mag.IMAPAnalysis",
+        "OldNames": [
+            "mag.IMAPTestingAnalysis",
+            "mag.AutomatedAnalysis"
+        ],
         "WarnOnOldName": true
     }
 }

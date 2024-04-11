@@ -2,7 +2,7 @@ function figures = cptPlots(analysis, options)
 % CPTPLOTS Create plots for CPT results.
 
     arguments
-        analysis (1, 1) mag.IMAPTestingAnalysis
+        analysis (1, 1) mag.IMAPAnalysis
         options.Filter duration {mustBeScalarOrEmpty} = duration.empty()
     end
 
