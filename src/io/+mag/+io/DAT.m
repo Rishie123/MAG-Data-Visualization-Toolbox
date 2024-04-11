@@ -5,11 +5,6 @@ classdef DAT < mag.io.Type
         Extension = ".dat"
     end
 
-    properties (Dependent)
-        ScienceExportFormat
-        HKExportFormat
-    end
-
     properties
         % VARIABLES Select variables to export.
         Variables (1, :) string = ["x", "y", "z"]
@@ -24,14 +19,6 @@ classdef DAT < mag.io.Type
             end
 
             this.assignProperties(options);
-        end
-
-        function scienceExportFormat = get.ScienceExportFormat(~)
-            scienceExportFormat = mag.io.format.ScienceDAT();
-        end
-
-        function hkExportFormat = get.HKExportFormat(~)
-            hkExportFormat = [];
         end
     end
 

@@ -5,11 +5,6 @@ classdef CSV < mag.io.Type
         Extension = ".csv"
     end
 
-    properties (Dependent)
-        ScienceExportFormat
-        HKExportFormat
-    end
-
     methods
 
         function this = CSV(options)
@@ -19,14 +14,6 @@ classdef CSV < mag.io.Type
             end
 
             this.assignProperties(options);
-        end
-
-        function scienceExportFormat = get.ScienceExportFormat(~)
-            scienceExportFormat = [];
-        end
-
-        function hkExportFormat = get.HKExportFormat(~)
-            hkExportFormat = [];
         end
     end
 

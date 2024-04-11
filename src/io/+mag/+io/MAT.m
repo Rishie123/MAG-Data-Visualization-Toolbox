@@ -5,11 +5,6 @@ classdef MAT < mag.io.Type
         Extension = ".mat"
     end
 
-    properties (Dependent)
-        ScienceExportFormat
-        HKExportFormat
-    end
-
     properties
         % APPEND Append data to existing MAT file.
         Append (1, 1) logical = false
@@ -23,51 +18,45 @@ classdef MAT < mag.io.Type
                 options.?mag.io.MAT
             end
 
-            args = namedargs2cell(options);
-
-            if ~isempty(args)
-                this.set(args{:});
-            end
-        end
-
-        function scienceExportFormat = get.ScienceExportFormat(~)
-            scienceExportFormat = mag.io.format.ScienceMAT();
-        end
-
-        function hkExportFormat = get.HKExportFormat(~)
-            hkExportFormat = mag.io.format.HKMAT();
+            this.assignProperties(options);
         end
     end
 
     methods
 
-        function data = import(this, ~)
+        function data = import(this, options)
 
             arguments (Input)
-                this
-                ~
+                this (1, 1) mag.io.MAT
+                options.Type (1, 1) string {mustBeMember(options.Type, ["Science", "I-ALiRT", "HK"])}
             end
 
             arguments (Output)
-                data (1, :) struct
+                data (1, :) mag.Instrument
             end
+
+            format = this.getImportFormat(options.Type);
 
             for i = 1:numel(this.ImportFileNames)
 
                 matData = load(this.ImportFileNames(i), "data", "-mat");
                 assert(~isempty(matData), "MAT file using unsupported format.");
 
-                data(i) = matData.data; %#ok<AGROW>
+                data(i) = format.convertFromStruct(matData.data); %#ok<AGROW>
             end
         end
 
-        function export(this, data, ~)
+        function export(this, data, options)
 
             arguments
-                this
-                data (1, 1) struct
-                ~
+                this (1, 1) mag.io.MAT
+                data (1, 1) {mustBeA(data, ["mag.Instrument", "mag.IALiRT", "mag.HK"])}
+                options.Location (1, 1) string {mustBeFolder}
+                options.FileName string {mustBeScalarOrEmpty}
             end
+
+            format = this.getExportFormat(data);
+            structData = format.convertToStruct(data);
 
             if this.Append
                 extraOptions = {"-append"};
@@ -75,7 +64,7 @@ classdef MAT < mag.io.Type
                 extraOptions = {};
             end
 
-            save(this.ExportFileName, "-struct", "data", "-mat", extraOptions{:});
+            save(format.getExportFileName(options.FileName, data), "-struct", "structData", "-mat", extraOptions{:});
         end
     end
 end
