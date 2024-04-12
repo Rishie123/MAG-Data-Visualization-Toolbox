@@ -6,6 +6,8 @@ classdef Science < mag.meta.Data
     end
 
     properties
+        % PRIMARY Boolean denoting whether sensor is primary.
+        Primary (1, 1) logical = false
         % MODEL Sensor model type and number.
         Model string {mustBeScalarOrEmpty, mustMatchRegex(Model, "^[LEF]M\d$")}
         % FEE FEE id.

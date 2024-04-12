@@ -14,7 +14,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     ranges = sortrows(data(:, "range"));
 
     % Select sensor.
-    sensor = string(this.Results.getSensor(primaryOrSecondary));
+    sensor = string(this.Results.Science.getName(primaryOrSecondary));
 
     % Adapt existing event properties.
     if contains("Sensor", sensorEvents.Properties.VariableNames)

@@ -291,6 +291,63 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
     end
 
+    methods (Sealed)
+
+        function name = getName(this, primaryOrSecondary)
+        % GETNAME Return name of primary or secondary sensor.
+
+            arguments (Input)
+                this mag.Science {mustBeNonempty}
+                primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])} = "Primary"
+            end
+
+            arguments (Output)
+                name (1, 1) mag.meta.Sensor
+            end
+
+            % If no primary sensor is set, assume it's FOB.
+            metaData = [this.MetaData];
+            locPrimary = [metaData.Primary];
+
+            switch nnz(locPrimary)
+                case 0
+                    primarySensor = mag.meta.Sensor.FOB;
+                case 1
+
+                    sensors = [metaData.Sensor];
+                    primarySensor = sensors(locPrimary);
+                otherwise
+                    error("One and only one sensor can be primary.");
+            end
+
+            % Retrieve selected sensor.
+            supportedSensors = enumeration("mag.meta.Sensor");
+
+            switch primaryOrSecondary
+                case "Primary"
+                    locSelected = supportedSensors == primarySensor;
+                case "Secondary"
+                    locSelected = supportedSensors ~= primarySensor;
+            end
+
+            name = supportedSensors(locSelected);
+        end
+
+        function science = select(this, primaryOrSecondary)
+        % SELECT Return primary or secondary sensor.
+
+            arguments (Input)
+                this mag.Science {mustBeNonempty}
+                primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])} = "Primary"
+            end
+
+            metaData = [this.MetaData];
+            locSelected = [metaData.Sensor] == this.getName(primaryOrSecondary);
+
+            science = this(locSelected);
+        end
+    end
+
     methods (Access = protected)
 
         function header = getHeader(this)

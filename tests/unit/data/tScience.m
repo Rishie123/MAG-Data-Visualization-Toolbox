@@ -361,6 +361,58 @@ classdef tScience < matlab.unittest.TestCase
                 "PSD max frequency should match sine wave frequency.");
         end
 
+        % Test that primary sensor name is returned correctly.
+        function getName_primary(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Sensor = "FOB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Primary = true;
+            science2.MetaData.Sensor = "FIB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.getName(), mag.meta.Sensor.FIB, "Primary sensor should be returned by default.");
+            testCase.verifyEqual(science.getName("Primary"), mag.meta.Sensor.FIB, "Primary sensor should be returned when asked.");
+        end
+
+        % Test that secondary sensor name is returned correctly.
+        function getName_secondary(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Sensor = "FOB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Primary = true;
+            science2.MetaData.Sensor = "FIB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.getName("Secondary"), mag.meta.Sensor.FOB, "Secondary sensor should be returned when asked.");
+        end
+
+        % Test that primary sensor data is selected correctly.
+        function select(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Sensor = "FOB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Primary = true;
+            science2.MetaData.Sensor = "FIB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.select("Primary"), science2, "Primary sensor should be returned when asked.");
+        end
+
         % Test that displaying a single object displays the correct
         % information.
         function customDisplay_singleObject(testCase)

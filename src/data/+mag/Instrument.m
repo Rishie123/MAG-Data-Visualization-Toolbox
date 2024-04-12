@@ -44,100 +44,45 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             this.assignProperties(options);
         end
 
-        function value = get.HasData(this)
-            value = this.HasMetaData || this.HasScience || this.HasIALiRT || this.HasHK;
+        function hasData = get.HasData(this)
+            hasData = this.HasMetaData || this.HasScience || this.HasIALiRT || this.HasHK;
         end
 
-        function value = get.HasMetaData(this)
-            value = ~isempty(this.MetaData);
+        function hasMetaData = get.HasMetaData(this)
+            hasMetaData = ~isempty(this.MetaData);
         end
 
-        function value = get.HasScience(this)
-            value = ~isempty(this.Science) && all([this.Science.HasData]);
+        function hasScience = get.HasScience(this)
+            hasScience = ~isempty(this.Science) && all([this.Science.HasData]);
         end
 
-        function value = get.HasIALiRT(this)
-            value = ~isempty(this.IALiRT);
+        function hasIALiRT = get.HasIALiRT(this)
+            hasIALiRT = ~isempty(this.IALiRT);
         end
 
-        function value = get.HasHK(this)
-            value = ~isempty(this.HK) && this.HK.HasData;
+        function hasHK = get.HasHK(this)
+            hasHK = ~isempty(this.HK) && this.HK.HasData;
         end
 
-        function value = get.TimeRange(this)
+        function timeRange = get.TimeRange(this)
 
             if this.HasScience
 
                 firstTimes = arrayfun(@(x) x.Time(1), this.Science, UniformOutput = true);
                 lastTimes = arrayfun(@(x) x.Time(end), this.Science, UniformOutput = true);
 
-                value = [min(firstTimes), max(lastTimes)];
+                timeRange = [min(firstTimes), max(lastTimes)];
             else
-                value = [NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC")];
+                timeRange = [NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC")];
             end
         end
 
         function primary = get.Primary(this)
-
-            sensor = this.getSensor("Primary");
-
-            if isempty(sensor) || isempty(this.Science)
-
-                primary = mag.Science.empty();
-                return;
-            end
-
-            metaData = [this.Science.MetaData];
-            locPrimary = [metaData.Sensor] == sensor;
-
-            primary = this.Science(locPrimary);
+            primary = this.Science.select("Primary");
         end
 
         function secondary = get.Secondary(this)
-
-            sensor = this.getSensor("Secondary");
-
-            if isempty(sensor) || isempty(this.Science)
-
-                secondary = mag.Science.empty();
-                return;
-            end
-
-            metaData = [this.Science.MetaData];
-            locSecondary = [metaData.Sensor] == sensor;
-
-            secondary = this.Science(locSecondary);
-        end
-
-        function sensor = getSensor(this, primaryOrSecondary)
-        % GETSENSOR Return name of primary or secondary sensor.
-
-            arguments (Input)
-                this (1, 1) mag.Instrument
-                primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])} = "Primary"
-            end
-
-            arguments (Output)
-                sensor mag.meta.Sensor {mustBeScalarOrEmpty}
-            end
-
-            if isempty(this.MetaData)
-
-                sensor = mag.meta.Sensor.empty();
-                return;
-            end
-
-            primarySensor = this.MetaData.Primary;
-            supportedSensors = enumeration("mag.meta.Sensor");
-
-            switch primaryOrSecondary
-                case "Primary"
-                    locSelected = supportedSensors == primarySensor;
-                case "Secondary"
-                    locSelected = supportedSensors ~= primarySensor;
-            end
-
-            sensor = supportedSensors(locSelected);
+            secondary = this.Science.select("Secondary");
         end
 
         function fillWarmUp(this, timePeriod, filler)
@@ -290,19 +235,6 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 header = ['  ', className, tag, ' with properties:'];
             else
                 header = getHeader@matlab.mixin.CustomDisplay(this);
-            end
-        end
-
-        function groups = getPropertyGroups(this)
-
-            if isscalar(this)
-
-                propertyList = ["HasData", "HasMetaData", "HasScience", "HasHK", "TimeRange", ...
-                    "Primary", "Secondary", "Science", "IALiRT", ...
-                    "MetaData", "Events", "HK"];
-                groups = matlab.mixin.util.PropertyGroup(propertyList, "");
-            else
-                groups = getPropertyGroups@matlab.mixin.CustomDisplay(this);
             end
         end
     end

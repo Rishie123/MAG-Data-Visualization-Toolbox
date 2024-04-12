@@ -1,16 +1,20 @@
 classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
 % IALIRT Class containing MAG I-ALiRT data.
 
-    properties (GetAccess = public, SetAccess = private)
-        % PRIMARY Primary I-ALiRT data.
-        Primary mag.Science {mustBeScalarOrEmpty}
-        % SECONDARY Secondary I-ALiRT data.
-        Secondary mag.Science {mustBeScalarOrEmpty}
+    properties
+        % SCIENCE Science data.
+        Science (1, :) mag.Science
     end
 
     properties (Dependent)
         % HASDATA Boolean denoting whether data is present.
         HasData (1, 1) logical
+        % HASSCIENCE Logical denoting whether instrument has science data.
+        HasScience (1, 1) logical
+        % PRIMARY Primary science data.
+        Primary mag.Science {mustBeScalarOrEmpty}
+        % SECONDARY Secondary science data.
+        Secondary mag.Science {mustBeScalarOrEmpty}
     end
 
     methods
@@ -22,14 +26,23 @@ classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
                 secondaryData (1, 1) mag.Science
             end
 
-            this.Primary = primaryData;
-            this.Secondary = secondaryData;
+            this.Science = [primaryData, secondaryData];
         end
 
         function hasData = get.HasData(this)
+            hasData = this.HasScience;
+        end
 
-            hasData = ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
-                this.Primary.HasData && this.Secondary.HasData;
+        function hasData = get.HasScience(this)
+            hasData = ~isempty(this.Science) && all([this.Science.HasData]);
+        end
+
+        function primary = get.Primary(this)
+            primary = this.Science.select("Primary");
+        end
+
+        function secondary = get.Secondary(this)
+            secondary = this.Science.select("Secondary");
         end
 
         function crop(this, primaryFilter, secondaryFilter)
@@ -50,9 +63,7 @@ classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
         function copiedThis = copyElement(this)
 
             copiedThis = copyElement@matlab.mixin.Copyable(this);
-
-            copiedThis.Primary = copy(this.Primary);
-            copiedThis.Secondary = copy(this.Secondary);
+            copiedThis.Science = copy(this.Science);
         end
     end
 end
