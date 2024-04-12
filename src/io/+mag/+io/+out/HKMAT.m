@@ -1,4 +1,4 @@
-classdef HKMAT < mag.io.out.IMAT
+classdef HKMAT < mag.io.out.MAT
 % HKMAT Format HK data for MAT export.
 
     methods

@@ -1,5 +1,5 @@
-classdef (Abstract) ICDF < mag.io.out.IFormat
-% ICDF Interface for CDF export format providers.
+classdef (Abstract) CDF < mag.io.out.Format
+% CDF Interface for CDF export format providers.
 
     properties
         % SKELETONLOCATION Location of skeleton files.

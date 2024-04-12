@@ -1,5 +1,5 @@
-classdef (Abstract) IMAT < mag.io.in.IFormat
-% IMAT Interface for MAT input format providers.
+classdef (Abstract) MAT < mag.io.in.Format
+% MAT Interface for MAT input format providers.
 
     methods (Abstract)
 

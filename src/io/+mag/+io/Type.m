@@ -8,13 +8,13 @@ classdef (Abstract) Type < mag.mixin.SetGet
 
     properties
         % SCIENCEIMPORTFORMAT Science import format.
-        ScienceImportFormat mag.io.in.IFormat {mustBeScalarOrEmpty}
+        ScienceImportFormat mag.io.in.Format {mustBeScalarOrEmpty}
         % SCIENCEEXPORTFORMAT Science export format.
-        ScienceExportFormat mag.io.out.IFormat {mustBeScalarOrEmpty}
+        ScienceExportFormat mag.io.out.Format {mustBeScalarOrEmpty}
         % HKIMPORTFORMAT Housekeeping import format.
-        HKImportFormat mag.io.in.IFormat {mustBeScalarOrEmpty}
+        HKImportFormat mag.io.in.Format {mustBeScalarOrEmpty}
         % HKEXPORTFORMAT Housekeeping export format.
-        HKExportFormat mag.io.out.IFormat {mustBeScalarOrEmpty}
+        HKExportFormat mag.io.out.Format {mustBeScalarOrEmpty}
     end
 
     methods (Abstract)
@@ -32,7 +32,7 @@ classdef (Abstract) Type < mag.mixin.SetGet
         % GETIMPORTFORMAT Retrieve format based on import type.
 
             arguments (Output)
-                format (1, 1) mag.io.in.IFormat
+                format (1, 1) mag.io.in.Format
             end
 
             switch type
@@ -49,7 +49,7 @@ classdef (Abstract) Type < mag.mixin.SetGet
         % GETEXPORTFORMAT Retrieve format based on export data type.
 
             arguments (Output)
-                format (1, 1) mag.io.out.IFormat
+                format (1, 1) mag.io.out.Format
             end
 
             if isa(data, "mag.Science")

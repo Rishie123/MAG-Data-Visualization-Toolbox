@@ -1,5 +1,5 @@
-classdef (Abstract) IMAT < mag.io.out.IFormat
-% IMAT Interface for MAT export format providers.
+classdef (Abstract) MAT < mag.io.out.Format
+% MAT Interface for MAT export format providers.
 
     methods (Abstract)
 

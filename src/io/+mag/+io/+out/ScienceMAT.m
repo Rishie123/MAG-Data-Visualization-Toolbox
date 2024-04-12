@@ -1,4 +1,4 @@
-classdef ScienceMAT < mag.io.out.IMAT
+classdef ScienceMAT < mag.io.out.MAT
 % SCIENCEMAT Format science data for MAT export.
 
     methods

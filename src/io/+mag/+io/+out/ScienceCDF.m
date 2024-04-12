@@ -1,4 +1,4 @@
-classdef ScienceCDF < mag.io.out.ICDF
+classdef ScienceCDF < mag.io.out.CDF
 % SCIENCECDF Format science data for CDF export.
 
     methods

@@ -1,4 +1,4 @@
-classdef (Abstract) IFormat < matlab.mixin.Heterogeneous & mag.mixin.SetGet
+classdef (Abstract) Format < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 % IFORMAT Interface for data format providers for import.
 
     methods (Abstract)
