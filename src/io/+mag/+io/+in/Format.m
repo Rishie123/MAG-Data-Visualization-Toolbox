@@ -3,7 +3,10 @@ classdef (Abstract) Format < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
     methods (Abstract)
 
-        % INITIALIZEOUTPUT Initialize output for import.
-        data = initializeOutput(this)
+        % APPLYPROCESSINGSTEPS Process data according to input steps.
+        applyProcessingSteps(this, data, processingStep)
+
+        % ASSIGNTOOUTPUT Assign partial result to output data.
+        assignToOutput(this, output, partialData)
     end
 end

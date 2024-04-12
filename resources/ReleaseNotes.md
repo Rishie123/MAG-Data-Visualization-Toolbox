@@ -1,3 +1,8 @@
+# App
+
+- Add support for CDF import/export
+- Remove support for DAT export
+
 # Software
 
 - Refactor import/export of science and HK data

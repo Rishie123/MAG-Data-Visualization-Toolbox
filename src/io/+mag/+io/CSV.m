@@ -19,21 +19,38 @@ classdef CSV < mag.io.Type
 
     methods
 
-        function data = import(this, ~)
+        function import(this, options, importOptions)
 
-            % Import data as tables.
-            data = cell.empty();
+            arguments (Input)
+                this (1, 1) mag.io.CSV
+                options.FileNames (1, :) string {mustBeFile}
+                importOptions.?mag.io.in.Settings
+                importOptions.Format (1, 1) mag.io.in.CSV
+            end
 
-            for i = 1:numel(this.ImportFileNames)
+            importArgs = namedargs2cell(importOptions);
+            importSettings = mag.io.in.Settings(importArgs{:});
+
+            format = importSettings.Format;
+
+            for fn = options.FileNames
 
                 % Check there is at least one line of data in the file.
-                if nnz(~cellfun(@isempty, strsplit(fileread(this.ImportFileNames(i)), newline))) < 2
+                if nnz(~cellfun(@isempty, strsplit(fileread(fn), newline()))) < 2
                     continue;
                 end
 
-                dataStore = tabularTextDatastore(this.ImportFileNames(i), FileExtensions = this.Extension);
-                data{i} = dataStore.readall(UseParallel = mag.internal.useParallel());
+                % Import data.
+                dataStore = tabularTextDatastore(fn, FileExtensions = this.Extension);
+                rawData = dataStore.readall(UseParallel = mag.internal.useParallel());
+
+                partialData = format.convert(rawData, fn);
+                format.applyProcessingSteps(partialData, importSettings.PerFileProcessing);
+
+                format.assignToOutput(importSettings.Output, partialData);
             end
+
+            format.applyProcessingSteps(partialData, importSettings.WholeDataProcessing);
         end
 
         function export(this, data, options) %#ok<INUSD>

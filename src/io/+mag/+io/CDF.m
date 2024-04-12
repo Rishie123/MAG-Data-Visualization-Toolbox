@@ -20,28 +20,32 @@ classdef CDF < mag.io.Type
 
     methods
 
-        function data = import(this, options)
+        function import(~, options, importOptions)
 
             arguments (Input)
-                this (1, 1) mag.io.CDF
-                options.Type (1, 1) string {mustBeMember(options.Type, ["Science", "I-ALiRT", "HK"])}
+                ~
                 options.FileNames (1, :) string {mustBeFile}
+                importOptions.?mag.io.in.Settings
+                importOptions.Format (1, 1) mag.io.in.CDF
             end
 
-            arguments (Output)
-                data (1, 1) mag.Instrument
-            end
+            importArgs = namedargs2cell(importOptions);
+            importSettings = mag.io.in.Settings(importArgs{:});
 
-            format = this.getImportFormat(options.Type);
-            data = format.initializeOutput();
+            format = importSettings.Format;
 
             for fn = options.FileNames
 
                 cdfInfo = spdfcdfinfo(fn);
-                rawData = spdfcdfread(fn);
+                rawData = spdfcdfread(fn, 'CDFEpochtoString', true);
 
-                format.addToOutput(data, cdfInfo, rawData);
+                partialData = format.convert(rawData, cdfInfo);
+                format.applyProcessingSteps(partialData, importSettings.PerFileProcessing);
+
+                format.assignToOutput(importSettings.Output, partialData);
             end
+
+            format.applyProcessingSteps(partialData, importSettings.WholeDataProcessing);
         end
 
         function export(this, data, options)

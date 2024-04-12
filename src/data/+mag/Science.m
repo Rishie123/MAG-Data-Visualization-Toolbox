@@ -52,19 +52,19 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function x = get.X(this)
-            x = this.Data.(this.Settings.X);
+            x = double(this.Data.(this.Settings.X));
         end
 
         function y = get.Y(this)
-            y = this.Data.(this.Settings.Y);
+            y = double(this.Data.(this.Settings.Y));
         end
 
         function z = get.Z(this)
-            z = this.Data.(this.Settings.Z);
+            z = double(this.Data.(this.Settings.Z));
         end
 
         function xyz = get.XYZ(this)
-            xyz = this.Data{:, [this.Settings.X, this.Settings.Y, this.Settings.Z]};
+            xyz = double(this.Data{:, [this.Settings.X, this.Settings.Y, this.Settings.Z]});
         end
 
         function b = get.B(this)

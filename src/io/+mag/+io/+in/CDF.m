@@ -3,7 +3,8 @@ classdef (Abstract) CDF < mag.io.in.Format
 
     methods (Abstract)
 
-        % ADDTOOUTPUT Add information to output for import.
-        addToOutput(this, data, rawData, cdfInfo)
+        % CONVERT Process raw data and convert to common data
+        % format.
+        data = convert(this, rawData, cdfInfo)
     end
 end
