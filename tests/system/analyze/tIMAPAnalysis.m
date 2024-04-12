@@ -14,7 +14,7 @@ classdef tIMAPAnalysis < matlab.unittest.TestCase
 
     methods (Test)
 
-        % Test that full analysis returns expected 
+        % Test that full analysis returns expected results and data format.
         function fullAnalysis(testCase)
 
             % Set up.

@@ -6,10 +6,8 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         Events (1, :) mag.event.Event
         % METADATA Meta data.
         MetaData mag.meta.Instrument {mustBeScalarOrEmpty}
-        % PRIMARY Primary science data.
-        Primary mag.Science {mustBeScalarOrEmpty}
-        % SECONDARY Secondary science data.
-        Secondary mag.Science {mustBeScalarOrEmpty}
+        % SCIENCE Science data.
+        Science (1, :) mag.Science
         % IALIRT I-ALiRT data.
         IALiRT mag.IALiRT {mustBeScalarOrEmpty}
         % HK Housekeeping data.
@@ -29,6 +27,10 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         HasHK (1, 1) logical
         % TIMERANGE Time range covered by science data.
         TimeRange (1, 2) datetime
+        % PRIMARY Primary science data.
+        Primary mag.Science {mustBeScalarOrEmpty}
+        % SECONDARY Secondary science data.
+        Secondary mag.Science {mustBeScalarOrEmpty}
     end
 
     methods
@@ -51,9 +53,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function value = get.HasScience(this)
-
-            value = ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
-                this.Primary.HasData && this.Secondary.HasData;
+            value = ~isempty(this.Science) && all([this.Science.HasData]);
         end
 
         function value = get.HasIALiRT(this)
@@ -68,11 +68,45 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
 
             if this.HasScience
 
-                value = [min([this.Primary.Time(1), this.Secondary.Time(1)]), ...
-                    max([this.Primary.Time(end), this.Secondary.Time(end)])];
+                firstTimes = arrayfun(@(x) x.Time(1), this.Science, UniformOutput = true);
+                lastTimes = arrayfun(@(x) x.Time(end), this.Science, UniformOutput = true);
+
+                value = [min(firstTimes), max(lastTimes)];
             else
                 value = [NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC")];
             end
+        end
+
+        function primary = get.Primary(this)
+
+            sensor = this.getSensor("Primary");
+
+            if isempty(sensor) || isempty(this.Science)
+
+                primary = mag.Science.empty();
+                return;
+            end
+
+            metaData = [this.Science.MetaData];
+            locPrimary = [metaData.Sensor] == sensor;
+
+            primary = this.Science(locPrimary);
+        end
+
+        function secondary = get.Secondary(this)
+
+            sensor = this.getSensor("Secondary");
+
+            if isempty(sensor) || isempty(this.Science)
+
+                secondary = mag.Science.empty();
+                return;
+            end
+
+            metaData = [this.Science.MetaData];
+            locSecondary = [metaData.Sensor] == sensor;
+
+            secondary = this.Science(locSecondary);
         end
 
         function sensor = getSensor(this, primaryOrSecondary)
@@ -84,7 +118,13 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             end
 
             arguments (Output)
-                sensor (1, 1) mag.meta.Sensor
+                sensor mag.meta.Sensor {mustBeScalarOrEmpty}
+            end
+
+            if isempty(this.MetaData)
+
+                sensor = mag.meta.Sensor.empty();
+                return;
             end
 
             primarySensor = this.MetaData.Primary;
@@ -110,8 +150,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 filler (1, 1) double = missing()
             end
 
-            this.Primary.replace(timePeriod, filler);
-            this.Secondary.replace(timePeriod, filler);
+            for s = this.Science
+                s.replace(timePeriod, filler);
+            end
         end
 
         function crop(this, primaryFilter, secondaryFilter)
@@ -178,8 +219,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 targetFrequency (1, 1) double
             end
 
-            this.Primary.resample(targetFrequency);
-            this.Secondary.resample(targetFrequency);
+            for s = this.Science
+                s.resample(targetFrequency);
+            end
 
             for hk = this.HK
                 hk.resample(targetFrequency);
@@ -195,11 +237,33 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 targetFrequency (1, 1) double
             end
 
-            this.Primary.downsample(targetFrequency);
-            this.Secondary.downsample(targetFrequency);
+            for s = this.Science
+                s.downsample(targetFrequency);
+            end
 
             for hk = this.HK
                 hk.downsample(targetFrequency);
+            end
+        end
+    end
+
+    methods (Hidden, Sealed, Static)
+
+        function loadedObject = loadobj(object)
+        % LOADOBJ Override default loading from MAT file.
+
+            if isa(object, "mag.Instrument")
+                loadedObject = object;
+            else
+
+                if ~isfield(object, "Science")
+
+                    science = [object.Primary, object.Secondary];
+                    object = rmfield(object, ["Primary", "Secondary"]);
+
+                    args = namedargs2cell(object);
+                    loadedObject = mag.Instrument(args{:}, Science = science);
+                end
             end
         end
     end
@@ -211,8 +275,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             copiedThis = copyElement@matlab.mixin.Copyable(this);
 
             copiedThis.MetaData = copy(this.MetaData);
-            copiedThis.Primary = copy(this.Primary);
-            copiedThis.Secondary = copy(this.Secondary);
+            copiedThis.Science = copy(this.Science);
             copiedThis.IALiRT = copy(this.IALiRT);
             copiedThis.HK = copy(this.HK);
         end
@@ -235,7 +298,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             if isscalar(this)
 
                 propertyList = ["HasData", "HasMetaData", "HasScience", "HasHK", "TimeRange", ...
-                    "Primary", "Secondary", "IALiRT", ...
+                    "Primary", "Secondary", "Science", "IALiRT", ...
                     "MetaData", "Events", "HK"];
                 groups = matlab.mixin.util.PropertyGroup(propertyList, "");
             else

@@ -125,8 +125,8 @@ function loadScienceData(this, primaryMetaData, secondaryMetaData)
 
     %% Assign Values
 
-    this.Results.Primary = mag.Science(primaryData, primaryMetaData);
-    this.Results.Secondary = mag.Science(secondaryData, secondaryMetaData);
+    this.Results.Science = [mag.Science(primaryData, primaryMetaData),
+        mag.Science(secondaryData, secondaryMetaData)];
 end
 
 function [mode, primaryFrequency, secondaryFrequency, packetFrequency] = extractFileMetaData(fileName)
