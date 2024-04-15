@@ -80,8 +80,8 @@ classdef tIALiRT < matlab.mock.TestCase
 
         function [iALiRT, primaryBehavior, secondaryBehavior] = createTestData(testCase)
 
-            [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {timetable.empty(), mag.meta.Science()}, Strict = true);
-            [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {timetable.empty(), mag.meta.Science()}, Strict = true);
+            [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {timetable.empty(), mag.meta.Science(Primary = true, Sensor = "FOB")}, Strict = true);
+            [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {timetable.empty(), mag.meta.Science(Sensor = "FIB")}, Strict = true);
 
             iALiRT = mag.IALiRT(primary, secondary);
         end

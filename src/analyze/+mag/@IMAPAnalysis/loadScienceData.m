@@ -72,6 +72,10 @@ function loadScienceData(this)
         primary.Data = ss.apply(primary.Data, primary.MetaData);
         secondary.Data = ss.apply(secondary.Data, secondary.MetaData);
     end
+
+    %% Assign Values
+
+    this.Results.Science = [primary, secondary];
 end
 
 function period = findRampModePeriod(events)

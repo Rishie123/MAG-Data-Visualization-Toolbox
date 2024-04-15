@@ -47,29 +47,6 @@ classdef tInstrument < matlab.mock.TestCase
             testCase.verifyEqual(instrument.TimeRange, expectedTimeRange, """TimeRange"" should return minimum and maximum time based on both sensors.");
         end
 
-        % Test that primary sensor name is returned correctly.
-        function getSensor_primary(testCase)
-
-            % Set up.
-            instrument = mag.Instrument(MetaData = mag.meta.Instrument());
-            instrument.MetaData.Primary = "FIB";
-
-            % Exercise and verify.
-            testCase.verifyEqual(instrument.getSensor(), mag.meta.Sensor.FIB, "Primary sensor should be returned by default.");
-            testCase.verifyEqual(instrument.getSensor("Primary"), mag.meta.Sensor.FIB, "Primary sensor should be returned when asked.");
-        end
-
-        % Test that secondary sensor name is returned correctly.
-        function getSensor_secondary(testCase)
-
-            % Set up.
-            instrument = mag.Instrument(MetaData = mag.meta.Instrument());
-            instrument.MetaData.Primary = "FIB";
-
-            % Exercise and verify.
-            testCase.verifyEqual(instrument.getSensor("Secondary"), mag.meta.Sensor.FOB, "Secondary sensor should be returned when asked.");
-        end
-
         % Test that "fillWarmUp" method calls method of underlying science
         % data.
         function fillWarmUpMethod(testCase)
@@ -210,17 +187,17 @@ classdef tInstrument < matlab.mock.TestCase
 
             scienceTT = timetable(datetime("now", TimeZone = "UTC") + minutes(1:10)', (1:10)', (11:20)', (21:30)', 3 * ones(10, 1), (1:10)', VariableNames = ["x", "y", "z", "range", "sequence"]);
 
-            [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
-            [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
+            [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Primary = true, Sensor = "FOB", Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
+            [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Sensor = "FIB", Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
 
-            iALiRTScience = mag.Science(scienceTT, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC")));
-            [iALiRT, iALiRTBehavior] = testCase.createMock(?mag.IALiRT, ConstructorInputs = {iALiRTScience, iALiRTScience}, Strict = true);
+            iALiRTPrimaryScience = mag.Science(scienceTT, mag.meta.Science(Primary = true, Sensor = "FOB", Timestamp = datetime("now", TimeZone = "UTC")));
+            iALiRTSecondaryScience = mag.Science(scienceTT, mag.meta.Science(Sensor = "FIB", Timestamp = datetime("now", TimeZone = "UTC")));
+            [iALiRT, iALiRTBehavior] = testCase.createMock(?mag.IALiRT, ConstructorInputs = {iALiRTPrimaryScience, iALiRTSecondaryScience}, Strict = true);
 
             [hk, hkBehavior] = testCase.createMock(?mag.HK, ConstructorInputs = {scienceTT, mag.meta.HK(Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
 
             instrument = mag.Instrument(MetaData = mag.meta.Instrument(), ...
-                Primary = primary, ...
-                Secondary = secondary, ...
+                Science = [primary, secondary], ...
                 IALiRT = iALiRT, ...
                 HK = hk);
         end

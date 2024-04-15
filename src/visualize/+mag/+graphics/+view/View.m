@@ -45,8 +45,8 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
         function [primarySensor, secondarySensor] = getSensorNames(this)
         % GETSENSORNAMES Get names of primary and secondary sensors.
 
-            primarySensor = string(this.Results.getSensor("Primary"));
-            secondarySensor = string(this.Results.getSensor("Secondary"));
+            primarySensor = string(this.Results.Science.getName("Primary"));
+            secondarySensor = string(this.Results.Science.getName("Secondary"));
         end
 
         function hkType = getHKType(this, type)
