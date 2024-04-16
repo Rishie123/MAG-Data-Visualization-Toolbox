@@ -19,14 +19,13 @@ classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
 
     methods
 
-        function this = IALiRT(primaryData, secondaryData)
+        function this = IALiRT(options)
 
             arguments
-                primaryData (1, 1) mag.Science
-                secondaryData (1, 1) mag.Science
+                options.?mag.IALiRT
             end
 
-            this.Science = [primaryData, secondaryData];
+            this.assignProperties(options);
         end
 
         function hasData = get.HasData(this)

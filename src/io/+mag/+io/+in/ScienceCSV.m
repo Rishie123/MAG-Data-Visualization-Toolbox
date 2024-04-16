@@ -1,11 +1,45 @@
 classdef ScienceCSV < mag.io.in.CSV
-% SCIENCECSV Format science data for CSV import.
+    % SCIENCECSV Format science data for CSV import.
 
     properties (Constant, Access = private)
         FileNamePattern (1, 1) string = "MAGScience-(?<mode>\w+)-\((?<primaryFrequency>\d+),(?<secondaryFrequency>\d+)\)-(?<packetFrequency>\d+)s-(?<date>\d+)-(?<time>\w+).(?<extension>\w+)"
     end
 
     methods
+
+        function combinedData = combineByType(~, data)
+
+            arguments (Input)
+                ~
+                data (1, :) mag.Science
+            end
+
+            arguments (Output)
+                combinedData (1, :) mag.Science
+            end
+
+            combinedData = mag.Science.empty();
+
+            % Combine data by sensor.
+            metaData = [data.MetaData];
+            sensors = unique([metaData.Sensor]);
+
+            for s = sensors
+
+                locSelection = [metaData.Sensor] == s;
+                selectedData = data(locSelection);
+
+                td = vertcat(selectedData.Data);
+
+                md = selectedData(1).MetaData.copy();
+                md.set(Mode = "Hybrid", DataFrequency = NaN(), PacketFrequency = NaN(), Timestamp = min([metaData(locSelection).Timestamp]));
+
+                combinedData(end + 1) = mag.Science(td, md); %#ok<AGROW>
+            end
+        end
+    end
+
+    methods (Access = protected)
 
         function data = convert(this, rawData, fileName)
 
@@ -16,7 +50,7 @@ classdef ScienceCSV < mag.io.in.CSV
             end
 
             arguments (Output)
-                data (1, 1) {mustBeA(data, ["mag.Instrument", "mag.IALiRT"])}
+                data (1, :) mag.Science
             end
 
             % Separate primary and secondary.
@@ -27,41 +61,8 @@ classdef ScienceCSV < mag.io.in.CSV
             [mode, primaryFrequency, secondaryFrequency, packetFrequency] = this.extractFileMetaData(fileName);
 
             % Process science data.
-            if mode == mag.meta.Mode.IALiRT
-                data = mag.IALiRT();
-            else
-                data = mag.Instrument();
-            end
-
-            data.Primary = this.processScience(rawPrimary, "pri", Mode = mode, DataFrequency = primaryFrequency, PacketFrequency = packetFrequency);
-            data.Secondary = this.processScience(rawSecondary, "sec", Mode = mode, DataFrequency = secondaryFrequency, PacketFrequency = packetFrequency);
-        end
-
-        function applyProcessingSteps(~, data, processingSteps)
-
-            arguments
-                ~
-                data (1, 1) {mustBeA(data, ["mag.Instrument", "mag.IALiRT"])}
-                processingSteps (1, :) mag.process.Step
-            end
-
-            for ps = processingSteps
-
-                data.Primary.Data = ps.apply(data.Primary.Data, data.Primary.MetaData);
-                data.Secondary.Data = ps.apply(data.Secondary.Data, data.Secondary.MetaData);
-            end
-        end
-
-        function assignToOutput(this, output, data)
-
-            arguments
-                this (1, 1) mag.io.in.ScienceCSV
-                output (1, 1) {mustBeA(output, ["mag.Instrument", "mag.IALiRT"])}
-                data (1, 1) mag.Instrument
-            end
-
-            this.assignSensor("Primary", output, data);
-            this.assignSensor("Secondary", output, data);
+            data = [this.processScience(rawPrimary, "pri", Sensor = mag.meta.Sensor.FOB, Mode = mode, DataFrequency = primaryFrequency, PacketFrequency = packetFrequency), ...
+                this.processScience(rawSecondary, "sec", Sensor = mag.meta.Sensor.FIB, Mode = mode, DataFrequency = secondaryFrequency, PacketFrequency = packetFrequency)];
         end
     end
 
@@ -75,7 +76,13 @@ classdef ScienceCSV < mag.io.in.CSV
             % If no meta data was found, assume default values.
             if isempty(rawData)
 
-                if contains(fileName, "normal", IgnoreCase = true)
+                if contains(fileName, "ialirt", IgnoreCase = true)
+
+                    mode = "IALiRT";
+                    primaryFrequency = "0.25";
+                    secondaryFrequency = "0.25";
+                    packetFrequency = "4";
+                elseif contains(fileName, "normal", IgnoreCase = true)
 
                     mode = "Normal";
                     primaryFrequency = "2";
@@ -113,7 +120,7 @@ classdef ScienceCSV < mag.io.in.CSV
             end
 
             metaDataArgs = namedargs2cell(metaDataOptions);
-            metaData = mag.meta.Science(metaDataArgs{:});
+            metaData = mag.meta.Science(metaDataArgs{:}, Primary = isequal(sensor, "pri"));
 
             % Rename variables.
             newVariableNames = ["x", "y", "z", "range", "coarse", "fine"];
@@ -130,8 +137,9 @@ classdef ScienceCSV < mag.io.in.CSV
 
             % Add continuity information, for simpler interpolation.
             % Property order:
-            %     sequence, x, y, z, range, coarse, fine, compression, quality
-            rawData.Properties.VariableContinuity = ["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step"];
+            %     sequence, x, y, z, range, coarse, fine, compression,
+            %     quality, t
+            rawData.Properties.VariableContinuity = ["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step", "continuous"];
 
             % Convert to mag.Science.
             data = mag.Science(table2timetable(rawData, RowTimes = "t"), metaData);
@@ -144,9 +152,9 @@ classdef ScienceCSV < mag.io.in.CSV
         % ASSIGNSENSOR Assign value of sensor to output.
 
             if isempty(output.(property))
-                output.(property) = mag.Science(data.(property).Data, data.(property).MetaData);
+                output.(property).Science(end + 1) = mag.Science(data.(property).Data, data.(property).MetaData);
             else
-                output.(property).Data = vertcat(output.(property).Data, data.(property).Data);
+                output.(property).Data = vertcat(output.(property).Data, data.Data);
             end
         end
     end

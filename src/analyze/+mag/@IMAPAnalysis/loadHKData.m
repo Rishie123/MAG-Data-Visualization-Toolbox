@@ -1,28 +1,26 @@
-function loadHKData(this, hkMetaData)
+function loadHKData(this)
+    %% Initialize
+
+    if isempty(this.IALiRTFileNames)
+        return;
+    end
 
     this.Results.HK = mag.HK.empty();
 
+    %% Import and Process Data
+
     for hkp = 1:numel(this.HKPattern)
 
-        % Import data.
         [~, ~, extension] = fileparts(this.HKPattern(hkp));
-        rawHK = this.dispatchExtension(extension, ImportFileNames = this.HKFileNames{hkp}).import();
+        importStrategy = this.dispatchExtension(extension, "HK");
 
-        if ~isempty(rawHK)
-
-            % Preprocess variables.
-            rawHK = sortrows(vertcat(rawHK{:}), "SHCOARSE");
-            rawHK = renamevars(rawHK, "SHCOARSE", "t");
-
-            % Apply processing steps.
-            for ps = this.HKProcessing
-                rawHK = ps.apply(rawHK, hkMetaData(hkp));
-            end
-
-            % Assign value.
-            this.Results.HK(end + 1) = mag.hk.dispatchHKType(table2timetable(rawHK, RowTimes = "t"), hkMetaData(hkp));
-        end
+        this.Results.HK(end + 1) = mag.io.import( ...
+            FileNames = this.HKFileNames{hkp}, ...
+            Format = importStrategy, ...
+            ProcessingSteps = this.HKProcessing);
     end
+
+    %% Amend Timerange
 
     % Concentrate on recorded timerange.
     if ~isempty(this.Results.MetaData) && ~ismissing(this.Results.MetaData.Timestamp)

@@ -342,7 +342,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             metaData = [this.MetaData];
-            locSelected = [metaData.Sensor] == this.getName(primaryOrSecondary);
+            locSelected = [metaData.Primary] == isequal(primaryOrSecondary, "Primary");
 
             science = this(locSelected);
         end
@@ -354,8 +354,8 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             if isscalar(this) && ~isempty(this.MetaData)
 
-                if ~isempty(this.MetaData) && ~isempty(this.MetaData.Sensor) && ~isempty(this.MetaData.Model)
-                    tag = char(compose(" from %s (%s) in %s (%d)", this.MetaData.Sensor, this.MetaData.Model, this.MetaData.Mode, this.MetaData.DataFrequency));
+                if ~isempty(this.MetaData) && ~isempty(this.MetaData.Sensor) && ~isempty(this.MetaData.Setup) && ~isempty(this.MetaData.Setup.Model)
+                    tag = char(compose(" from %s (%s) in %s (%d)", this.MetaData.Sensor, this.MetaData.Setup.Model, this.MetaData.Mode, this.MetaData.DataFrequency));
                 elseif ~isempty(this.MetaData) && ~isempty(this.MetaData.Sensor)
                     tag = char(compose(" from %s in %s (%d)", this.MetaData.Sensor, this.MetaData.Mode, this.MetaData.DataFrequency));
                 else

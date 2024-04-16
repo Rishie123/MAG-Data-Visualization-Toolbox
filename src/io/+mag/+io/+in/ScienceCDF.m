@@ -7,6 +7,40 @@ classdef ScienceCDF < mag.io.in.CDF
 
     methods
 
+        function combinedData = combineByType(~, data)
+
+            arguments (Input)
+                ~
+                data (1, :) mag.Science
+            end
+
+            arguments (Output)
+                combinedData (1, :) mag.Science
+            end
+
+            combinedData = mag.Science.empty();
+
+            % Combine data by sensor.
+            metaData = [data.MetaData];
+            sensors = unique([metaData.Sensor]);
+
+            for s = sensors
+
+                locSelection = [metaData.Sensor] == s;
+                selectedData = data(locSelection);
+
+                td = vertcat(selectedData.Data);
+
+                md = selectedData(1).MetaData.copy();
+                md.set(Mode = "Hybrid", DataFrequency = NaN(), PacketFrequency = NaN(), Timestamp = min([metaData(locSelection).Timestamp]));
+
+                combinedData(end + 1) = mag.Science(td, md); %#ok<AGROW>
+            end
+        end
+    end
+
+    methods (Access = protected)
+
         function data = convert(this, rawData, cdfInfo)
 
             arguments (Input)
@@ -14,7 +48,7 @@ classdef ScienceCDF < mag.io.in.CDF
                 rawData cell
                 cdfInfo (1, 1) struct
             end
-            
+
             arguments (Output)
                 data (1, 1) mag.Science
             end
@@ -41,42 +75,6 @@ classdef ScienceCDF < mag.io.in.CDF
             metaData = mag.meta.Science(Mode = mode, Sensor = sensor, ...
                 Timestamp = datetime(date, InputFormat = "uuuuMMdd", Format = mag.time.Constant.Format, TimeZone = mag.time.Constant.TimeZone));
             data = mag.Science(timedData, metaData);
-        end
-
-        function applyProcessingSteps(~, data, processingSteps)
-
-            arguments
-                ~
-                data (1, 1) mag.Science
-                processingSteps (1, :) mag.process.Step
-            end
-
-            for ps = processingSteps
-                data.Data = ps.apply(data.Data, data.MetaData);
-            end
-        end
-
-        function assignToOutput(~, output, data)
-
-            arguments
-                ~
-                output (1, 1) {mustBeA(output, ["mag.Instrument", "mag.IALiRT"])}
-                data (1, 1) mag.Science
-            end
-
-            % TODO: Primary==FOB assumption.
-            switch data.MetaData.Sensor
-                case mag.meta.Sensor.FOB
-                    property = "Primary";
-                case mag.meta.Sensor.FIB
-                    property = "Secondary";
-            end
-
-            if isempty(output.(property))
-                output.(property) = mag.Science(data.Data, data.MetaData);
-            else
-                output.(property).Data = vertcat(output.(property).Data, data.Data);
-            end
         end
     end
 

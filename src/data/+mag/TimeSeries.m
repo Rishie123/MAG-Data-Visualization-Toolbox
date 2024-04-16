@@ -40,6 +40,14 @@ classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
         end
     end
 
+    methods (Hidden, Sealed)
+
+        function catThis = combine(this)
+
+
+        end
+    end
+
     methods (Abstract)
 
         % RESAMPLE Resample data to the specified frequency.

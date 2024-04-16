@@ -1,37 +1,52 @@
-function loadScienceData(this)
-    %% Import Data
+function loadScienceData(this, primarySetup, secondarySetup)
+    %% Initialize
 
     if isempty(this.ScienceFileNames)
         return;
     end
 
-    [~, ~, extension] = fileparts(this.SciencePattern);
+    %% Import Data
 
-    importStrategy = this.dispatchExtension(extension);
-    importStrategy.import( ...
+    [~, ~, extension] = fileparts(this.SciencePattern);
+    importStrategy = this.dispatchExtension(extension, "Science");
+
+    this.Results.Science = mag.io.import( ...
         FileNames = this.ScienceFileNames, ...
-        Output = this.Results, ...
-        Format = mag.io.in.CSV(), ...
-        PerFileProcessing = this.PerFileProcessing, ...
-        WholeDataProcessing = this.WholeDataProcessing);
+        Format = importStrategy, ...
+        ProcessingSteps = this.PerFileProcessing);
 
     primary = this.Results.Primary;
+    primary.MetaData.Setup = primarySetup;
+
     secondary = this.Results.Secondary;
+    secondary.MetaData.Setup = secondarySetup;
 
     %% Amend Timestamp
 
-    [startTime, endTime] = bounds(primary.Time);
+    [startTime(1), endTime(1)] = bounds(primary.Time);
+    [startTime(2), endTime(2)] = bounds(secondary.Time);
+
+    startTime = min(startTime);
+    endTime = max(endTime);
 
     primary.MetaData.Timestamp = startTime;
-    primary.MetaData.Timestamp = startTime;
+    secondary.MetaData.Timestamp = startTime;
 
     %% Add Mode and Range Change Events
 
     sensorEvents = eventtable(this.Results.Events);
     sensorEvents = sensorEvents(timerange(startTime - seconds(1), endTime, "closed"), :);
 
-    primary.Data.Properties.Events = this.generateEventTable("Primary", sensorEvents, primary.Data);
-    secondary.Data.Properties.Events = this.generateEventTable("Secondary", sensorEvents, secondary.Data);
+    primary.Data.Properties.Events = this.generateEventTable(primary, sensorEvents);
+    secondary.Data.Properties.Events = this.generateEventTable(secondary, sensorEvents);
+
+    %% Process Data as a Whole
+
+    for ps = this.WholeDataProcessing
+
+        primary.Data = ps.apply(primary.Data, primary.MetaData);
+        secondary.Data = ps.apply(secondary.Data, secondary.MetaData);
+    end
 
     %% Extract Ramp Mode (If Any)
 
@@ -72,10 +87,6 @@ function loadScienceData(this)
         primary.Data = ss.apply(primary.Data, primary.MetaData);
         secondary.Data = ss.apply(secondary.Data, secondary.MetaData);
     end
-
-    %% Assign Values
-
-    this.Results.Science = [primary, secondary];
 end
 
 function period = findRampModePeriod(events)

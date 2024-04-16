@@ -1,78 +1,37 @@
-function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
-    %% Import Data
+function loadIALiRTData(this, primarySetup, secondarySetup)
+    %% Initialize
 
     if isempty(this.IALiRTFileNames)
         return;
     end
 
-    primaryMetaData = primaryMetaData.copy();
-    primaryMetaData.set(Mode = "IALiRT", DataFrequency = 1/4, PacketFrequency = 4);
+    this.Results.IALiRT = mag.IALiRT();
 
-    secondaryMetaData = secondaryMetaData.copy();
-    secondaryMetaData.set(Mode = "IALiRT", DataFrequency = 1/4, PacketFrequency = 4);
+    %% Import Data
 
     [~, ~, extension] = fileparts(this.IALiRTPattern);
-    rawIALiRT = this.dispatchExtension(extension, ImportFileNames = this.IALiRTFileNames).import();
+    importStrategy = this.dispatchExtension(extension, "Science");
 
-    primaryData = timetable.empty();
-    secondaryData = timetable.empty();
+    this.Results.IALiRT.Science = mag.io.import( ...
+        FileNames = this.IALiRTFileNames, ...
+        Format = importStrategy, ...
+        ProcessingSteps = this.PerFileProcessing);
 
-    for i = 1:numel(rawIALiRT)
-        %% Split Data
+    primary = this.Results.IALiRT.Primary;
+    primary.MetaData.Setup = primarySetup;
 
-        primary = rawIALiRT{i}(:, regexpPattern(".*(pri|sequence).*"));
-        secondary = rawIALiRT{i}(:, regexpPattern(".*(sec|sequence).*"));
-
-        %% Process Data
-
-        % Rename variables.
-        newVariableNames = ["x", "y", "z", "range", "coarse", "fine"];
-
-        primary = renamevars(primary, ["x_pri", "y_pri", "z_pri", "rng_pri", "pri_coarse", "pri_fine"], newVariableNames);
-        secondary = renamevars(secondary, ["x_sec", "y_sec", "z_sec", "rng_sec", "sec_coarse", "sec_fine"], newVariableNames);
-
-        % Add compression and quality flags.
-        primary.compression = false(height(primary), 1);
-        secondary.compression = false(height(secondary), 1);
-
-        primary.quality = repmat(mag.meta.Quality.Regular, height(primary), 1);
-        secondary.quality = repmat(mag.meta.Quality.Regular, height(secondary), 1);
-
-        % Current file meta data.
-        pmd = primaryMetaData.copy();
-        smd = secondaryMetaData.copy();
-
-        % Apply processing steps.
-        for ps = this.PerFileProcessing
-
-            primary = ps.apply(primary, pmd);
-            secondary = ps.apply(secondary, smd);
-        end
-
-        %% Convert to timetable
-
-        primaryData = vertcat(primaryData, table2timetable(primary, RowTimes = "t")); %#ok<AGROW>
-        secondaryData = vertcat(secondaryData, table2timetable(secondary, RowTimes = "t")); %#ok<AGROW>
-    end
-
-    % Add continuity information, for simpler interpolation.
-    % Property order:
-    %     sequence, x, y, z, range, coarse, fine, compression, quality
-    [primaryData.Properties.VariableContinuity, secondaryData.Properties.VariableContinuity] = ...
-        deal(["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step"]);
+    secondary = this.Results.IALiRT.Secondary;
+    secondary.MetaData.Setup = secondarySetup;
 
     %% Amend Timestamp
 
-    startTime = bounds(primaryData.t);
+    startTime(1) = bounds(primary.Time);
+    startTime(2) = bounds(secondary.Time);
 
-    if numel(rawIALiRT) == 1
+    startTime = min(startTime);
 
-        primaryMetaData = pmd;
-        secondaryMetaData = smd;
-    end
-
-    primaryMetaData.Timestamp = startTime;
-    secondaryMetaData.Timestamp = startTime;
+    primary.MetaData.Timestamp = startTime;
+    secondary.MetaData.Timestamp = startTime;
 
     %% Add Mode and Range Change Events
 
@@ -94,34 +53,30 @@ function loadIALiRTData(this, primaryMetaData, secondaryMetaData)
         Reason = string.empty(0, 1)));
     sensorEvents = table2timetable(sensorEvents, RowTimes = "Time");
 
-    primaryData.Properties.Events = this.generateEventTable("Primary", sensorEvents, primaryData);
-    secondaryData.Properties.Events = this.generateEventTable("Secondary", sensorEvents, secondaryData);
+    primary.Data.Properties.Events = this.generateEventTable(primary, sensorEvents);
+    secondary.Data.Properties.Events = this.generateEventTable(secondary, sensorEvents);
 
     %% Process Data as a Whole
 
     for ps = this.WholeDataProcessing
 
-        primaryData = ps.apply(primaryData, primaryMetaData);
-        secondaryData = ps.apply(secondaryData, secondaryMetaData);
+        primary.Data = ps.apply(primary.Data, primary.MetaData);
+        secondary.Data = ps.apply(secondary.Data, secondary.MetaData);
     end
 
     %% Remove Ramp Mode (If Any)
 
     if ~isempty(this.PrimaryRamp) && ~isempty(this.SecondaryRamp)
 
-        primaryData(timerange(this.PrimaryRamp.Time(1), this.PrimaryRamp.Time(end), "closed"), :) = [];
-        secondaryData(timerange(this.SecondaryRamp.Time(1), this.SecondaryRamp.Time(end), "closed"), :) = [];
+        primary.Data(timerange(this.PrimaryRamp.Time(1), this.PrimaryRamp.Time(end), "closed"), :) = [];
+        secondary.Data(timerange(this.SecondaryRamp.Time(1), this.SecondaryRamp.Time(end), "closed"), :) = [];
     end
 
     %% Process I-ALiRT Data
 
     for is = this.IALiRTProcessing
 
-        primaryData = is.apply(primaryData, primaryMetaData);
-        secondaryData = is.apply(secondaryData, secondaryMetaData);
+        primary.Data = is.apply(primary.Data, primary.MetaData);
+        secondary.Data = is.apply(secondary.Data, secondary.MetaData);
     end
-
-    %% Assign Values
-
-    this.Results.IALiRT = mag.IALiRT(mag.Science(primaryData, primaryMetaData), mag.Science(secondaryData, secondaryMetaData));
 end

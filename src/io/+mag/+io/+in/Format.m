@@ -3,10 +3,10 @@ classdef (Abstract) Format < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
     methods (Abstract)
 
-        % APPLYPROCESSINGSTEPS Process data according to input steps.
-        applyProcessingSteps(this, data, processingStep)
+        % LOADANDCONVERT Load data and convert to common format.
+        data = loadAndConvert(this, fileName)
 
-        % ASSIGNTOOUTPUT Assign partial result to output data.
-        assignToOutput(this, output, partialData)
+        % COMBINEBYTYPE Combine data by type.
+        combinedData = combineByType(this, data)
     end
 end

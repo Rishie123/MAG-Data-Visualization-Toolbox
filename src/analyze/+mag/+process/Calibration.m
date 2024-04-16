@@ -64,7 +64,7 @@ classdef Calibration < mag.process.Step
 
                 locRange = data.range == r;
 
-                calibrationFile = this.getFileName(r, metaData.Model);
+                calibrationFile = this.getFileName(r, metaData.Setup.Model);
                 data{locRange, this.Variables} = this.applyCalibration(data{locRange, this.Variables}, calibrationFile);
             end
         end

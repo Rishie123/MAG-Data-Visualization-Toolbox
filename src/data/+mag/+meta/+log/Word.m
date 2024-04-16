@@ -19,19 +19,13 @@ classdef Word < mag.meta.log.Type
 
     methods (Hidden)
 
-        function [instrumentMetaData, primaryMetaData, secondaryMetaData] = load(this, instrumentMetaData, primaryMetaData, secondaryMetaData)
+        function [instrumentMetaData, primarySetup, secondarySetup] = load(this, instrumentMetaData, primarySetup, secondarySetup)
 
-            arguments (Input)
-                this
+            arguments
+                this (1, 1) mag.meta.log.Word
                 instrumentMetaData (1, 1) mag.meta.Instrument
-                primaryMetaData (1, :) mag.meta.Science
-                secondaryMetaData (1, :) mag.meta.Science
-            end
-
-            arguments (Output)
-                instrumentMetaData (1, 1) mag.meta.Instrument
-                primaryMetaData (1, :) mag.meta.Science
-                secondaryMetaData (1, :) mag.meta.Science
+                primarySetup (1, 1) mag.meta.Setup
+                secondarySetup (1, 1) mag.meta.Setup
             end
 
             % Read meta data file.
@@ -56,15 +50,15 @@ classdef Word < mag.meta.log.Type
             instrumentMetaData.Timestamp = datetime(rawData.Date, TimeZone = "UTC", Format = mag.time.Constant.Format) + duration(rawData.Time, InputFormat = "hh:mm");
 
             % Enhance primary and secondary meta data.
-            [primaryMetaData.Model] = deal(rawData.FOBModel);
-            [primaryMetaData.FEE] = deal("FEE3");
-            [primaryMetaData.Harness] = deal(rawData.FOBHarness);
-            [primaryMetaData.Can] = deal(rawData.FOBCan);
+            primarySetup.Model = rawData.FOBModel;
+            primarySetup.FEE = "FEE3";
+            primarySetup.Harness = rawData.FOBHarness;
+            primarySetup.Can = rawData.FOBCan;
 
-            [secondaryMetaData.Model] = deal(rawData.FIBModel);
-            [secondaryMetaData.FEE] = deal("FEE4");
-            [secondaryMetaData.Harness] = deal(rawData.FIBHarness);
-            [secondaryMetaData.Can] = deal(rawData.FIBCan);
+            secondarySetup.Model = rawData.FIBModel;
+            secondarySetup.FEE = "FEE4";
+            secondarySetup.Harness = rawData.FIBHarness;
+            secondarySetup.Can = rawData.FIBCan;
         end
     end
 end

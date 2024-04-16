@@ -24,19 +24,13 @@ classdef Excel < mag.meta.log.Type
 
     methods (Hidden)
 
-        function [instrumentMetaData, primaryMetaData, secondaryMetaData] = load(this, instrumentMetaData, primaryMetaData, secondaryMetaData)
+        function [instrumentMetaData, primarySetup, secondarySetup] = load(this, instrumentMetaData, primarySetup, secondarySetup)
 
-            arguments (Input)
-                this
+            arguments
+                this (1, 1) mag.meta.log.Excel
                 instrumentMetaData (1, 1) mag.meta.Instrument
-                primaryMetaData (1, :) mag.meta.Science
-                secondaryMetaData (1, :) mag.meta.Science
-            end
-
-            arguments (Output)
-                instrumentMetaData (1, 1) mag.meta.Instrument
-                primaryMetaData (1, :) mag.meta.Science
-                secondaryMetaData (1, :) mag.meta.Science
+                primarySetup (1, 1) mag.meta.Setup
+                secondarySetup (1, 1) mag.meta.Setup
             end
 
             % Read meta data file.
@@ -84,24 +78,20 @@ classdef Excel < mag.meta.log.Type
                 duration(regexp(data, "^Time: (\d+\:\d+)", "once", "tokens", "dotexceptnewline", "lineanchors"), InputFormat = "hh:mm");
 
             % Enhance primary and secondary meta data.
-            [primaryMetaData.Model] = deal(primaryDetails.model);
-            [primaryMetaData.FEE] = deal(primaryDetails.fee);
-            [primaryMetaData.Harness] = deal(primaryDetails.harness);
+            primarySetup.Model = primaryDetails.model;
+            primarySetup.FEE = primaryDetails.fee;
+            primarySetup.Harness = primaryDetails.harness;
 
             if isfield(primaryDetails, "can")
-
-                [primaryMetaData.Can] = deal(primaryDetails.can);
-                [primaryMetaData.Can] = extractBetween([primaryMetaData.Can], "(", ")");
+                primarySetup.Can = extractBetween(primaryDetails.can, "(", ")");
             end
 
-            [secondaryMetaData.Model] = deal(secondaryDetails.model);
-            [secondaryMetaData.FEE] = deal(secondaryDetails.fee);
-            [secondaryMetaData.Harness] = deal(secondaryDetails.harness);
+            secondarySetup.Model = secondaryDetails.model;
+            secondarySetup.FEE = secondaryDetails.fee;
+            secondarySetup.Harness = secondaryDetails.harness;
 
             if isfield(secondaryDetails, "can")
-
-                [secondaryMetaData.Can] = deal(secondaryDetails.can);
-                [secondaryMetaData.Can] = extractBetween([secondaryMetaData.Can], "(", ")");
+                secondarySetup.Can = extractBetween(secondaryDetails.can, "(", ")");
             end
         end
     end
