@@ -35,7 +35,7 @@ classdef (Abstract) Data < matlab.mixin.Copyable & matlab.mixin.Heterogeneous & 
             for mc = metaClasses
 
                 for mp = mc.PropertyList'
-
+e
                     if ~mp.Constant && isequal(mp.GetAccess, "public") && isequal(mp.SetAccess, "public")
                         structThis.(mp.Name) = this.(mp.Name);
                     end
@@ -70,7 +70,7 @@ classdef (Abstract) Data < matlab.mixin.Copyable & matlab.mixin.Heterogeneous & 
                 value = uniqueValues;
             else
 
-                if ismissing(alternative)
+                if ismissing(alternative) && mag.internal.isMissingCompatible(values)
                     value = feval(class(values), alternative);
                 else
                     value = alternative;

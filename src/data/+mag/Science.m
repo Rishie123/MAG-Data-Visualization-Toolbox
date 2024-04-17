@@ -92,7 +92,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function compression = get.Compression(this)
-            compression = this.Data.(this.Settings.Compression);
+            compression = logical(this.Data.(this.Settings.Compression));
         end
 
         function set.Quality(this, quality)

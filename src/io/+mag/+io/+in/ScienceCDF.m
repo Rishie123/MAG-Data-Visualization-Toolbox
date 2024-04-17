@@ -7,41 +7,7 @@ classdef ScienceCDF < mag.io.in.CDF
 
     methods
 
-        function combinedData = combineByType(~, data)
-
-            arguments (Input)
-                ~
-                data (1, :) mag.Science
-            end
-
-            arguments (Output)
-                combinedData (1, :) mag.Science
-            end
-
-            combinedData = mag.Science.empty();
-
-            % Combine data by sensor.
-            metaData = [data.MetaData];
-            sensors = unique([metaData.Sensor]);
-
-            for s = sensors
-
-                locSelection = [metaData.Sensor] == s;
-                selectedData = data(locSelection);
-
-                td = vertcat(selectedData.Data);
-
-                md = selectedData(1).MetaData.copy();
-                md.set(Mode = "Hybrid", DataFrequency = NaN(), PacketFrequency = NaN(), Timestamp = min([metaData(locSelection).Timestamp]));
-
-                combinedData(end + 1) = mag.Science(td, md); %#ok<AGROW>
-            end
-        end
-    end
-
-    methods (Access = protected)
-
-        function data = convert(this, rawData, cdfInfo)
+        function data = process(this, rawData, cdfInfo)
 
             arguments (Input)
                 this
@@ -68,11 +34,11 @@ classdef ScienceCDF < mag.io.in.CDF
 
             % Add continuity information, for simpler interpolation.
             % Property order:
-            %     sequence, x, y, z, range, coarse, fine, compression, quality
-            timedData.Properties.VariableContinuity = ["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step"];
+            %     sequence, x, y, z, range, compression, quality
+            timedData.Properties.VariableContinuity = ["step", "continuous", "continuous", "continuous", "step", "step", "step"];
 
             % Create mag.Science object with meta data.
-            metaData = mag.meta.Science(Mode = mode, Sensor = sensor, ...
+            metaData = mag.meta.Science(Mode = mode, Primary = isequal(sensor, mag.meta.Sensor.FOB), Sensor = sensor, ...
                 Timestamp = datetime(date, InputFormat = "uuuuMMdd", Format = mag.time.Constant.Format, TimeZone = mag.time.Constant.TimeZone));
             data = mag.Science(timedData, metaData);
         end

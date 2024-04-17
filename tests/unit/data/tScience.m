@@ -422,14 +422,33 @@ classdef tScience < matlab.unittest.TestCase
 
             science.MetaData.DataFrequency = 64;
             science.MetaData.Mode = "Burst";
-            science.MetaData.Model = "FM4";
             science.MetaData.Sensor = "FIB";
+            science.MetaData.Setup = mag.meta.Setup(Model = "FM4");
 
             % Exercise.
             output = evalc("display(science)");
 
             % Verify.
             testCase.verifySubstring(eraseTags(output), "FIB (FM4) in Burst (64)", "Science meta data should be included in display.");
+        end
+
+        % Test that displaying a single object displays the correct
+        % information, even when setup is missing.
+        function customDisplay_singleObject_noSetup(testCase)
+
+            % Set up.
+            science = testCase.createTestData();
+
+            science.MetaData.DataFrequency = 64;
+            science.MetaData.Mode = "Burst";
+            science.MetaData.Sensor = "FIB";
+            science.MetaData.Setup = mag.meta.Setup.empty();
+
+            % Exercise.
+            output = evalc("display(science)");
+
+            % Verify.
+            testCase.verifySubstring(eraseTags(output), "FIB in Burst (64)", "Science meta data should be included in display.");
         end
 
         % Test that displaying a single object displays the correct
@@ -441,8 +460,8 @@ classdef tScience < matlab.unittest.TestCase
 
             science.MetaData.DataFrequency = 64;
             science.MetaData.Mode = "Burst";
-            science.MetaData.Model = string.empty();
             science.MetaData.Sensor = "FIB";
+            science.MetaData.Setup = mag.meta.Setup();
 
             % Exercise.
             output = evalc("display(science)");
@@ -460,8 +479,8 @@ classdef tScience < matlab.unittest.TestCase
 
             science.MetaData.DataFrequency = 64;
             science.MetaData.Mode = "Burst";
-            science.MetaData.Model = string.empty();
             science.MetaData.Sensor = mag.meta.Sensor.empty();
+            science.MetaData.Setup = mag.meta.Setup();
 
             % Exercise.
             output = evalc("display(science)");

@@ -227,7 +227,8 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
 
         function header = getHeader(this)
 
-            if isscalar(this) && this.HasScience && this.HasMetaData && ~isempty(this.Primary.MetaData) && ~isempty(this.Secondary.MetaData)
+            if isscalar(this) && this.HasScience && this.HasMetaData && ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
+                    ~isempty(this.Primary.MetaData) && ~isempty(this.Secondary.MetaData)
 
                 className = matlab.mixin.CustomDisplay.getClassNameForHeader(this);
                 tag = char(compose(" in %s (%d, %d)", this.Primary.MetaData.Mode, this.Primary.MetaData.DataFrequency, this.Secondary.MetaData.DataFrequency));

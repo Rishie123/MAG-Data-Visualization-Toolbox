@@ -46,10 +46,10 @@ classdef (Abstract, Hidden) Science < mag.graphics.view.View
 
         function value = getFieldTitle(data)
 
-            if isempty(data.MetaData.FEE) || isempty(data.MetaData.Model) || isempty(data.MetaData.Can)
+            if isempty(data.MetaData.Setup) || isempty(data.MetaData.Setup.FEE) || isempty(data.MetaData.Setup.Model) || isempty(data.MetaData.Setup.Can)
                 value = data.MetaData.getDisplay("Sensor");
             else
-                value = compose("%s (%s - %s - %s)", data.MetaData.getDisplay("Sensor"), data.MetaData.getDisplay("FEE"), data.MetaData.getDisplay("Model"), data.MetaData.getDisplay("Can"));
+                value = compose("%s (%s - %s - %s)", data.MetaData.Setup.Sensor, data.MetaData.Setup.FEE, data.MetaData.Setup.Model, data.MetaData.Setup.Can);
             end
         end
     end

@@ -10,7 +10,7 @@ classdef tIALiRT < matlab.mock.TestCase
             primary = mag.Science(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.Science());
             secondary = mag.Science(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.Science());
 
-            iALiRT = mag.IALiRT(primary, secondary);
+            iALiRT = mag.IALiRT(Science = [primary, secondary]);
 
             % Exercise and verify.
             testCase.verifyTrue(iALiRT.HasData, """HasData"" property should be ""true"".");
@@ -24,7 +24,7 @@ classdef tIALiRT < matlab.mock.TestCase
             primary = mag.Science(timetable.empty(), mag.meta.Science());
             secondary = mag.Science(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.Science());
 
-            iALiRT = mag.IALiRT(primary, secondary);
+            iALiRT = mag.IALiRT(Science = [primary, secondary]);
 
             % Exercise and verify.
             testCase.verifyFalse(iALiRT.HasData, """HasData"" property should be ""false"".");
@@ -38,7 +38,7 @@ classdef tIALiRT < matlab.mock.TestCase
             primary = mag.Science(timetable(datetime("now", TimeZone = "UTC"), 1), mag.meta.Science());
             secondary = mag.Science(timetable.empty(), mag.meta.Science());
 
-            iALiRT = mag.IALiRT(primary, secondary);
+            iALiRT = mag.IALiRT(Science = [primary, secondary]);
 
             % Exercise and verify.
             testCase.verifyFalse(iALiRT.HasData, """HasData"" property should be ""false"".");
@@ -83,7 +83,7 @@ classdef tIALiRT < matlab.mock.TestCase
             [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {timetable.empty(), mag.meta.Science(Primary = true, Sensor = "FOB")}, Strict = true);
             [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {timetable.empty(), mag.meta.Science(Sensor = "FIB")}, Strict = true);
 
-            iALiRT = mag.IALiRT(primary, secondary);
+            iALiRT = mag.IALiRT(Science = [primary, secondary]);
         end
     end
 end

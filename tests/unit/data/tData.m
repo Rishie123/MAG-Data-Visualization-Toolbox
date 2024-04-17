@@ -25,14 +25,11 @@ classdef tData < matlab.unittest.TestCase
         function metadata_struct(testCase)
 
             % Set up.
-            metaData = mag.meta.Science(Can = "Can 1", FEE = "FEE3", Harness = "IMAP-IMAP1", Model = "EM2", Sensor = "FOB", ...
-                Mode = "Burst", DataFrequency = 4, PacketFrequency = 8, Primary = true);
+            setup = mag.meta.Setup(Can = "Can 1", FEE = "FEE3", Harness = "IMAP-IMAP1", Model = "EM2");
+            metaData = mag.meta.Science(Setup = setup, Sensor = "FOB", Mode = "Burst", DataFrequency = 4, PacketFrequency = 8, Primary = true);
 
             expectedStruct = struct(Primary = true, ...
-                Model = "EM2", ...
-                FEE = "FEE3", ...
-                Harness = "IMAP-IMAP1", ...
-                Can = "Can 1", ...
+                Setup = setup, ...
                 Sensor = mag.meta.Sensor.FOB, ...
                 Mode = mag.meta.Mode.Burst, ...
                 DataFrequency = 4, ...
@@ -54,10 +51,10 @@ classdef tData < matlab.unittest.TestCase
 
             % Set up.
             metaData = mag.meta.Science();
-            metaData.Model = string.empty();
+            metaData.Sensor = mag.meta.Sensor.empty();
 
             % Exercise.
-            value = metaData.getDisplay("Model");
+            value = metaData.getDisplay("Sensor");
 
             % Verify.
             testCase.verifyEmpty(value, "Display value should be equal to expected value.");
@@ -69,12 +66,12 @@ classdef tData < matlab.unittest.TestCase
 
             % Set up.
             metaData = mag.meta.Science();
-            metaData.Model = "FM5";
+            metaData.Sensor = mag.meta.Sensor.FOB;
 
-            expectedValue = "FM5";
+            expectedValue = mag.meta.Sensor.FOB;
 
             % Exercise.
-            value = metaData.getDisplay("Model");
+            value = metaData.getDisplay("Sensor");
 
             % Verify.
             testCase.verifyEqual(value, expectedValue, "Display value should be equal to expected value.");
@@ -87,12 +84,12 @@ classdef tData < matlab.unittest.TestCase
             % Set up.
             metaData(1) = mag.meta.Science();
             metaData(2) = mag.meta.Science();
-            [metaData.Model] = deal("FM4");
+            [metaData.Sensor] = deal(mag.meta.Sensor.FIB);
 
-            expectedValue = "FM4";
+            expectedValue = mag.meta.Sensor.FIB;
 
             % Exercise.
-            value = metaData.getDisplay("Model");
+            value = metaData.getDisplay("Sensor");
 
             % Verify.
             testCase.verifyEqual(value, expectedValue, "Display value should be equal to expected value.");
@@ -105,10 +102,10 @@ classdef tData < matlab.unittest.TestCase
             % Set up.
             metaData(1) = mag.meta.Science();
             metaData(2) = mag.meta.Science();
-            [metaData.Model] = deal("FM4", "FM5");
+            [metaData.Sensor] = deal(mag.meta.Sensor.FIB, mag.meta.Sensor.FOB);
 
             % Exercise.
-            value = metaData.getDisplay("Model");
+            value = metaData.getDisplay("Sensor");
 
             % Verify.
             testCase.verifyTrue(ismissing(value), "Display value should be equal to expected value.");
@@ -121,12 +118,12 @@ classdef tData < matlab.unittest.TestCase
             % Set up.
             metaData(1) = mag.meta.Science();
             metaData(2) = mag.meta.Science();
-            [metaData.Model] = deal("FM4", "FM5");
+            [metaData.Sensor] = deal(mag.meta.Sensor.FOB, mag.meta.Sensor.FIB);
 
             expectedValue = "Ciao";
 
             % Exercise.
-            value = metaData.getDisplay("Model", expectedValue);
+            value = metaData.getDisplay("Sensor", expectedValue);
 
             % Verify.
             testCase.verifyEqual(value, expectedValue, "Display value should be equal to expected value.");

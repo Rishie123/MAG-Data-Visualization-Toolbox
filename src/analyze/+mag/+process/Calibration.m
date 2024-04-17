@@ -2,7 +2,7 @@ classdef Calibration < mag.process.Step
 % CALIBRATION Correct data by applying scale factor, misalignment and
 % offset.
 
-    properties (Constant, Hidden)
+    properties (Constant)
         % FILELOCATION Location of calibration files.
         FileLocation (1, 1) string = fullfile(fileparts(mfilename("fullpath")), "../../calibration")
     end
@@ -60,11 +60,17 @@ classdef Calibration < mag.process.Step
 
             ranges = unique(data.range);
 
+            if isempty(metaData.Setup)
+                modelName = string.empty();
+            else
+                modelName = metaData.Setup.Model;
+            end
+
             for r = ranges'
 
                 locRange = data.range == r;
 
-                calibrationFile = this.getFileName(r, metaData.Setup.Model);
+                calibrationFile = this.getFileName(r, modelName);
                 data{locRange, this.Variables} = this.applyCalibration(data{locRange, this.Variables}, calibrationFile);
             end
         end

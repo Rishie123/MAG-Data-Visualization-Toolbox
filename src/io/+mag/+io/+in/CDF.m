@@ -3,19 +3,10 @@ classdef (Abstract) CDF < mag.io.in.Format
 
     methods
 
-        function data = loadAndConvert(this, fileName)
+        function [rawData, cdfInfo] = load(~, fileName)
 
             cdfInfo = spdfcdfinfo(fileName);
             rawData = spdfcdfread(fileName, 'CDFEpochtoString', true);
-
-            data = this.convert(rawData, cdfInfo);
         end
-    end
-
-    methods (Abstract, Access = protected)
-
-        % CONVERT Process raw data and convert to common data
-        % format.
-        data = convert(this, rawData, cdfInfo)
     end
 end

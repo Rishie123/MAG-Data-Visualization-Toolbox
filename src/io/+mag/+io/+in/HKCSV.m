@@ -7,41 +7,7 @@ classdef HKCSV < mag.io.in.CSV
 
     methods
 
-        function combinedData = combineByType(~, data)
-
-            arguments (Input)
-                ~
-                data (1, :) mag.HK
-            end
-
-            arguments (Output)
-                combinedData (1, :) mag.HK
-            end
-
-            combinedData = mag.HK.empty();
-
-            % Combine data by sensor.
-            metaData = [data.MetaData];
-            types = unique([metaData.Type]);
-
-            for t = types
-
-                locSelection = [metaData.Type] == t;
-                selectedData = data(locSelection);
-
-                td = vertcat(selectedData.Data);
-
-                md = selectedData(1).MetaData.copy();
-                md.set(Timestamp = min([metaData(locSelection).Timestamp]));
-
-                combinedData(end + 1) = mag.hk.dispatchHKType(td, md); %#ok<AGROW>
-            end
-        end
-    end
-
-    methods (Access = protected)
-
-        function data = convert(this, rawData, fileName)
+        function data = process(this, rawData, fileName)
 
             arguments (Input)
                 this

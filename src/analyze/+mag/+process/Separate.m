@@ -50,7 +50,7 @@ classdef Separate < mag.process.Step
 
             if isequal(this.Variables, "*")
 
-                locMissingCompatible = varfun(@this.isMissingCompatible, data, OutputFormat = "uniform");
+                locMissingCompatible = varfun(@mag.internal.isMissingCompatible, data, OutputFormat = "uniform");
                 variables = data.Properties.VariableNames(locMissingCompatible);
 
                 variables(variables == this.DiscriminationVariable) = [];
@@ -68,13 +68,6 @@ classdef Separate < mag.process.Step
             end
 
             data = [data; finalRow];
-        end
-    end
-
-    methods (Static, Access = private)
-
-        function tf = isMissingCompatible(x)
-            tf = isa(x, "single") | isa(x, "double") | isa(x, "duration") | isa(x, "calendarDuration") | isa(x, "datetime") | isa(x, "categorical") | isa(x, "string");
         end
     end
 end

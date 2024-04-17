@@ -192,7 +192,7 @@ classdef tInstrument < matlab.mock.TestCase
 
             iALiRTPrimaryScience = mag.Science(scienceTT, mag.meta.Science(Primary = true, Sensor = "FOB", Timestamp = datetime("now", TimeZone = "UTC")));
             iALiRTSecondaryScience = mag.Science(scienceTT, mag.meta.Science(Sensor = "FIB", Timestamp = datetime("now", TimeZone = "UTC")));
-            [iALiRT, iALiRTBehavior] = testCase.createMock(?mag.IALiRT, ConstructorInputs = {iALiRTPrimaryScience, iALiRTSecondaryScience}, Strict = true);
+            [iALiRT, iALiRTBehavior] = testCase.createMock(?mag.IALiRT, ConstructorInputs = {"Science", [iALiRTPrimaryScience, iALiRTSecondaryScience]}, Strict = true);
 
             [hk, hkBehavior] = testCase.createMock(?mag.HK, ConstructorInputs = {scienceTT, mag.meta.HK(Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
 

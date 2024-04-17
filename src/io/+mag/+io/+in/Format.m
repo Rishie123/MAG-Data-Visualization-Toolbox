@@ -3,10 +3,11 @@ classdef (Abstract) Format < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
     methods (Abstract)
 
-        % LOADANDCONVERT Load data and convert to common format.
-        data = loadAndConvert(this, fileName)
-
-        % COMBINEBYTYPE Combine data by type.
-        combinedData = combineByType(this, data)
+        % LOAD Load raw data from file.
+        rawData = load(this, fileName)
+    
+        % PROCESS Process raw data and convert to common data
+        % format.
+        data = process(this, rawData, varargin)
     end
 end

@@ -1,5 +1,5 @@
 classdef ScienceCSV < mag.io.in.CSV
-    % SCIENCECSV Format science data for CSV import.
+% SCIENCECSV Format science data for CSV import.
 
     properties (Constant, Access = private)
         FileNamePattern (1, 1) string = "MAGScience-(?<mode>\w+)-\((?<primaryFrequency>\d+),(?<secondaryFrequency>\d+)\)-(?<packetFrequency>\d+)s-(?<date>\d+)-(?<time>\w+).(?<extension>\w+)"
@@ -7,41 +7,7 @@ classdef ScienceCSV < mag.io.in.CSV
 
     methods
 
-        function combinedData = combineByType(~, data)
-
-            arguments (Input)
-                ~
-                data (1, :) mag.Science
-            end
-
-            arguments (Output)
-                combinedData (1, :) mag.Science
-            end
-
-            combinedData = mag.Science.empty();
-
-            % Combine data by sensor.
-            metaData = [data.MetaData];
-            sensors = unique([metaData.Sensor]);
-
-            for s = sensors
-
-                locSelection = [metaData.Sensor] == s;
-                selectedData = data(locSelection);
-
-                td = vertcat(selectedData.Data);
-
-                md = selectedData(1).MetaData.copy();
-                md.set(Mode = "Hybrid", DataFrequency = NaN(), PacketFrequency = NaN(), Timestamp = min([metaData(locSelection).Timestamp]));
-
-                combinedData(end + 1) = mag.Science(td, md); %#ok<AGROW>
-            end
-        end
-    end
-
-    methods (Access = protected)
-
-        function data = convert(this, rawData, fileName)
+        function data = process(this, rawData, fileName)
 
             arguments (Input)
                 this

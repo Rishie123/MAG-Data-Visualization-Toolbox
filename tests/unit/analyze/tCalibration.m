@@ -16,13 +16,29 @@ classdef tCalibration < MAGAnalysisTestCase
             end
         end
 
+        % Verify that default calibration is selected, if sensor setup is
+        % empty.
+        function default_emptySetup(testCase)
+
+            % Set up.
+            uncalibratedData = testCase.createTestData();
+            metaData = mag.meta.Science(Setup = mag.meta.Setup.empty());
+
+            % Exercise.
+            calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"]);
+            calibratedData = calibrationStep.apply(uncalibratedData, metaData);
+
+            % Verify.
+            testCase.verifyEqual(calibratedData, uncalibratedData, "Calibrated value should match expectation.");
+        end
+
         % Verify that default calibration is selected, if sensor model is
         % empty.
         function default_emptyModel(testCase)
 
             % Set up.
             uncalibratedData = testCase.createTestData();
-            metaData = mag.meta.Science(Model = string.empty());
+            metaData = mag.meta.Science(Setup = mag.meta.Setup(Model = string.empty()));
 
             % Exercise.
             calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"]);
@@ -38,7 +54,7 @@ classdef tCalibration < MAGAnalysisTestCase
 
             % Set up.
             uncalibratedData = testCase.createTestData();
-            metaData = mag.meta.Science(Model = "EM1");
+            metaData = mag.meta.Science(Setup = mag.meta.Setup(Model = "EM1"));
 
             % Exercise.
             calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"]);
@@ -53,7 +69,7 @@ classdef tCalibration < MAGAnalysisTestCase
 
             % Set up.
             uncalibratedData = testCase.createTestData();
-            metaData = mag.meta.Science(Model = "FM5");
+            metaData = mag.meta.Science(Setup = mag.meta.Setup(Model = "FM5"));
 
             expectedData = uncalibratedData;
             expectedData{:, "x"} = 1.075387;
@@ -74,7 +90,7 @@ classdef tCalibration < MAGAnalysisTestCase
 
             % Set up.
             uncalibratedData = testCase.createTestData(Range = 3 * ones(3, 1));
-            metaData = mag.meta.Science(Model = "FM5");
+            metaData = mag.meta.Science(Setup = mag.meta.Setup(Model = "FM5"));
 
             expectedData = uncalibratedData;
             expectedData{:, "x"} = 1.014961;
@@ -95,7 +111,7 @@ classdef tCalibration < MAGAnalysisTestCase
 
             % Set up.
             uncalibratedData = testCase.createTestData();
-            metaData = mag.meta.Science(Model = "FM5");
+            metaData = mag.meta.Science(Setup = mag.meta.Setup(Model = "FM5"));
 
             expectedData = uncalibratedData;
             expectedData{:, "x"} = 1.075432;
@@ -117,12 +133,33 @@ classdef tCalibration < MAGAnalysisTestCase
 
             % Set up.
             uncalibratedData = testCase.createTestData(Range = 2 * ones(3, 1));
-            metaData = mag.meta.Science(Model = "FM4");
+            metaData = mag.meta.Science(Setup = mag.meta.Setup(Model = "FM4"));
 
             expectedData = uncalibratedData;
             expectedData{:, "x"} = 1.016675;
             expectedData{:, "y"} = -0.001415 + 0.996880;
             expectedData{:, "z"} = 0.001770 - 0.004966 + 0.997683;
+
+            % Exercise.
+            calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"], Temperature = "Cold");
+            calibratedData = calibrationStep.apply(uncalibratedData, metaData);
+
+            % Verify.
+            testCase.verifyThat(calibratedData, matlab.unittest.constraints.IsEqualTo(expectedData, Within = matlab.unittest.constraints.AbsoluteTolerance(1e-10)), ...
+                "Calibrated value should match expectation.");
+        end
+
+        % Verify that correct calibration is selected for lab models.
+        function calibration_labModel(testCase)
+
+            % Set up.
+            uncalibratedData = testCase.createTestData(Time = datetime("now"), XYZ = [1, 2, 3], Range = 0, Sequence = 1);
+            metaData = mag.meta.Science(Setup = mag.meta.Setup(Model = "LM2"));
+
+            expectedData = uncalibratedData;
+            expectedData{:, "x"} = 3;
+            expectedData{:, "y"} = -1;
+            expectedData{:, "z"} = -2;
 
             % Exercise.
             calibrationStep = mag.process.Calibration(Variables = ["x", "y", "z"], Temperature = "Cold");
