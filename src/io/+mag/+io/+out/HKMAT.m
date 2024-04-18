@@ -3,21 +3,15 @@ classdef HKMAT < mag.io.out.MAT
 
     methods
 
-        function fileName = getExportFileName(~, inputFileName, data)
+        function fileName = getExportFileName(~, data)
 
             arguments
                 ~
-                inputFileName (1, 1) string
                 data (1, :) mag.HK
             end
 
-            if ~isempty(inputFileName)
-                fileName = inputFileName;
-            else
-
-                metaData = [data.MetaData];
-                fileName = compose("%s HK", datestr(min([metaData.Timestamp]), "ddmmyy-hhMM")) + ".mat"; %#ok<DATST>
-            end
+            metaData = [data.MetaData];
+            fileName = compose("%s HK", datestr(min([metaData.Timestamp]), "ddmmyy-hhMM")) + ".mat"; %#ok<DATST>
         end
 
         function structData = convertToStruct(this, data)

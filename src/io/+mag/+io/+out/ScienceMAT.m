@@ -3,27 +3,21 @@ classdef ScienceMAT < mag.io.out.MAT
 
     methods
 
-        function fileName = getExportFileName(~, inputFileName, data)
+        function fileName = getExportFileName(~, data)
 
             arguments
                 ~
-                inputFileName (1, 1) string
                 data (1, 1) {mustBeA(data, ["mag.Instrument", "mag.IALiRT"])}
             end
 
-            if ~isempty(inputFileName)
-                fileName = options.FileName;
+            if data.MetaData.Mode == mag.meta.Mode.IALiRT
+                format = "%s %s (%.2f, %.2f)";
             else
-
-                if data.MetaData.Mode == mag.meta.Mode.IALiRT
-                    format = "%s %s (%.2f, %.2f)";
-                else
-                    format = "%s %s (%d, %d)";
-                end
-
-                fileName = fullfile(options.Location, compose(format, datestr(data.Primary.MetaData.Timestamp, "ddmmyy-hhMM"), ...
-                    data.Primary.MetaData.Mode, data.Primary.MetaData.DataFrequency, data.Secondary.MetaData.DataFrequency) + ".mat"); %#ok<DATST>
+                format = "%s %s (%d, %d)";
             end
+
+            fileName = fullfile(options.Location, compose(format, datestr(data.Primary.MetaData.Timestamp, "ddmmyy-hhMM"), ...
+                data.Primary.MetaData.Mode, data.Primary.MetaData.DataFrequency, data.Secondary.MetaData.DataFrequency) + ".mat"); %#ok<DATST>
         end
 
         function structData = convertToStruct(~, data)

@@ -14,10 +14,14 @@ function loadHKData(this)
         [~, ~, extension] = fileparts(this.HKPattern(hkp));
         importStrategy = this.dispatchExtension(extension, "HK");
 
-        this.Results.HK(end + 1) = mag.io.import( ...
+        hkData = mag.io.import( ...
             FileNames = this.HKFileNames{hkp}, ...
             Format = importStrategy, ...
             ProcessingSteps = this.HKProcessing);
+
+        if ~isempty(hkData)
+            this.Results.HK(end + 1) = hkData;
+        end
     end
 
     %% Amend Timerange

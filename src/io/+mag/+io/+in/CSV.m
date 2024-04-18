@@ -1,6 +1,10 @@
 classdef (Abstract) CSV < mag.io.in.Format
 % CSV Interface for CSV input format providers.
 
+    properties (Constant)
+        Extension = ".csv"
+    end
+
     methods
 
         function [rawData, fileName] = load(~, fileName)

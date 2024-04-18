@@ -40,8 +40,21 @@ classdef Word < mag.meta.log.Type
             rawData = rows2vars(rawData, VariableNamesSource = 1, VariableNamingRule = "preserve");
             rawData = renamevars(rawData, 2:15, ["Operator", "Controller", "Date", "Time", "Name", "BSW", "ASW", "GSE", "FOBModel", "FOBHarness", "FOBCan", "FIBModel", "FIBHarness", "FIBCan"]);
 
+            % Determine whether model is FM or EM.
+            if contains(this.FileName, "IMAP-MAG-TE-ICL-071")
+
+                model = "FM";
+                primaryFEE = "FEE3";
+                secondaryFEE = "FEE4";
+            elseif contains(this.FileName, "IMAP-OPS-TE-ICL-001")
+
+                model = "EM";
+                primaryFEE = "FEE1";
+                secondaryFEE = "FEE2";
+            end
+
             % Assign instrument meta data.
-            instrumentMetaData.Model = "FM";
+            instrumentMetaData.Model = model;
             instrumentMetaData.BSW = extractAfter(rawData.BSW, optionalPattern(lettersPattern()));
             instrumentMetaData.ASW = extractAfter(rawData.ASW, optionalPattern(lettersPattern()));
             instrumentMetaData.GSE = extractAfter(rawData.GSE, optionalPattern(lettersPattern()));
@@ -51,12 +64,12 @@ classdef Word < mag.meta.log.Type
 
             % Enhance primary and secondary meta data.
             primarySetup.Model = rawData.FOBModel;
-            primarySetup.FEE = "FEE3";
+            primarySetup.FEE = primaryFEE;
             primarySetup.Harness = rawData.FOBHarness;
             primarySetup.Can = rawData.FOBCan;
 
             secondarySetup.Model = rawData.FIBModel;
-            secondarySetup.FEE = "FEE4";
+            secondarySetup.FEE = secondaryFEE;
             secondarySetup.Harness = rawData.FIBHarness;
             secondarySetup.Can = rawData.FIBCan;
         end

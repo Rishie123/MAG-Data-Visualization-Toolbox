@@ -1,13 +1,18 @@
-function export(this, exportStrategy, options)
+function export(this, exportType, options)
 
     arguments
         this (1, 1) mag.IMAPAnalysis
-        exportStrategy (1, 1) mag.io.Type
+        exportType (1, 1) string {mustBeMember(exportType, ["MAT", "CDF"])}
         options.Location (1, 1) string {mustBeFolder} = "results"
         options.StartTime (1, 1) datetime = NaT(TimeZone = "UTC")
         options.EndTime (1, 1) datetime = NaT(TimeZone = "UTC")
     end
 
+    % Determine export classes.
+    scienceFormat = feval("mag.io.out.Science" + exportType);
+    hkFormat = feval("mag.io.out.HK" + exportType);
+
+    % Determine export window.
     if ismissing(options.StartTime)
         options.StartTime = datetime("-Inf", TimeZone = "UTC");
     end
@@ -17,7 +22,6 @@ function export(this, exportStrategy, options)
     end
 
     period = timerange(options.StartTime, options.EndTime, "closed");
-    extension = exportStrategy.Extension;
 
     % Export full science.
     if this.Results.HasScience
@@ -25,7 +29,7 @@ function export(this, exportStrategy, options)
         results = this.Results.copy();
         results.crop(period);
 
-        exportStrategy.export(results, Location = options.Location);
+        mag.io.export(results, Location = options.Location, Format = scienceFormat);
     end
 
     % Export each mode.
@@ -34,7 +38,7 @@ function export(this, exportStrategy, options)
     for m = modes
 
         m.crop(period);
-        exportStrategy.export(m, Location = options.Location);
+        mag.io.export(m, Location = options.Location, Format = scienceFormat);
     end
 
     % Export I-ALiRT.
@@ -43,21 +47,25 @@ function export(this, exportStrategy, options)
     if ~isempty(iALiRT)
 
         iALiRT.crop(period);
-        exportStrategy.export(iALiRT, Location = options.Location);
+        mag.io.export(iALiRT, Location = options.Location, Format = scienceFormat);
     end
 
     % Export range cycling.
     rangeCycling = this.getRangeCycling();
 
     if ~isempty(rangeCycling)
-        exportStrategy.export(rangeCycling, Location = options.Location, FileName = compose("%s Range Cycling", datestr(rangeCycling.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
+
+        mag.io.export(rangeCycling, Location = options.Location, Format = scienceFormat, ...
+            FileName = compose("%s Range Cycling", datestr(rangeCycling.MetaData.Timestamp, "ddmmyy-hhMM")) + scienceFormat.Extension); %#ok<DATST>
     end
 
     % Export ramp mode.
     rampMode = this.getRampMode();
 
     if ~isempty(rampMode)
-        exportStrategy.export(rampMode, Location = options.Location, FileName = compose("%s Ramp Mode", datestr(rampMode.MetaData.Timestamp, "ddmmyy-hhMM")) + extension); %#ok<DATST>
+
+        mag.io.export(rampMode, Location = options.Location, Format = scienceFormat, ...
+            FileName = compose("%s Ramp Mode", datestr(rampMode.MetaData.Timestamp, "ddmmyy-hhMM")) + scienceFormat.Extension); %#ok<DATST>
     end
 
     % Export HK data.
@@ -66,6 +74,6 @@ function export(this, exportStrategy, options)
         hk = this.Results.HK.copy();
         hk.crop(period);
 
-        exportStrategy.export(hk, Location = options.Location);
+        mag.io.export(hk, Location = options.Location, Format = hkFormat);
     end
 end

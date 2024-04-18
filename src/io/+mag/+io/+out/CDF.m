@@ -1,6 +1,10 @@
 classdef (Abstract) CDF < mag.io.out.Format
 % CDF Interface for CDF export format providers.
 
+    properties (Constant)
+        Extension = ".cdf"
+    end
+
     properties
         % SKELETONLOCATION Location of skeleton files.
         SkeletonLocation (1, 1) string {mustBeFolder}
@@ -10,10 +14,36 @@ classdef (Abstract) CDF < mag.io.out.Format
         Version (1, 1) string
     end
 
-    methods (Abstract)
+    methods
+
+        function exportData = convertToExportableFormat(~, data)
+            exportData = data;
+        end
+
+        function write(this, fileName, exportData)
+
+            assert(exist("spdfcdfinfo", "file"), "SPDF CDF toolbox needs to be installed.");
+
+            cdfInfo = spdfcdfinfo(this.getSkeletonFileName());
+
+            spdfcdfwrite(fileName, ...
+                this.getVariableList(cdfInfo, exportData), ...
+                'GlobalAttributes', this.getGlobalAttributes(cdfInfo), ...
+                'VariableAttributes', this.getVariableAttributes(cdfInfo, exportData), ...
+                'ConvertDatenumToTT2000', true, ...
+                'WriteMode', 'overwrite', ...
+                'Format', 'singlefile', ...
+                'RecordBound', this.getRecordBound(cdfInfo), ...
+                'CDFCompress', 'gzip.6',...
+                'Checksum', 'MD5', ...
+                'VarDatatypes', this.getVariableDataType(cdfInfo));
+        end
+    end
+
+    methods (Abstract, Access = protected)
 
         % GETSKELETONFILE Get skeleton file name containing meta data.
-        sensor = getSkeletonFileName(this)
+        fileName = getSkeletonFileName(this)
 
         % GETGLOBALATTRIBUTES Retrieve global attributes of CDF file.
         globalAttributes = getGlobalAttributes(this, cdfInfo)

@@ -11,7 +11,7 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
         % EVENTPATTERN Pattern of event files.
         EventPattern (1, :) string = fullfile("*", "Event", "*.html")
         % METADATAPATTERN Pattern of meta data files.
-        MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-061*.xlsx"), fullfile("IMAP-MAG-TE-ICL-071*.docx")]
+        MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-061*.xlsx"), fullfile("IMAP-MAG-TE-ICL-071*.docx"), fullfile("IMAP-OPS-TE-ICL-001*.docx")]
         % SCIENCEPATTERN Pattern of science data files.
         SciencePattern (1, :) string = fullfile("MAGScience-*-(*)-*.csv")
         % IALIRTPATTERN Pattern of I-ALiRT data files.
@@ -23,7 +23,6 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
             fullfile("*", "Export", "idle_export_proc.*.csv")]
         % PERFILEPROCESSING Steps needed to process single files of data.
         PerFileProcessing (1, :) mag.process.Step = [ ...
-            mag.process.Missing(Variables = ["x", "y", "z"]), ...
             mag.process.AllZero(Variables = ["coarse", "fine", "x", "y", "z"]), ...
             mag.process.SignedInteger(CompressionVariable = "compression", Variables = ["x", "y", "z"]), ...
             mag.process.Separate(DiscriminationVariable = "t", QualityVariable = "quality", Variables = ["x", "y", "z"])]
@@ -507,9 +506,9 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
             end
 
             switch extension
-                case ".csv"
+                case mag.io.in.CSV.Extension
                     format = "CSV";
-                case ".cdf"
+                case mag.io.in.CDF.Extension
                     format = "CDF";
                 otherwise
                     error("Unsupported extension ""%s"" for science data import.", extension);

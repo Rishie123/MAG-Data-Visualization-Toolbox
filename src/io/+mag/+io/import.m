@@ -27,7 +27,9 @@ function data = import(options)
     end
 
     % Combine results by type.
-    if isa(data, "mag.Science")
+    if isempty(data)
+        % do nothing
+    elseif isa(data, "mag.Science")
         data = combineScience(data);
     elseif isa(data, "mag.HK")
         data = combineHK(data);
@@ -56,12 +58,17 @@ function combinedData = combineScience(data)
     for s = sensors
 
         locSelection = [metaData.Sensor] == s;
+
         selectedData = data(locSelection);
+        selectedMetaData = [selectedData.MetaData];
 
         td = vertcat(selectedData.Data);
 
-        md = selectedData(1).MetaData.copy();
-        md.set(Mode = "Hybrid", DataFrequency = NaN(), PacketFrequency = NaN(), Timestamp = min([metaData(locSelection).Timestamp]));
+        md = selectedMetaData(1).copy();
+        md.set(Mode = selectedMetaData.getDisplay("Mode", "Hybrid"), ...
+            DataFrequency = selectedMetaData.getDisplay("DataFrequency"), ...
+            PacketFrequency = selectedMetaData.getDisplay("PacketFrequency"), ...
+            Timestamp = min([selectedMetaData.Timestamp]));
 
         combinedData(end + 1) = mag.Science(td, md); %#ok<AGROW>
     end
