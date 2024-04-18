@@ -27,6 +27,10 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         HasHK (1, 1) logical
         % TIMERANGE Time range covered by science data.
         TimeRange (1, 2) datetime
+        % OUTBOARD Outboard science data (FOB, OBS, MAGo).
+        Outboard mag.Science {mustBeScalarOrEmpty}
+        % INBOARD Inboard science data (FIB, IBS, MAGi).
+        Inboard mag.Science {mustBeScalarOrEmpty}
         % PRIMARY Primary science data.
         Primary mag.Science {mustBeScalarOrEmpty}
         % SECONDARY Secondary science data.
@@ -75,6 +79,14 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             else
                 timeRange = [NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC")];
             end
+        end
+
+        function outboard = get.Outboard(this)
+            outboard = this.Science.select("Outboard");
+        end
+
+        function inboard = get.Inboard(this)
+            inboard = this.Science.select("Inboard");
         end
 
         function primary = get.Primary(this)

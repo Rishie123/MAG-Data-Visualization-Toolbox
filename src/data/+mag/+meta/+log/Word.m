@@ -38,19 +38,28 @@ classdef Word < mag.meta.log.Type
             end
 
             rawData = rows2vars(rawData, VariableNamesSource = 1, VariableNamingRule = "preserve");
-            rawData = renamevars(rawData, 2:15, ["Operator", "Controller", "Date", "Time", "Name", "BSW", "ASW", "GSE", "FOBModel", "FOBHarness", "FOBCan", "FIBModel", "FIBHarness", "FIBCan"]);
 
-            % Determine whether model is FM or EM.
-            if contains(this.FileName, "IMAP-MAG-TE-ICL-071")
+            % Check if document is for EM.
+            if (width(rawData) == 14) && contains(this.FileName, "IMAP-OPS-TE-ICL-001")
 
-                model = "FM";
-                primaryFEE = "FEE3";
-                secondaryFEE = "FEE4";
-            elseif contains(this.FileName, "IMAP-OPS-TE-ICL-001")
+                rawData = renamevars(rawData, 2:14, ["Operator", "Date", "Time", "Name", "BSW", "ASW", "GSE", "FOBModel", "FOBHarness", "FOBCan", "FIBModel", "FIBHarness", "FIBCan"]);
 
                 model = "EM";
                 primaryFEE = "FEE1";
                 secondaryFEE = "FEE2";
+
+            % Check if it is for FM.
+            elseif (width(rawData) == 15) && contains(this.FileName, "IMAP-MAG-TE-ICL-071")
+
+                rawData = renamevars(rawData, 2:15, ["Operator", "Controller", "Date", "Time", "Name", "BSW", "ASW", "GSE", "FOBModel", "FOBHarness", "FOBCan", "FIBModel", "FIBHarness", "FIBCan"]);
+
+                model = "FM";
+                primaryFEE = "FEE3";
+                secondaryFEE = "FEE4";
+
+            % Otherwise, error.
+            else
+                error("Unrecognized table format.");
             end
 
             % Assign instrument meta data.

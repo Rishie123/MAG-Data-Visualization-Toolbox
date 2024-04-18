@@ -6,8 +6,15 @@
 
 # Software
 
+## IO
+
 - Refactor import/export of science and HK data
 - Add support for CDF science import/export
-- Add support in `mag.meta.log.Word` for EM documents
 - Remove support for DAT export
+
+## Other
+
+- Add `Science` property to `mag.Instrument` and `mag.IALiRT` as back-end for `Primary` and `Secondary` properties
+- Add `Outboard` and `Inboard` property to `mag.Instrument`
+- Add support in `mag.meta.log.Word` for EM documents
 - Move description of sensor setup to `mag.meta.Setup`

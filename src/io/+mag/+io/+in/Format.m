@@ -1,5 +1,5 @@
 classdef (Abstract) Format < matlab.mixin.Heterogeneous & mag.mixin.SetGet
-% IFORMAT Interface for data format providers for import.
+% FORMAT Interface for data format providers for import.
 
     properties (Abstract, Constant)
         % EXTENSION Extension supported for file format.

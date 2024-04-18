@@ -2,18 +2,20 @@ function export(data, options)
 % EXPORT Export data to specified files with specified format.
 
     arguments
-        data (1, :) mag.TimeSeries
+        data (1, :) {mustBeA(data, ["mag.Instrument", "mag.IALiRT", "mag.HK"])}
         options.Location (1, 1) string {mustBeFolder}
-        options.FileName string {mustBeScalarOrEmpty}
+        options.FileName string {mustBeScalarOrEmpty} = string.empty()
         options.Format (1, 1) mag.io.out.Format
     end
 
     if isempty(options.FileName)
-        fileName = fullfile(options.Location, options.Format.getExportFileName(data));
+        fileName = options.Format.getExportFileName(data);
     else
-        fileName = fullfile(options.Location, options.FileName);
+        fileName = options.FileName;
     end
 
-    exportData = options.Format.convertToExportableFormat(data);
+    fileName = fullfile(options.Location, fileName);
+    exportData = options.Format.convertToExportFormat(data);
+
     options.Format.write(fileName, exportData);
 end

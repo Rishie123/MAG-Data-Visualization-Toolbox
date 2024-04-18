@@ -14,28 +14,28 @@ classdef HKMAT < mag.io.out.MAT
             fileName = compose("%s HK", datestr(min([metaData.Timestamp]), "ddmmyy-hhMM")) + ".mat"; %#ok<DATST>
         end
 
-        function structData = convertToStruct(this, data)
+        function exportData = convertToExportFormat(this, data)
 
             arguments
                 this
                 data (1, :) mag.HK
             end
 
-            structData = struct();
+            exportData = struct();
 
-            structData = this.addHKData(structData, data.getHKType("PW"), "PWR");
-            structData = this.addHKData(structData, data.getHKType("SID15"), "SID15");
-            structData = this.addHKData(structData, data.getHKType("STATUS"), "STATUS");
-            structData = this.addHKData(structData, data.getHKType("PROCSTAT"), "PROCSTAT");
+            exportData = this.addHKData(exportData, data.getHKType("PW"), "PWR");
+            exportData = this.addHKData(exportData, data.getHKType("SID15"), "SID15");
+            exportData = this.addHKData(exportData, data.getHKType("STATUS"), "STATUS");
+            exportData = this.addHKData(exportData, data.getHKType("PROCSTAT"), "PROCSTAT");
         end
     end
 
     methods (Static, Access = private)
 
-        function exportedData = addHKData(exportedData, data, matTypeName)
+        function exportData = addHKData(exportData, data, matTypeName)
 
             arguments
-                exportedData (1, 1) struct
+                exportData (1, 1) struct
                 data mag.HK {mustBeScalarOrEmpty}
                 matTypeName (1, 1) string
             end
@@ -44,12 +44,12 @@ classdef HKMAT < mag.io.out.MAT
                 return;
             end
 
-            exportedData.HK.(matTypeName).Time = data.Time;
+            exportData.HK.(matTypeName).Time = data.Time;
 
             for p = string(data.Data.Properties.VariableNames)
 
                 if (~isequal(p, "t") && ~isequal(p, "timestamp"))
-                    exportedData.HK.(matTypeName).(p) = data.Data.(p);
+                    exportData.HK.(matTypeName).(p) = data.Data.(p);
                 end
             end
         end

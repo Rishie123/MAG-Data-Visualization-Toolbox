@@ -11,7 +11,8 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
         % EVENTPATTERN Pattern of event files.
         EventPattern (1, :) string = fullfile("*", "Event", "*.html")
         % METADATAPATTERN Pattern of meta data files.
-        MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-061*.xlsx"), fullfile("IMAP-MAG-TE-ICL-071*.docx"), fullfile("IMAP-OPS-TE-ICL-001*.docx")]
+        MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-058*.xlsx"), fullfile("IMAP-MAG-TE-ICL-061*.xlsx"), ...
+            fullfile("IMAP-MAG-TE-ICL-071*.docx"), fullfile("IMAP-OPS-TE-ICL-001*.docx")]
         % SCIENCEPATTERN Pattern of science data files.
         SciencePattern (1, :) string = fullfile("MAGScience-*-(*)-*.csv")
         % IALIRTPATTERN Pattern of I-ALiRT data files.
@@ -323,9 +324,7 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
             end
 
             rampMode = this.Results.copy();
-
-            rampMode.Primary = this.PrimaryRamp;
-            rampMode.Secondary = this.SecondaryRamp;
+            rampMode.Science = [this.PrimaryRamp, this.SecondaryRamp];
 
             if rampMode.HasScience
                 rampMode.cropToMatch();

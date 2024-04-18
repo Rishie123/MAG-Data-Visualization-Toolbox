@@ -16,7 +16,7 @@ classdef (Abstract) CDF < mag.io.out.Format
 
     methods
 
-        function exportData = convertToExportableFormat(~, data)
+        function exportData = convertToExportFormat(~, data)
             exportData = data;
         end
 

@@ -49,7 +49,7 @@ classdef (Abstract, Hidden) Science < mag.graphics.view.View
             if isempty(data.MetaData.Setup) || isempty(data.MetaData.Setup.FEE) || isempty(data.MetaData.Setup.Model) || isempty(data.MetaData.Setup.Can)
                 value = data.MetaData.getDisplay("Sensor");
             else
-                value = compose("%s (%s - %s - %s)", data.MetaData.Setup.Sensor, data.MetaData.Setup.FEE, data.MetaData.Setup.Model, data.MetaData.Setup.Can);
+                value = compose("%s (%s - %s - %s)", data.MetaData.Sensor, data.MetaData.Setup.FEE, data.MetaData.Setup.Model, data.MetaData.Setup.Can);
             end
         end
     end

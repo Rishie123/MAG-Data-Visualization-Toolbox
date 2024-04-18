@@ -16,7 +16,10 @@ function data = import(options)
     for i = 1:numel(options.FileNames)
 
         [rawData, details] = options.Format.load(options.FileNames(i));
-        data = [data, options.Format.process(rawData, details)]; %#ok<AGROW>
+
+        if ~isempty(rawData)
+            data = [data, options.Format.process(rawData, details)]; %#ok<AGROW>
+        end
     end
 
     for ps = options.ProcessingSteps

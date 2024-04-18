@@ -333,16 +333,25 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             name = supportedSensors(locSelected);
         end
 
-        function science = select(this, primaryOrSecondary)
+        function science = select(this, selected)
         % SELECT Return primary or secondary sensor.
 
             arguments (Input)
                 this mag.Science {mustBeNonempty}
-                primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])} = "Primary"
+                selected (1, 1) string {mustBeMember(selected, ["Outboard", "Inboard", "Primary", "Secondary"])}
+            end
+
+            arguments (Output)
+                science mag.Science {mustBeScalarOrEmpty}
             end
 
             metaData = [this.MetaData];
-            locSelected = [metaData.Primary] == isequal(primaryOrSecondary, "Primary");
+
+            if contains(selected, "board")
+                locSelected = [metaData.Sensor] == ("F" + extract(selected, regexpPattern("O|I")) + "B");
+            else
+                locSelected = [metaData.Primary] == isequal(selected, "Primary");
+            end
 
             science = this(locSelected);
         end
