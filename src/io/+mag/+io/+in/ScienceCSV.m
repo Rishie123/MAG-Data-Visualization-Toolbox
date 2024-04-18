@@ -111,17 +111,4 @@ classdef ScienceCSV < mag.io.in.CSV
             data = mag.Science(table2timetable(rawData, RowTimes = "t"), metaData);
         end
     end
-
-    methods (Static, Access = private)
-
-        function assignSensor(property, output, data)
-        % ASSIGNSENSOR Assign value of sensor to output.
-
-            if isempty(output.(property))
-                output.(property).Science(end + 1) = mag.Science(data.(property).Data, data.(property).MetaData);
-            else
-                output.(property).Data = vertcat(output.(property).Data, data.Data);
-            end
-        end
-    end
 end
