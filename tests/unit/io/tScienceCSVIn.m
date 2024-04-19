@@ -6,14 +6,6 @@ classdef tScienceCSVIn < MAGIOTestCase
         InvalidFileName = {"super_data20240410-15h26.csv"}
     end
 
-    methods (TestClassSetup)
-
-        % Check that SPDF CDF Toolbox is installed.
-        function checkSPDFCDFToolbox(testCase)
-            testCase.assumeTrue(exist("spdfcdfinfo", "file") == 2, "SPDF CDF Toolbox not installed. Test skipped.");
-        end
-    end
-
     methods (Static, TestParameterDefinition)
 
         function ValidFileDetails = initializeValidFileDetails()
