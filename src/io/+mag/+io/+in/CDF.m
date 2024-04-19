@@ -9,7 +9,7 @@ classdef (Abstract) CDF < mag.io.in.Format
 
         function [rawData, cdfInfo] = load(~, fileName)
 
-            assert(exist("spdfcdfinfo", "file"), "SPDF CDF toolbox needs to be installed.");
+            assert(exist("spdfcdfinfo", "file"), "SPDF CDF Toolbox needs to be installed.");
 
             cdfInfo = spdfcdfinfo(fileName);
             rawData = spdfcdfread(fileName, 'CDFEpochtoString', true);

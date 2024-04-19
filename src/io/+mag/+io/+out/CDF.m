@@ -22,7 +22,7 @@ classdef (Abstract) CDF < mag.io.out.Format
 
         function write(this, fileName, exportData)
 
-            assert(exist("spdfcdfinfo", "file"), "SPDF CDF toolbox needs to be installed.");
+            assert(exist("spdfcdfinfo", "file"), "SPDF CDF Toolbox needs to be installed.");
 
             cdfInfo = spdfcdfinfo(this.getSkeletonFileName());
 
