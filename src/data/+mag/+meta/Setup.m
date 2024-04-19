@@ -1,4 +1,4 @@
-classdef Setup < mag.mixin.SetGet
+classdef Setup < mag.mixin.SetGet & mag.mixin.Struct
 % SETUP Description of MAG sensor setup.
 
     properties

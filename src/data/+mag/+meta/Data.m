@@ -1,4 +1,4 @@
-classdef (Abstract) Data < matlab.mixin.Copyable & matlab.mixin.Heterogeneous & mag.mixin.SetGet
+classdef (Abstract) Data < matlab.mixin.Copyable & matlab.mixin.Heterogeneous & mag.mixin.SetGet & mag.mixin.Struct
 % DATA Description of MAG telemetry data.
 %
 % Includes description of which sensor, mode and frequency was used, and
@@ -19,31 +19,6 @@ classdef (Abstract) Data < matlab.mixin.Copyable & matlab.mixin.Heterogeneous & 
     end
 
     methods (Sealed)
-
-        function sortedThis = sort(this, varargin)
-        % SORT Override default sorting algorithm.
-
-            [~, idxSort] = sort([this.Timestamp], varargin{:});
-            sortedThis = this(idxSort);
-        end
-
-        function structThis = struct(this)
-        % STRUCT Convert class to struct containing only public properties.
-
-            metaClasses = metaclass(this);
-
-            for mc = metaClasses
-
-                for mp = mc.PropertyList'
-
-                    if ~mp.Constant && isequal(mp.GetAccess, "public") && isequal(mp.SetAccess, "public")
-                        structThis.(mp.Name) = this.(mp.Name);
-                    end
-                end
-
-                metaClasses = [metaClasses, mc.SuperclassList]; %#ok<AGROW>
-            end
-        end
 
         function value = getDisplay(this, property, alternative)
         % GETDISPLAY Get property value for display purposes. If object is
@@ -76,6 +51,16 @@ classdef (Abstract) Data < matlab.mixin.Copyable & matlab.mixin.Heterogeneous & 
                     value = alternative;
                 end
             end
+        end
+    end
+
+    methods (Hidden, Sealed)
+
+        function sortedThis = sort(this, varargin)
+        % SORT Override default sorting algorithm.
+
+            [~, idxSort] = sort([this.Timestamp], varargin{:});
+            sortedThis = this(idxSort);
         end
     end
 end
