@@ -19,3 +19,4 @@
 - Add support in `mag.meta.log.Word` for EM documents
 - Add `mag.mixin.Struct` to enable support to convert to `struct` for meta data classes
 - Move description of sensor setup to `mag.meta.Setup`
+- Add tests for IO classes

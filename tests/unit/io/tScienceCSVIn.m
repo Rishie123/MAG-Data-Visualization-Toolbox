@@ -89,6 +89,17 @@ classdef tScienceCSVIn < MAGIOTestCase
             testCase.assertClass(fileName, "string", "File name should be a struct.");
         end
 
+        % Test that loading empty CSV file returns empty table.
+        function load_empty(testCase)
+
+            % Set up.
+            fileName = fullfile(testCase.TestDataLocation, "empty.csv");
+
+            % Exercise and verify.
+            csvFormat = mag.io.in.ScienceCSV();
+            testCase.verifyEmpty(csvFormat.load(fileName), "Empty file should result in empty table.");
+        end
+
         % Test that processing valid CSV files provides correct
         % information.
         function process_valid(testCase, ValidFileDetails)
