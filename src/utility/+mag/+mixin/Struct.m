@@ -23,10 +23,15 @@ classdef (Abstract, HandleCompatible) Struct
 
                 for mp = metaProperties'
 
-                    if isa(this.(mp.Name), "mag.mixin.Struct")
-                        structThis.(mp.Name) = struct(this.(mp.Name));
+                    n = mp.Name;
+                    v = this.(n);
+
+                    if isa(v, "mag.mixin.Struct")
+                        structThis.(n) = struct(v);
+                    elseif isenum(v)
+                        structThis.(n) = string(v);
                     else
-                        structThis.(mp.Name) = this.(mp.Name);
+                        structThis.(n) = v;
                     end
                 end
 

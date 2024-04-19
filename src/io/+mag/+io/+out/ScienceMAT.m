@@ -20,10 +20,10 @@ classdef ScienceMAT < mag.io.out.MAT
                 data.Primary.MetaData.Mode, data.Primary.MetaData.DataFrequency, data.Secondary.MetaData.DataFrequency) + this.Extension; %#ok<DATST>
         end
 
-        function exportData = convertToExportFormat(~, data)
+        function exportData = convertToExportFormat(this, data)
 
             arguments
-                ~
+                this (1, 1) mag.io.out.ScienceMAT
                 data (1, 1) {mustBeA(data, ["mag.Instrument", "mag.IALiRT"])}
             end
 
@@ -33,7 +33,7 @@ classdef ScienceMAT < mag.io.out.MAT
             exportData.B.P.Sequence = data.Primary.Sequence;
             exportData.B.P.Compression = data.Primary.Compression;
             exportData.B.P.Quality = categorical(string(data.Primary.Quality));
-            exportData.B.P.MetaData = struct(data.Primary.MetaData);
+            exportData.B.P.MetaData = this.convertToStruct(data.Primary.MetaData);
 
             exportData.B.S.Time = data.Secondary.Time;
             exportData.B.S.Data = data.Secondary.XYZ;
@@ -41,7 +41,24 @@ classdef ScienceMAT < mag.io.out.MAT
             exportData.B.S.Sequence = data.Secondary.Sequence;
             exportData.B.S.Compression = data.Secondary.Compression;
             exportData.B.S.Quality = categorical(string(data.Secondary.Quality));
-            exportData.B.S.MetaData = struct(data.Secondary.MetaData);
+            exportData.B.S.MetaData = this.convertToStruct(data.Secondary.MetaData);
+        end
+    end
+
+    methods (Static, Access = private)
+
+        function structMetaData = convertToStruct(metaData)
+        % CONVERTTOSTRUCT Convert meta data to struct, and maintain
+        % previous data format.
+
+            structMetaData = struct(metaData);
+
+            setupStruct = structMetaData.Setup;
+            structMetaData = rmfield(structMetaData, "Setup");
+
+            for f = fieldnames(setupStruct)'
+                structMetaData.(f{:}) = setupStruct.(f{:});
+            end
         end
     end
 end
