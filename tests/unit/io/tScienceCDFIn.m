@@ -1,9 +1,5 @@
-classdef tScienceCDFIn < matlab.unittest.TestCase
+classdef tScienceCDFIn < MAGIOTestCase
 % TSCIENCECDFIN Unit tests for "mag.io.in.ScienceCDF" class.
-
-    properties (Constant, Access = private)
-        TestDataLocation = fullfile(fileparts(mfilename("fullpath")), "data")
-    end
 
     properties (TestParameter)
         ValidFileDetails

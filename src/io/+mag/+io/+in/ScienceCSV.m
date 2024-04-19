@@ -24,23 +24,26 @@ classdef ScienceCSV < mag.io.in.CSV
             rawSecondary = rawData(:, regexpPattern(".*(sec|sequence).*"));
 
             % Extract file meta data.
-            [mode, primaryFrequency, secondaryFrequency, packetFrequency] = this.extractFileMetaData(fileName);
+            [mode, primaryFrequency, secondaryFrequency, packetFrequency, timeStamp] = this.extractFileMetaData(fileName);
 
             % Process science data.
-            data = [this.processScience(rawPrimary, "pri", Sensor = mag.meta.Sensor.FOB, Mode = mode, DataFrequency = primaryFrequency, PacketFrequency = packetFrequency), ...
-                this.processScience(rawSecondary, "sec", Sensor = mag.meta.Sensor.FIB, Mode = mode, DataFrequency = secondaryFrequency, PacketFrequency = packetFrequency)];
+            data = [this.processScience(rawPrimary, "pri", Sensor = mag.meta.Sensor.FOB, Mode = mode, DataFrequency = primaryFrequency, PacketFrequency = packetFrequency, Timestamp = timeStamp), ...
+                this.processScience(rawSecondary, "sec", Sensor = mag.meta.Sensor.FIB, Mode = mode, DataFrequency = secondaryFrequency, PacketFrequency = packetFrequency, Timestamp = timeStamp)];
         end
     end
 
     methods (Access = private)
 
-        function [mode, primaryFrequency, secondaryFrequency, packetFrequency] = extractFileMetaData(this, fileName)
+        function [mode, primaryFrequency, secondaryFrequency, packetFrequency, timeStamp] = extractFileMetaData(this, fileName)
         % EXTRACTMETADATA Extract meta data information from file name.
 
             rawData = regexp(fileName, this.FileNamePattern, "names");
 
             % If no meta data was found, assume default values.
             if isempty(rawData)
+
+                timeStamp = regexp(fileName, "(?<date>\d+)-(?<time>\w+)", "names");
+                timeStamp = datetime(timeStamp.date + timeStamp.time, InputFormat = "uuuuMMddHH'h'mm", TimeZone = mag.time.Constant.TimeZone, Format = mag.time.Constant.Format);
 
                 if contains(fileName, "ialirt", IgnoreCase = true)
 
@@ -72,6 +75,7 @@ classdef ScienceCSV < mag.io.in.CSV
                 primaryFrequency = rawData.primaryFrequency;
                 secondaryFrequency = rawData.secondaryFrequency;
                 packetFrequency = rawData.packetFrequency;
+                timeStamp = datetime(rawData.date + rawData.time, InputFormat = "uuuuMMddHH'h'mm", TimeZone = mag.time.Constant.TimeZone, Format = mag.time.Constant.Format);
             end
         end
 
