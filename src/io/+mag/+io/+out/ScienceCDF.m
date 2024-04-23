@@ -1,7 +1,16 @@
 classdef ScienceCDF < mag.io.out.CDF
 % SCIENCECDF Format science data for CDF export.
 
-    methods (Access = protected)
+    methods
+
+        function this = ScienceCDF(options)
+
+            arguments
+                options.?mag.io.out.ScienceCDF
+            end
+
+            this.assignProperties(options)
+        end
 
         function fileName = getExportFileName(this, data)
 
@@ -9,23 +18,26 @@ classdef ScienceCDF < mag.io.out.CDF
                 lower(this.Level), ...
                 lower(string(data.MetaData.Mode)), ...
                 lower(extract(string(data.MetaData.Sensor), regexpPattern("[O|I]"))), ...
-                datenum(data.MetaData.Timestamp, "yyyymmdd"), ...
-                lower(this.Version)); %#ok<DATNM>
+                datestr(data.MetaData.Timestamp, "yyyymmdd"), ...
+                lower(this.Version)); %#ok<DATST>
         end
+    end
+
+    methods (Access = protected)
 
         function fileName = getSkeletonFileName(this)
-            fileName = fullfile(this.SkeletonLocation, sprintf("imap_mag_%s_skeletontable_%s.cdf", this.Level, this.Version));
+            fileName = fullfile(this.SkeletonLocation, sprintf("imap_mag_%s_skeletontable_%s.cdf", lower(this.Level), lower(this.Version)));
         end
 
-        function globalAttributes = getGlobalAttributes(this, cdfInfo)
+        function globalAttributes = getGlobalAttributes(this, cdfInfo, data)
 
             globalAttributes = cdfInfo.GlobalAttributes;
 
-            globalAttributes.Logical_source = sprintf('imap_L1b_mag%s', lower(data.MetaData.Mode{:}(1)));
-            globalAttributes.Logical_file_id = char(this.ExportFileName);
+            globalAttributes.Logical_source = sprintf('imap_L1b_mag%s', lower(data.MetaData.Mode(1)));
+            globalAttributes.Logical_file_id = cdfInfo.Filename;
             globalAttributes.Logical_source_description = sprintf('IMAP Magnetometer Level %s %s Mode Data in %s coordinates.', this.Level, data.MetaData.Mode, "S/C");
             globalAttributes.Generation_date = char(datetime("now", Format = "yyyy-MM-dd'T'HH:mm:SS"));
-            globalAttributes.Software_version = char(metaData.ASW);
+            globalAttributes.Software_version = char.empty();
 
             globalAttributes.Distribution = 'Internal to Imperial College London';
             globalAttributes.Rules_of_use = 'Not for science use or publication';
@@ -62,7 +74,7 @@ classdef ScienceCDF < mag.io.out.CDF
             variableList{8} = data.XYZ;
 
             % Add labels.
-            fileName = this.getSkeletonFileName(data);
+            fileName = this.getSkeletonFileName();
             variableAttributes = this.getVariableAttributes(cdfInfo, data);
 
             variableList{10} = spdfcdfread(fileName, 'Variable', variableAttributes.FIELDNAM{5, 1});

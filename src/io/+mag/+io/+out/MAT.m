@@ -20,7 +20,7 @@ classdef (Abstract) MAT < mag.io.out.Format
                 exportData (1, 1) struct
             end
 
-            if this.Append
+            if this.Append && isfile(fileName)
                 extraOptions = {"-append"};
             else
                 extraOptions = {};

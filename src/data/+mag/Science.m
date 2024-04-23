@@ -84,7 +84,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function range = get.Range(this)
-            range = this.Data.(this.Settings.Range);
+            range = uint8(this.Data.(this.Settings.Range));
         end
 
         function sequence = get.Sequence(this)

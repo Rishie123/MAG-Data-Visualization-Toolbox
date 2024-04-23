@@ -7,11 +7,11 @@ classdef (Abstract) CDF < mag.io.out.Format
 
     properties
         % SKELETONLOCATION Location of skeleton files.
-        SkeletonLocation (1, 1) string {mustBeFolder}
+        SkeletonLocation string {mustBeScalarOrEmpty, mustBeFolder}
         % LEVEL Data processing level.
-        Level (1, 1) string {mag.validator.mustMatchRegex(Level, "L[0-2]\w?")}
+        Level (1, 1) string {mag.validator.mustMatchRegex(Level, "L[0-2]\w?")} = "L1a"
         % VERSION CDF skeleton version.
-        Version (1, 1) string
+        Version (1, 1) string = "V001"
     end
 
     methods
@@ -26,9 +26,9 @@ classdef (Abstract) CDF < mag.io.out.Format
 
             cdfInfo = spdfcdfinfo(this.getSkeletonFileName());
 
-            spdfcdfwrite(fileName, ...
+            spdfcdfwrite(char(fileName), ...
                 this.getVariableList(cdfInfo, exportData), ...
-                'GlobalAttributes', this.getGlobalAttributes(cdfInfo), ...
+                'GlobalAttributes', this.getGlobalAttributes(cdfInfo, exportData), ...
                 'VariableAttributes', this.getVariableAttributes(cdfInfo, exportData), ...
                 'ConvertDatenumToTT2000', true, ...
                 'WriteMode', 'overwrite', ...
@@ -46,7 +46,7 @@ classdef (Abstract) CDF < mag.io.out.Format
         fileName = getSkeletonFileName(this)
 
         % GETGLOBALATTRIBUTES Retrieve global attributes of CDF file.
-        globalAttributes = getGlobalAttributes(this, cdfInfo)
+        globalAttributes = getGlobalAttributes(this, cdfInfo, data)
 
         % GETVARIABLEATTRIBUTES Retrieve variable attributes of CDF file.
         variableAttributes = getVariableAttributes(this, cdfInfo, data)

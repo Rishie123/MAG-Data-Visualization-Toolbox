@@ -1,18 +1,6 @@
 classdef tExport < MAGIOTestCase & matlab.mock.TestCase
 % TEXPORT Unit tests for "mag.io.export" function.
 
-    properties
-        TemporaryDirectory matlab.unittest.fixtures.TemporaryFolderFixture {mustBeScalarOrEmpty}
-    end
-
-    methods (TestMethodSetup)
-
-        % Create temporary directory for test.
-        function createTemporaryDirectory(testCase)
-            testCase.TemporaryDirectory = testCase.applyFixture(matlab.unittest.fixtures.TemporaryFolderFixture());
-        end
-    end
-
     methods (Test)
 
         % Test that "export" function works as expected when no file name
@@ -21,7 +9,7 @@ classdef tExport < MAGIOTestCase & matlab.mock.TestCase
 
             % Set up.
             data = mag.Instrument();
-            location = testCase.TemporaryDirectory.Folder;
+            location = testCase.WorkingDirectory.Folder;
 
             fileName = "myExportFileName";
             exportData = table.empty();
@@ -44,7 +32,7 @@ classdef tExport < MAGIOTestCase & matlab.mock.TestCase
 
             % Set up.
             data = mag.Instrument();
-            location = testCase.TemporaryDirectory.Folder;
+            location = testCase.WorkingDirectory.Folder;
 
             fileName = "myExportFileName";
             exportData = table.empty();

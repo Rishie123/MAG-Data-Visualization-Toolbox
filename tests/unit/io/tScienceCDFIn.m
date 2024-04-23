@@ -57,7 +57,7 @@ classdef tScienceCDFIn < MAGIOTestCase
             fileName = fullfile(testCase.TestDataLocation, ValidFileDetails.FileName);
 
             % Exercise.
-            cdfFormat = mag.io.in.ScienceCDF();
+            cdfFormat = mag.io.in.ScienceCDF(Timestamp = "epoch", Field = "vectors", Range = "vectors");
 
             [rawData, cdfInfo] = cdfFormat.load(fileName);
             data = cdfFormat.process(rawData, cdfInfo);
