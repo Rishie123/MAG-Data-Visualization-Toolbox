@@ -1,4 +1,4 @@
-classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & mag.mixin.SetGet
+classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & mag.mixin.SetGet & mag.mixin.Croppable
 % INSTRUMENT Class containing MAG instrument data.
 
     properties
@@ -132,8 +132,8 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
 
             arguments
                 this (1, 1) mag.Instrument
-                primaryFilter (1, 1) {mustBeA(primaryFilter, ["duration", "timerange", "withtol"])}
-                secondaryFilter (1, 1) {mustBeA(secondaryFilter, ["duration", "timerange", "withtol"])} = primaryFilter
+                primaryFilter
+                secondaryFilter = primaryFilter
             end
 
             % Filter science.

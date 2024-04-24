@@ -111,20 +111,10 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             arguments
                 this (1, 1) mag.Science
-                timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
+                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
             end
 
-            if isa(timeFilter, "duration")
-
-                if timeFilter >= 0
-                    timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
-                else
-                    timePeriod = timerange(this.Time(1), this.Time(end) + timeFilter, "closed");
-                end
-            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
-                timePeriod = timeFilter;
-            end
-
+            timePeriod = this.convertToTimeSubscript(timeFilter, this.Time);
             this.Data = this.Data(timePeriod, :);
 
             if ~isempty(this.Data.Properties.Events)
