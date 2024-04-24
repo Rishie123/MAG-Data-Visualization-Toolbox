@@ -1,6 +1,11 @@
 classdef ScienceCDF < mag.io.out.CDF
 % SCIENCECDF Format science data for CDF export.
 
+    properties
+        % CDFSETTINGS CDF file options.
+        CDFSettings (1, 1) mag.io.CDFSettings
+    end
+
     methods
 
         function this = ScienceCDF(options)
@@ -43,12 +48,12 @@ classdef ScienceCDF < mag.io.out.CDF
             globalAttributes.Rules_of_use = 'Not for science use or publication';
         end
 
-        function variableAttributes = getVariableAttributes(~, cdfInfo, data)
+        function variableAttributes = getVariableAttributes(this, cdfInfo, data)
 
             variableAttributes = cdfInfo.VariableAttributes;
 
-            variableAttributes.SCALEMAX{1, 2} = spdfdatenumtott2000(datenum(data.Time(1))); %#ok<DATNM>
-            variableAttributes.SCALEMIN{1, 2} = spdfdatenumtott2000(datenum(data.Time(end))); %#ok<DATNM>
+            variableAttributes.SCALEMAX{1, 2} = this.convertToCDFTime(cdfInfo, data.Time(1));
+            variableAttributes.SCALEMIN{1, 2} = this.convertToCDFTime(cdfInfo, data.Time(end));
         end
 
         function variableDataTypes = getVariableDataType(~, cdfInfo)
@@ -68,7 +73,7 @@ classdef ScienceCDF < mag.io.out.CDF
             variableList(1:2:end) = cdfInfo.Variables(:, 1);
 
             % Add time.
-            variableList{2} = datenum(data.Time); %#ok<DATNM>
+            variableList{2} = this.convertToCDFTime(cdfInfo, data.Time);
 
             % Add magnetic field.
             variableList{8} = data.XYZ;
@@ -97,6 +102,26 @@ classdef ScienceCDF < mag.io.out.CDF
             variableList{24} = zeros(numRows, 1, "uint8");
             variableList{26} = zeros(numRows, 1, "uint8");
             variableList{28} = zeros(numRows, 1, "uint16");
+        end
+    end
+
+    methods (Access = private)
+
+        function cdfTime = convertToCDFTime(this, cdfInfo, time)
+        % CONVERTTOCDFTIME Convert MATLAB datetime to CDF time
+        % representation, as specified in CDF meta data.
+
+            variableNames = cdfInfo.Variables(:, 1);
+            timeType = cdfInfo.Variables{matches(variableNames, this.CDFSettings.Timestamp), 4};
+
+            switch timeType
+                case "tt2000"
+
+                    time.TimeZone = "UTCLeapSeconds";
+                    cdfTime = convertTo(time, "tt2000");
+                otherwise
+                    error("Time type ""%s"" not supported.");
+            end
         end
     end
 end

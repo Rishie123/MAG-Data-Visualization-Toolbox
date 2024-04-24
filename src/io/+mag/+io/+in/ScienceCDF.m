@@ -6,12 +6,8 @@ classdef ScienceCDF < mag.io.in.CDF
     end
 
     properties
-        % TIMESTAMP Name of timestamp property in CDF file.
-        Timestamp (1, 1) pattern = "EPOCH"
-        % FIELD Name of field property in CDF file.
-        Field (1, 1) pattern = "B_MAG" + wildcardPattern() + "_URF"
-        % RANGE Name of range property in CDF file.
-        Range (1, 1) pattern = "VECTOR_RANGE"
+        % CDFSETTINGS CDF file options.
+        CDFSettings (1, 1) mag.io.CDFSettings
     end
 
     methods
@@ -22,7 +18,7 @@ classdef ScienceCDF < mag.io.in.CDF
                 options.?mag.io.in.ScienceCDF
             end
 
-            this.assignProperties(options)
+            this.assignProperties(options);
         end
 
         function data = process(this, rawData, cdfInfo)
@@ -44,8 +40,9 @@ classdef ScienceCDF < mag.io.in.CDF
             [rawTimestamps, rawField, rawRange] = this.extractRawCDFData(rawData, cdfInfo);
 
             % Convert timestamps to datetime.
-            timestamps = datetime(rawTimestamps, InputFormat = "uuuu-MM-dd'T'HH:mm:ss.SSS", ...
-                Format = mag.time.Constant.Format, TimeZone = mag.time.Constant.TimeZone);
+            timestamps = datetime(rawTimestamps, ConvertFrom = "tt2000", TimeZone = "UTCLeapSeconds");
+            timestamps.TimeZone = mag.time.Constant.TimeZone;
+            timestamps.Format = mag.time.Constant.Format;
 
             % Create science timetable.
             timedData = timetable(timestamps, (1:numel(timestamps))', ...
@@ -99,16 +96,16 @@ classdef ScienceCDF < mag.io.in.CDF
 
             variableNames = cdfInfo.Variables(:, 1);
 
-            rawTimestamps = rawData{matches(variableNames, this.Timestamp)};
+            rawTimestamps = rawData{matches(variableNames, this.CDFSettings.Timestamp)};
 
-            if isequal(this.Field, this.Range)
+            if isequal(this.CDFSettings.Field, this.CDFSettings.Range)
 
-                rawField = rawData{matches(variableNames, this.Field)}(:, 1:3);
-                rawRange = rawData{matches(variableNames, this.Range)}(:, 4);
+                rawField = rawData{matches(variableNames, this.CDFSettings.Field)}(:, 1:3);
+                rawRange = rawData{matches(variableNames, this.CDFSettings.Range)}(:, 4);
             else
 
-                rawField = rawData{matches(variableNames, this.Field)};
-                rawRange = rawData{matches(variableNames, this.Range)};
+                rawField = rawData{matches(variableNames, this.CDFSettings.Field)};
+                rawRange = rawData{matches(variableNames, this.CDFSettings.Range)};
             end
         end
     end

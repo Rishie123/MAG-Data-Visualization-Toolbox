@@ -47,7 +47,9 @@ classdef tScienceCDFOut < MAGIOTestCase
 
             % Set up.
             referenceFile = fullfile(testCase.TestDataLocation, "imap_mag_l1a_burst-magi_20240314_v001.cdf");
-            expectedExportData = mag.io.import(FileNames = referenceFile, Format = mag.io.in.ScienceCDF(Timestamp = "epoch", Field = "vectors", Range = "vectors"));
+
+            cdfSettings = mag.io.CDFSettings(Timestamp = "epoch", Field = "vectors", Range = "vectors");
+            expectedExportData = mag.io.import(FileNames = referenceFile, Format = mag.io.in.ScienceCDF(CDFSettings = cdfSettings));
 
             % Exercise.
             format = mag.io.out.ScienceCDF(Level = "L1b", SkeletonLocation = testCase.TestDataLocation, Version = "V001");

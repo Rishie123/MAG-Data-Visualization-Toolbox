@@ -12,7 +12,7 @@ classdef (Abstract) CDF < mag.io.in.Format
             assert(exist("spdfcdfinfo", "file"), "SPDF CDF Toolbox needs to be installed.");
 
             cdfInfo = spdfcdfinfo(fileName);
-            rawData = spdfcdfread(fileName, 'CDFEpochtoString', true);
+            rawData = spdfcdfread(fileName, 'KeepEpochAsIs', true);
         end
     end
 end
