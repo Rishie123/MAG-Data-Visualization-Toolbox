@@ -32,19 +32,13 @@ classdef GSEOS < mag.meta.log.Type
 
     methods (Hidden)
 
-        function [instrumentMetaData, primaryMetaData, secondaryMetaData] = load(this, instrumentMetaData, primaryMetaData, secondaryMetaData)
+        function [instrumentMetaData, primarySetup, secondarySetup] = load(this, instrumentMetaData, primarySetup, secondarySetup)
 
-            arguments (Input)
-                this
+            arguments
+                this (1, 1) mag.meta.log.GSEOS
                 instrumentMetaData (1, 1) mag.meta.Instrument
-                primaryMetaData (1, :) mag.meta.Science
-                secondaryMetaData (1, :) mag.meta.Science
-            end
-
-            arguments (Output)
-                instrumentMetaData (1, 1) mag.meta.Instrument
-                primaryMetaData (1, :) mag.meta.Science
-                secondaryMetaData (1, :) mag.meta.Science
+                primarySetup (1, 1) mag.meta.Setup
+                secondarySetup (1, 1) mag.meta.Setup
             end
 
             dataStore = tabularTextDatastore(this.FileName, FileExtensions = this.Extensions, TextType = "string", VariableNames = this.Names, TextscanFormats = this.Formats);

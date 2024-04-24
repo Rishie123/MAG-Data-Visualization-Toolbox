@@ -1,6 +1,22 @@
+# App
+
+- Adapt to refactoring of import/export
+- Add support for CDF import/export
+- Remove support for DAT export
+
 # Software
 
-- Rename `mag.IMAPTestingAnalysis` to `mag.IMAPAnalysis`
-- Fix issue with mode being mistakenly confused for "Ramp" when first range is `NaN`
-- Fix issue in `mag.graphics.sftPlots` with cropped analysis not defined when `Filter` is empty
-- Add system and unit tests for `mag.IMAPAnalysis`
+## IO
+
+- Refactor import/export of science and HK data
+- Add support for CDF science import/export
+- Remove support for DAT export
+
+## Other
+
+- Add `Science` property to `mag.Instrument` and `mag.IALiRT` as back-end for `Primary` and `Secondary` properties
+- Add `Outboard` and `Inboard` property to `mag.Instrument`
+- Add support in `mag.meta.log.Word` for EM documents
+- Add `mag.mixin.Struct` to enable support to convert to `struct` for meta data classes
+- Move description of sensor setup to `mag.meta.Setup`
+- Add tests for IO classes and utilities

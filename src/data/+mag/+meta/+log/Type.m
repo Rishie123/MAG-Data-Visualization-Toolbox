@@ -14,6 +14,6 @@ classdef (Abstract) Type < mag.mixin.SetGet
     methods (Abstract, Hidden)
 
         % LOAD Load meta data.
-        [instrumentMetaData, primaryMetaData, secondaryMetaData] = load(this, instrumentMetaData, primaryMetaData, secondaryMetaData)
+        [instrumentMetaData, primarySetup, secondarySetup] = load(this, instrumentMetaData, primarySetup, secondarySetup)
     end
 end

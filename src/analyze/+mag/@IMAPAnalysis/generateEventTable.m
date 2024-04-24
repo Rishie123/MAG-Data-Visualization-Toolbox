@@ -1,20 +1,23 @@
-function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents, data)
+function eventTable = generateEventTable(~, data, sensorEvents)
 
     arguments (Input)
-        this (1, 1) mag.IMAPAnalysis
-        primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])}
+        ~
+        data (1, 1) mag.Science
         sensorEvents timetable
-        data timetable
     end
 
     arguments (Output)
         eventTable eventtable
     end
 
-    ranges = sortrows(data(:, "range"));
-
     % Select sensor.
-    sensor = string(this.Results.getSensor(primaryOrSecondary));
+    sensor = string(data.MetaData.Sensor);
+
+    if data.MetaData.Primary
+        primaryOrSecondary = "Primary";
+    else
+        primaryOrSecondary = "Secondary";
+    end
 
     % Adapt existing event properties.
     if contains("Sensor", sensorEvents.Properties.VariableNames)
@@ -26,10 +29,10 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     sensorEvents = removeUninterestingVariables(sensorEvents, primaryOrSecondary);
 
     % Improve ramp mode timestamp estimates.
-    sensorEvents = updateRampModeTimestamps(sensorEvents, data);
+    sensorEvents = updateRampModeTimestamps(sensorEvents, data.Data);
 
     % Improve estimates of mode changes.
-    sensorEvents = findModeChanges(data, sensorEvents);
+    sensorEvents = findModeChanges(data.Data, sensorEvents);
 
     % Basic structure for events table.
     emptyTime = datetime.empty();
@@ -48,6 +51,8 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     % Process range changes.
     % Range changes can be automatic, so add automatic transitions. If they
     % are commanded, correct the times at which they occur.
+    ranges = sortrows(data.Data(:, data.Settings.Range));
+
     if ~isempty(ranges)
 
         [rangeTable, sensorEvents] = findRangeChanges(ranges, sensorEvents, primaryOrSecondary);
@@ -67,7 +72,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     end
 
     % Add sensor shutdown.
-    shutDownTable = array2timetable(repmat(missing(), [1, numel(eventTable.Properties.VariableNames)]), RowTimes = max(data.t) + eps(), VariableNames = eventTable.Properties.VariableNames);
+    shutDownTable = array2timetable(NaN(1, numel(eventTable.Properties.VariableNames)), RowTimes = max(data.Time) + eps(), VariableNames = eventTable.Properties.VariableNames);
     shutDownTable.Label = primaryOrSecondary + " Shutdown";
     shutDownTable.Reason = "Command";
 
@@ -81,7 +86,7 @@ function eventTable = generateEventTable(this, primaryOrSecondary, sensorEvents,
     eventTable.Reason = categorical(eventTable.Reason);
 
     eventTable{contains(eventTable.Label, "Config"), ["DataFrequency", "PacketFrequency", "Duration"]} = missing();
-    eventTable{contains(eventTable.Label, "Ramp"), "Range"} = missing();
+    eventTable{contains(eventTable.Label, "Ramp"), "Range"} = NaN();
 
     % Convert to event table.
     eventTable = eventtable(eventTable, EventLabelsVariable = "Label");

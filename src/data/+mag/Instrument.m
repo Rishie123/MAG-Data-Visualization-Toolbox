@@ -6,10 +6,8 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         Events (1, :) mag.event.Event
         % METADATA Meta data.
         MetaData mag.meta.Instrument {mustBeScalarOrEmpty}
-        % PRIMARY Primary science data.
-        Primary mag.Science {mustBeScalarOrEmpty}
-        % SECONDARY Secondary science data.
-        Secondary mag.Science {mustBeScalarOrEmpty}
+        % SCIENCE Science data.
+        Science (1, :) mag.Science
         % IALIRT I-ALiRT data.
         IALiRT mag.IALiRT {mustBeScalarOrEmpty}
         % HK Housekeeping data.
@@ -29,6 +27,14 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         HasHK (1, 1) logical
         % TIMERANGE Time range covered by science data.
         TimeRange (1, 2) datetime
+        % OUTBOARD Outboard science data (FOB, OBS, MAGo).
+        Outboard mag.Science {mustBeScalarOrEmpty}
+        % INBOARD Inboard science data (FIB, IBS, MAGi).
+        Inboard mag.Science {mustBeScalarOrEmpty}
+        % PRIMARY Primary science data.
+        Primary mag.Science {mustBeScalarOrEmpty}
+        % SECONDARY Secondary science data.
+        Secondary mag.Science {mustBeScalarOrEmpty}
     end
 
     methods
@@ -42,62 +48,53 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             this.assignProperties(options);
         end
 
-        function value = get.HasData(this)
-            value = this.HasMetaData || this.HasScience || this.HasIALiRT || this.HasHK;
+        function hasData = get.HasData(this)
+            hasData = this.HasMetaData || this.HasScience || this.HasIALiRT || this.HasHK;
         end
 
-        function value = get.HasMetaData(this)
-            value = ~isempty(this.MetaData);
+        function hasMetaData = get.HasMetaData(this)
+            hasMetaData = ~isempty(this.MetaData);
         end
 
-        function value = get.HasScience(this)
-
-            value = ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
-                this.Primary.HasData && this.Secondary.HasData;
+        function hasScience = get.HasScience(this)
+            hasScience = ~isempty(this.Science) && all([this.Science.HasData]);
         end
 
-        function value = get.HasIALiRT(this)
-            value = ~isempty(this.IALiRT);
+        function hasIALiRT = get.HasIALiRT(this)
+            hasIALiRT = ~isempty(this.IALiRT);
         end
 
-        function value = get.HasHK(this)
-            value = ~isempty(this.HK) && this.HK.HasData;
+        function hasHK = get.HasHK(this)
+            hasHK = ~isempty(this.HK) && this.HK.HasData;
         end
 
-        function value = get.TimeRange(this)
+        function timeRange = get.TimeRange(this)
 
             if this.HasScience
 
-                value = [min([this.Primary.Time(1), this.Secondary.Time(1)]), ...
-                    max([this.Primary.Time(end), this.Secondary.Time(end)])];
+                firstTimes = arrayfun(@(x) x.Time(1), this.Science, UniformOutput = true);
+                lastTimes = arrayfun(@(x) x.Time(end), this.Science, UniformOutput = true);
+
+                timeRange = [min(firstTimes), max(lastTimes)];
             else
-                value = [NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC")];
+                timeRange = [NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC")];
             end
         end
 
-        function sensor = getSensor(this, primaryOrSecondary)
-        % GETSENSOR Return name of primary or secondary sensor.
+        function outboard = get.Outboard(this)
+            outboard = this.Science.select("Outboard");
+        end
 
-            arguments (Input)
-                this (1, 1) mag.Instrument
-                primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])} = "Primary"
-            end
+        function inboard = get.Inboard(this)
+            inboard = this.Science.select("Inboard");
+        end
 
-            arguments (Output)
-                sensor (1, 1) mag.meta.Sensor
-            end
+        function primary = get.Primary(this)
+            primary = this.Science.select("Primary");
+        end
 
-            primarySensor = this.MetaData.Primary;
-            supportedSensors = enumeration("mag.meta.Sensor");
-
-            switch primaryOrSecondary
-                case "Primary"
-                    locSelected = supportedSensors == primarySensor;
-                case "Secondary"
-                    locSelected = supportedSensors ~= primarySensor;
-            end
-
-            sensor = supportedSensors(locSelected);
+        function secondary = get.Secondary(this)
+            secondary = this.Science.select("Secondary");
         end
 
         function fillWarmUp(this, timePeriod, filler)
@@ -110,8 +107,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 filler (1, 1) double = missing()
             end
 
-            this.Primary.replace(timePeriod, filler);
-            this.Secondary.replace(timePeriod, filler);
+            for s = this.Science
+                s.replace(timePeriod, filler);
+            end
         end
 
         function crop(this, primaryFilter, secondaryFilter)
@@ -178,8 +176,9 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 targetFrequency (1, 1) double
             end
 
-            this.Primary.resample(targetFrequency);
-            this.Secondary.resample(targetFrequency);
+            for s = this.Science
+                s.resample(targetFrequency);
+            end
 
             for hk = this.HK
                 hk.resample(targetFrequency);
@@ -195,11 +194,33 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 targetFrequency (1, 1) double
             end
 
-            this.Primary.downsample(targetFrequency);
-            this.Secondary.downsample(targetFrequency);
+            for s = this.Science
+                s.downsample(targetFrequency);
+            end
 
             for hk = this.HK
                 hk.downsample(targetFrequency);
+            end
+        end
+    end
+
+    methods (Hidden, Sealed, Static)
+
+        function loadedObject = loadobj(object)
+        % LOADOBJ Override default loading from MAT file.
+
+            if isa(object, "mag.Instrument")
+                loadedObject = object;
+            else
+
+                if ~isfield(object, "Science")
+
+                    science = [object.Primary, object.Secondary];
+                    object = rmfield(object, ["Primary", "Secondary"]);
+
+                    args = namedargs2cell(object);
+                    loadedObject = mag.Instrument(args{:}, Science = science);
+                end
             end
         end
     end
@@ -211,15 +232,15 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             copiedThis = copyElement@matlab.mixin.Copyable(this);
 
             copiedThis.MetaData = copy(this.MetaData);
-            copiedThis.Primary = copy(this.Primary);
-            copiedThis.Secondary = copy(this.Secondary);
+            copiedThis.Science = copy(this.Science);
             copiedThis.IALiRT = copy(this.IALiRT);
             copiedThis.HK = copy(this.HK);
         end
 
         function header = getHeader(this)
 
-            if isscalar(this) && this.HasScience && this.HasMetaData && ~isempty(this.Primary.MetaData) && ~isempty(this.Secondary.MetaData)
+            if isscalar(this) && this.HasScience && this.HasMetaData && ~isempty(this.Primary) && ~isempty(this.Secondary) && ...
+                    ~isempty(this.Primary.MetaData) && ~isempty(this.Secondary.MetaData)
 
                 className = matlab.mixin.CustomDisplay.getClassNameForHeader(this);
                 tag = char(compose(" in %s (%d, %d)", this.Primary.MetaData.Mode, this.Primary.MetaData.DataFrequency, this.Secondary.MetaData.DataFrequency));
@@ -227,19 +248,6 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 header = ['  ', className, tag, ' with properties:'];
             else
                 header = getHeader@matlab.mixin.CustomDisplay(this);
-            end
-        end
-
-        function groups = getPropertyGroups(this)
-
-            if isscalar(this)
-
-                propertyList = ["HasData", "HasMetaData", "HasScience", "HasHK", "TimeRange", ...
-                    "Primary", "Secondary", "IALiRT", ...
-                    "MetaData", "Events", "HK"];
-                groups = matlab.mixin.util.PropertyGroup(propertyList, "");
-            else
-                groups = getPropertyGroups@matlab.mixin.CustomDisplay(this);
             end
         end
     end

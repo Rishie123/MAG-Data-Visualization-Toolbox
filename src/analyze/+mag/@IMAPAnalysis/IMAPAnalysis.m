@@ -11,7 +11,8 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
         % EVENTPATTERN Pattern of event files.
         EventPattern (1, :) string = fullfile("*", "Event", "*.html")
         % METADATAPATTERN Pattern of meta data files.
-        MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-061*.xlsx"), fullfile("IMAP-MAG-TE-ICL-071*.docx")]
+        MetaDataPattern (1, :) string = [fullfile("*.msg"), fullfile("IMAP-MAG-TE-ICL-058*.xlsx"), fullfile("IMAP-MAG-TE-ICL-061*.xlsx"), ...
+            fullfile("IMAP-MAG-TE-ICL-071*.docx"), fullfile("IMAP-OPS-TE-ICL-001*.docx")]
         % SCIENCEPATTERN Pattern of science data files.
         SciencePattern (1, :) string = fullfile("MAGScience-*-(*)-*.csv")
         % IALIRTPATTERN Pattern of I-ALiRT data files.
@@ -23,10 +24,7 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
             fullfile("*", "Export", "idle_export_proc.*.csv")]
         % PERFILEPROCESSING Steps needed to process single files of data.
         PerFileProcessing (1, :) mag.process.Step = [ ...
-            mag.process.Missing(Variables = ["x", "y", "z"]), ...
             mag.process.AllZero(Variables = ["coarse", "fine", "x", "y", "z"]), ...
-            mag.process.Timestamp(), ...
-            mag.process.DateTime(), ...
             mag.process.SignedInteger(CompressionVariable = "compression", Variables = ["x", "y", "z"]), ...
             mag.process.Separate(DiscriminationVariable = "t", QualityVariable = "quality", Variables = ["x", "y", "z"])]
         % WHOLEDATAPROCESSING Steps needed to process all of imported data.
@@ -52,7 +50,6 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
             mag.process.Ramp()]
         % HKPROCESSING Steps needed to process imported HK data.
         HKProcessing (1, :) mag.process.Step = [ ...
-            mag.process.DateTime(), ...
             mag.process.Units(), ...
             mag.process.Separate(DiscriminationVariable = "t", QualityVariable = string.empty(), Variables = "*")]
     end
@@ -170,13 +167,13 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
 
             this.loadEventsData();
 
-            [primaryMetaData, secondaryMetaData, hkMetaData] = this.loadMetaData();
+            [primarySetup, secondarySetup] = this.loadMetaData();
 
-            this.loadScienceData(primaryMetaData, secondaryMetaData);
+            this.loadScienceData(primarySetup, secondarySetup);
 
-            this.loadIALiRTData(primaryMetaData, secondaryMetaData);
+            this.loadIALiRTData(primarySetup, secondarySetup);
 
-            this.loadHKData(hkMetaData);
+            this.loadHKData();
         end
 
         function modes = getAllModes(this)
@@ -327,9 +324,7 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
             end
 
             rampMode = this.Results.copy();
-
-            rampMode.Primary = this.PrimaryRamp;
-            rampMode.Secondary = this.SecondaryRamp;
+            rampMode.Science = [this.PrimaryRamp, this.SecondaryRamp];
 
             if rampMode.HasScience
                 rampMode.cropToMatch();
@@ -416,13 +411,16 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
         loadEventsData(this)
 
         % LOADMETADATA Load meta data.
-        [primaryMetaData, secondaryMetaData, hkMetaData] = loadMetaData(this)
+        [primarySetup, secondarySetup] = loadMetaData(this)
 
         % LOADSCIENCEDATA Load science data.
-        loadScienceData(this, primaryMetaData, secondaryMetaData)
+        loadScienceData(this, primarySetup, secondarySetup)
+
+        % LOADIALIRTDATA Load I-ALiRT data.
+        loadIALiRTData(this, primarySetup, secondarySetup)
 
         % LOADHKDATA Load HK data.
-        loadHKData(this, hkMetaData)
+        loadHKData(this)
 
         % GENERATEEVENTTABLE Create an event table for a sensor, based on
         % detected events and science data.
@@ -494,26 +492,28 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
 
     methods (Static, Access = private)
 
-        function importExportStrategy = dispatchExtension(extension, options)
+        function importStrategy = dispatchExtension(extension, type)
         % DISPATCHEXTENSION Dispatch extension to correct I/O strategy.
 
             arguments (Input)
                 extension
-                options.?mag.io.Type
+                type (1, 1) string {mustBeMember(type, ["Science", "HK"])}
             end
 
             arguments (Output)
-                importExportStrategy (1, 1) mag.io.Type
+                importStrategy (1, 1) mag.io.in.Format
             end
 
-            args = namedargs2cell(options);
-
             switch extension
-                case cellstr(mag.io.CSV.Extension)
-                    importExportStrategy = mag.io.CSV(args{:});
+                case mag.io.in.CSV.Extension
+                    format = "CSV";
+                case mag.io.in.CDF.Extension
+                    format = "CDF";
                 otherwise
                     error("Unsupported extension ""%s"" for science data import.", extension);
             end
+
+            importStrategy = feval("mag.io.in." + type + format);
         end
     end
 end

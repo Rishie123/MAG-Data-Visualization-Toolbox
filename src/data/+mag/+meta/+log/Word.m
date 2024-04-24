@@ -19,19 +19,13 @@ classdef Word < mag.meta.log.Type
 
     methods (Hidden)
 
-        function [instrumentMetaData, primaryMetaData, secondaryMetaData] = load(this, instrumentMetaData, primaryMetaData, secondaryMetaData)
+        function [instrumentMetaData, primarySetup, secondarySetup] = load(this, instrumentMetaData, primarySetup, secondarySetup)
 
-            arguments (Input)
-                this
+            arguments
+                this (1, 1) mag.meta.log.Word
                 instrumentMetaData (1, 1) mag.meta.Instrument
-                primaryMetaData (1, :) mag.meta.Science
-                secondaryMetaData (1, :) mag.meta.Science
-            end
-
-            arguments (Output)
-                instrumentMetaData (1, 1) mag.meta.Instrument
-                primaryMetaData (1, :) mag.meta.Science
-                secondaryMetaData (1, :) mag.meta.Science
+                primarySetup (1, 1) mag.meta.Setup
+                secondarySetup (1, 1) mag.meta.Setup
             end
 
             % Read meta data file.
@@ -44,10 +38,32 @@ classdef Word < mag.meta.log.Type
             end
 
             rawData = rows2vars(rawData, VariableNamesSource = 1, VariableNamingRule = "preserve");
-            rawData = renamevars(rawData, 2:15, ["Operator", "Controller", "Date", "Time", "Name", "BSW", "ASW", "GSE", "FOBModel", "FOBHarness", "FOBCan", "FIBModel", "FIBHarness", "FIBCan"]);
+
+            % Check if document is for EM.
+            if (width(rawData) == 14) && contains(this.FileName, "IMAP-OPS-TE-ICL-001")
+
+                rawData = renamevars(rawData, 2:14, ["Operator", "Date", "Time", "Name", "BSW", "ASW", "GSE", "FOBModel", "FOBHarness", "FOBCan", "FIBModel", "FIBHarness", "FIBCan"]);
+
+                model = "EM";
+                primaryFEE = "FEE1";
+                secondaryFEE = "FEE2";
+
+            % Check if it is for FM.
+            elseif (width(rawData) == 15) && contains(this.FileName, "IMAP-MAG-TE-ICL-071")
+
+                rawData = renamevars(rawData, 2:15, ["Operator", "Controller", "Date", "Time", "Name", "BSW", "ASW", "GSE", "FOBModel", "FOBHarness", "FOBCan", "FIBModel", "FIBHarness", "FIBCan"]);
+
+                model = "FM";
+                primaryFEE = "FEE3";
+                secondaryFEE = "FEE4";
+
+            % Otherwise, error.
+            else
+                error("Unrecognized table format.");
+            end
 
             % Assign instrument meta data.
-            instrumentMetaData.Model = "FM";
+            instrumentMetaData.Model = model;
             instrumentMetaData.BSW = extractAfter(rawData.BSW, optionalPattern(lettersPattern()));
             instrumentMetaData.ASW = extractAfter(rawData.ASW, optionalPattern(lettersPattern()));
             instrumentMetaData.GSE = extractAfter(rawData.GSE, optionalPattern(lettersPattern()));
@@ -56,15 +72,15 @@ classdef Word < mag.meta.log.Type
             instrumentMetaData.Timestamp = datetime(rawData.Date, TimeZone = "UTC", Format = mag.time.Constant.Format) + duration(rawData.Time, InputFormat = "hh:mm");
 
             % Enhance primary and secondary meta data.
-            [primaryMetaData.Model] = deal(rawData.FOBModel);
-            [primaryMetaData.FEE] = deal("FEE3");
-            [primaryMetaData.Harness] = deal(rawData.FOBHarness);
-            [primaryMetaData.Can] = deal(rawData.FOBCan);
+            primarySetup.Model = rawData.FOBModel;
+            primarySetup.FEE = primaryFEE;
+            primarySetup.Harness = rawData.FOBHarness;
+            primarySetup.Can = rawData.FOBCan;
 
-            [secondaryMetaData.Model] = deal(rawData.FIBModel);
-            [secondaryMetaData.FEE] = deal("FEE4");
-            [secondaryMetaData.Harness] = deal(rawData.FIBHarness);
-            [secondaryMetaData.Can] = deal(rawData.FIBCan);
+            secondarySetup.Model = rawData.FIBModel;
+            secondarySetup.FEE = secondaryFEE;
+            secondarySetup.Harness = rawData.FIBHarness;
+            secondarySetup.Can = rawData.FIBCan;
         end
     end
 end

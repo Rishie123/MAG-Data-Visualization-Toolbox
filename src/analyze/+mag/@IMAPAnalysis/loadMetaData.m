@@ -1,10 +1,9 @@
-function [primaryMetaData, secondaryMetaData, hkMetaData] = loadMetaData(this)
+function [primarySetup, secondarySetup] = loadMetaData(this)
     %%  Initialize
 
     metaData = mag.meta.Instrument();
-    primaryMetaData = mag.meta.Science(Sensor = "FOB");
-    secondaryMetaData = mag.meta.Science(Sensor = "FIB");
-    hkMetaData = mag.meta.HK.empty();
+    primarySetup = mag.meta.Setup();
+    secondarySetup = mag.meta.Setup();
 
     %% Instrument and Science Meta Data
 
@@ -25,21 +24,7 @@ function [primaryMetaData, secondaryMetaData, hkMetaData] = loadMetaData(this)
                 error("Unsupported meta data extension ""%s"".", extension);
         end
 
-        [metaData, primaryMetaData, secondaryMetaData] = loader.load(metaData, primaryMetaData, secondaryMetaData);
-    end
-
-    %% HK Meta Data
-
-    for hkp = 1:numel(this.HKPattern)
-
-        if isempty(this.HKFileNames{hkp})
-            continue;
-        end
-
-        rawData = regexp(this.HKFileNames{hkp}(1), mag.meta.HK.MetaDataFilePattern, "names");
-
-        timestamp = datetime(rawData.date + rawData.time, InputFormat = "yyyyMMddHHmmss", TimeZone = mag.time.Constant.TimeZone, Format = mag.time.Constant.Format);
-        hkMetaData(end + 1) = mag.meta.HK(Type = rawData.type, Timestamp = timestamp); %#ok<AGROW>
+        [metaData, primarySetup, secondarySetup] = loader.load(metaData, primarySetup, secondarySetup);
     end
 
     %% Assign Value

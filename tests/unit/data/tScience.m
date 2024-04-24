@@ -361,6 +361,74 @@ classdef tScience < matlab.unittest.TestCase
                 "PSD max frequency should match sine wave frequency.");
         end
 
+        % Test that primary sensor name is returned correctly.
+        function getName_primary(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Sensor = "FOB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Primary = true;
+            science2.MetaData.Sensor = "FIB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.getName(), mag.meta.Sensor.FIB, "Primary sensor should be returned by default.");
+            testCase.verifyEqual(science.getName("Primary"), mag.meta.Sensor.FIB, "Primary sensor should be returned when asked.");
+        end
+
+        % Test that secondary sensor name is returned correctly.
+        function getName_secondary(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Sensor = "FOB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Primary = true;
+            science2.MetaData.Sensor = "FIB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.getName("Secondary"), mag.meta.Sensor.FOB, "Secondary sensor should be returned when asked.");
+        end
+
+        % Test that primary sensor data is selected correctly.
+        function select_primarySecondary(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Sensor = "FOB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Primary = true;
+            science2.MetaData.Sensor = "FIB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.select("Primary"), science2, "Primary sensor should be returned when asked.");
+        end
+
+        % Test that outboard sensor data is selected correctly.
+        function select_outboardInboard(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Sensor = "FIB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Sensor = "FOB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.select("Outboard"), science2, "Outboard sensor should be returned when asked.");
+        end
+
         % Test that displaying a single object displays the correct
         % information.
         function customDisplay_singleObject(testCase)
@@ -370,14 +438,33 @@ classdef tScience < matlab.unittest.TestCase
 
             science.MetaData.DataFrequency = 64;
             science.MetaData.Mode = "Burst";
-            science.MetaData.Model = "FM4";
             science.MetaData.Sensor = "FIB";
+            science.MetaData.Setup = mag.meta.Setup(Model = "FM4");
 
             % Exercise.
             output = evalc("display(science)");
 
             % Verify.
             testCase.verifySubstring(eraseTags(output), "FIB (FM4) in Burst (64)", "Science meta data should be included in display.");
+        end
+
+        % Test that displaying a single object displays the correct
+        % information, even when setup is missing.
+        function customDisplay_singleObject_noSetup(testCase)
+
+            % Set up.
+            science = testCase.createTestData();
+
+            science.MetaData.DataFrequency = 64;
+            science.MetaData.Mode = "Burst";
+            science.MetaData.Sensor = "FIB";
+            science.MetaData.Setup = mag.meta.Setup.empty();
+
+            % Exercise.
+            output = evalc("display(science)");
+
+            % Verify.
+            testCase.verifySubstring(eraseTags(output), "FIB in Burst (64)", "Science meta data should be included in display.");
         end
 
         % Test that displaying a single object displays the correct
@@ -389,8 +476,8 @@ classdef tScience < matlab.unittest.TestCase
 
             science.MetaData.DataFrequency = 64;
             science.MetaData.Mode = "Burst";
-            science.MetaData.Model = string.empty();
             science.MetaData.Sensor = "FIB";
+            science.MetaData.Setup = mag.meta.Setup();
 
             % Exercise.
             output = evalc("display(science)");
@@ -408,8 +495,8 @@ classdef tScience < matlab.unittest.TestCase
 
             science.MetaData.DataFrequency = 64;
             science.MetaData.Mode = "Burst";
-            science.MetaData.Model = string.empty();
             science.MetaData.Sensor = mag.meta.Sensor.empty();
+            science.MetaData.Setup = mag.meta.Setup();
 
             % Exercise.
             output = evalc("display(science)");

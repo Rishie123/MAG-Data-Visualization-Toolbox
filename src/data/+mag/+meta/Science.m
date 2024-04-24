@@ -1,23 +1,15 @@
 classdef Science < mag.meta.Data
 % SCIENCE Description of MAG science data.
 
-    properties (Constant, Hidden)
-        MetaDataFilePattern (1, 1) string = "MAGScience-(?<mode>\w+)-\((?<primaryFrequency>\d+),(?<secondaryFrequency>\d+)\)-(?<packetFrequency>\d+)s-(?<date>\d+)-(?<time>\w+).(?<extension>\w+)"
-    end
-
     properties
-        % MODEL Sensor model type and number.
-        Model string {mustBeScalarOrEmpty, mustMatchRegex(Model, "^[LEF]M\d$")}
-        % FEE FEE id.
-        FEE string {mustBeScalarOrEmpty, mustMatchRegex(FEE, "^FEE\d$")}
-        % HARNESS Harness connecting sensor to electronics box.
-        Harness string {mustBeScalarOrEmpty}
-        % CAN Can containing sensor.
-        Can string {mustBeScalarOrEmpty}
+        % PRIMARY Boolean denoting whether sensor is primary.
+        Primary (1, 1) logical = false
+        % SETUP Sensor setup.
+        Setup mag.meta.Setup {mustBeScalarOrEmpty}
         % SENSOR Sensor type.
         Sensor mag.meta.Sensor {mustBeScalarOrEmpty}
         % MODE Selected mode.
-        Mode mag.meta.Mode {mustBeScalarOrEmpty} = mag.meta.Mode.Hybrid
+        Mode (1, 1) mag.meta.Mode = mag.meta.Mode.Hybrid
         % DATAFREQUENCY Frequency of data (how many vectors per second).
         DataFrequency (1, 1) double = NaN
         % PACKETFREQUENCY Frequency of packets (how often packets are
@@ -37,12 +29,5 @@ classdef Science < mag.meta.Data
 
             this.assignProperties(options);
         end
-    end
-end
-
-function mustMatchRegex(value, pattern)
-
-    if ~isempty(value) && ~matches(value, regexpPattern(pattern))
-        error("Value ""%s"" does not match patter ""%s"".", value, pattern);
     end
 end

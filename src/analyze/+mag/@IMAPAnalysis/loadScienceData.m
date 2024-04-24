@@ -1,166 +1,91 @@
-function loadScienceData(this, primaryMetaData, secondaryMetaData)
-    %% Import Data
+function loadScienceData(this, primarySetup, secondarySetup)
+    %% Initialize
 
     if isempty(this.ScienceFileNames)
         return;
     end
 
+    %% Import Data
+
     [~, ~, extension] = fileparts(this.SciencePattern);
-    rawScience = this.dispatchExtension(extension, ImportFileNames = this.ScienceFileNames).import();
+    importStrategy = this.dispatchExtension(extension, "Science");
 
-    primaryData = timetable.empty();
-    secondaryData = timetable.empty();
+    this.Results.Science = mag.io.import( ...
+        FileNames = this.ScienceFileNames, ...
+        Format = importStrategy, ...
+        ProcessingSteps = this.PerFileProcessing);
 
-    for i = 1:numel(rawScience)
-        %% Split Data
+    primary = this.Results.Primary;
+    primary.MetaData.Setup = primarySetup;
 
-        primary = rawScience{i}(:, regexpPattern(".*(pri|sequence).*"));
-        secondary = rawScience{i}(:, regexpPattern(".*(sec|sequence).*"));
-
-        %% Process Data
-
-        % Rename variables.
-        newVariableNames = ["x", "y", "z", "range", "coarse", "fine"];
-
-        primary = renamevars(primary, ["x_pri", "y_pri", "z_pri", "rng_pri", "pri_coarse", "pri_fine"], newVariableNames);
-        secondary = renamevars(secondary, ["x_sec", "y_sec", "z_sec", "rng_sec", "sec_coarse", "sec_fine"], newVariableNames);
-
-        % Add compression and quality flags.
-        primary.compression = false(height(primary), 1);
-        secondary.compression = false(height(secondary), 1);
-
-        primary.quality = repmat(mag.meta.Quality.Regular, height(primary), 1);
-        secondary.quality = repmat(mag.meta.Quality.Regular, height(secondary), 1);
-
-        % Current file meta data.
-        [mode, primaryFrequency, secondaryFrequency, packetFrequency] = extractFileMetaData(this.ScienceFileNames(i));
-
-        pmd = primaryMetaData.copy();
-        pmd.set(Mode = mode, DataFrequency = primaryFrequency, PacketFrequency = packetFrequency);
-
-        smd = secondaryMetaData.copy();
-        smd.set(Mode = mode, DataFrequency = secondaryFrequency, PacketFrequency = packetFrequency);
-
-        % Apply processing steps.
-        for ps = this.PerFileProcessing
-
-            primary = ps.apply(primary, pmd);
-            secondary = ps.apply(secondary, smd);
-        end
-
-        %% Convert to timetable
-
-        primaryData = vertcat(primaryData, table2timetable(primary, RowTimes = "t")); %#ok<AGROW>
-        secondaryData = vertcat(secondaryData, table2timetable(secondary, RowTimes = "t")); %#ok<AGROW>
-    end
-
-    % Add continuity information, for simpler interpolation.
-    % Property order:
-    %     sequence, x, y, z, range, coarse, fine, compression, quality
-    [primaryData.Properties.VariableContinuity, secondaryData.Properties.VariableContinuity] = ...
-        deal(["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step"]);
+    secondary = this.Results.Secondary;
+    secondary.MetaData.Setup = secondarySetup;
 
     %% Amend Timestamp
 
-    [startTime, endTime] = bounds(primaryData.t);
+    [startTime(1), endTime(1)] = bounds(primary.Time);
+    [startTime(2), endTime(2)] = bounds(secondary.Time);
 
-    if numel(rawScience) == 1
+    startTime = min(startTime);
+    endTime = max(endTime);
 
-        primaryMetaData = pmd;
-        secondaryMetaData = smd;
-    end
-
-    primaryMetaData.Timestamp = startTime;
-    secondaryMetaData.Timestamp = startTime;
+    primary.MetaData.Timestamp = startTime;
+    secondary.MetaData.Timestamp = startTime;
 
     %% Add Mode and Range Change Events
 
     sensorEvents = eventtable(this.Results.Events);
     sensorEvents = sensorEvents(timerange(startTime - seconds(1), endTime, "closed"), :);
 
-    primaryData.Properties.Events = this.generateEventTable("Primary", sensorEvents, primaryData);
-    secondaryData.Properties.Events = this.generateEventTable("Secondary", sensorEvents, secondaryData);
+    primary.Data.Properties.Events = this.generateEventTable(primary, sensorEvents);
+    secondary.Data.Properties.Events = this.generateEventTable(secondary, sensorEvents);
 
     %% Process Data as a Whole
 
     for ps = this.WholeDataProcessing
 
-        primaryData = ps.apply(primaryData, primaryMetaData);
-        secondaryData = ps.apply(secondaryData, secondaryMetaData);
+        primary.Data = ps.apply(primary.Data, primary.MetaData);
+        secondary.Data = ps.apply(secondary.Data, secondary.MetaData);
     end
 
     %% Extract Ramp Mode (If Any)
 
     % Determine ramp mode times.
-    primaryRampPeriod = findRampModePeriod(primaryData.Properties.Events);
-    secondaryRampPeriod = findRampModePeriod(secondaryData.Properties.Events);
+    primaryRampPeriod = findRampModePeriod(primary.Events);
+    secondaryRampPeriod = findRampModePeriod(secondary.Events);
 
-    primaryRampMode = primaryData(primaryRampPeriod, :);
-    secondaryRampMode = secondaryData(secondaryRampPeriod, :);
+    primaryRampMode = primary.Data(primaryRampPeriod, :);
+    secondaryRampMode = secondary.Data(secondaryRampPeriod, :);
 
-    primaryData(primaryRampPeriod, :) = [];
-    secondaryData(secondaryRampPeriod, :) = [];
+    primary.Data(primaryRampPeriod, :) = [];
+    secondary.Data(secondaryRampPeriod, :) = [];
 
     if ~isempty(primaryRampMode) && ~isempty(secondaryRampMode)
+
+        primaryRampMetaData = primary.MetaData.copy();
+        secondaryRampMetaData = secondary.MetaData.copy();
+
+        [primaryRampMetaData.DataFrequency, primaryRampMetaData.PacketFrequency] = deal(0.25, 4);
+        [secondaryRampMetaData.DataFrequency, secondaryRampMetaData.PacketFrequency] = deal(0.25, 4);
 
         % Process ramp mode.
         for rs = this.RampProcessing
 
-            primaryRampMode = rs.apply(primaryRampMode, primaryMetaData);
-            secondaryRampMode = rs.apply(secondaryRampMode, secondaryMetaData);
+            primaryRampMode = rs.apply(primaryRampMode, primaryRampMetaData);
+            secondaryRampMode = rs.apply(secondaryRampMode, secondaryRampMetaData);
         end
 
         % Assign ramp mode.
-        this.PrimaryRamp = mag.Science(primaryRampMode, primaryMetaData);
-        this.SecondaryRamp = mag.Science(secondaryRampMode, secondaryMetaData);
+        this.PrimaryRamp = mag.Science(primaryRampMode, primaryRampMetaData);
+        this.SecondaryRamp = mag.Science(secondaryRampMode, secondaryRampMetaData);
     end
 
     %% Process Science Data
 
     for ss = this.ScienceProcessing
 
-        primaryData = ss.apply(primaryData, primaryMetaData);
-        secondaryData = ss.apply(secondaryData, secondaryMetaData);
-    end
-
-    %% Assign Values
-
-    this.Results.Primary = mag.Science(primaryData, primaryMetaData);
-    this.Results.Secondary = mag.Science(secondaryData, secondaryMetaData);
-end
-
-function [mode, primaryFrequency, secondaryFrequency, packetFrequency] = extractFileMetaData(fileName)
-
-    arguments
-        fileName (1, 1) string
-    end
-
-    rawData = regexp(fileName, mag.meta.Science.MetaDataFilePattern, "names");
-
-    if isempty(rawData)
-
-        % Assume default values.
-        if contains(fileName, "normal", IgnoreCase = true)
-
-            mode = "Normal";
-            primaryFrequency = "2";
-            secondaryFrequency = "2";
-            packetFrequency = "8";
-        elseif contains(fileName, "burst", IgnoreCase = true)
-
-            mode = "Burst";
-            primaryFrequency = "128";
-            secondaryFrequency = "128";
-            packetFrequency = "2";
-        else
-            error("Unrecognized file name format for ""%s"".", fileName);
-        end
-    else
-
-        mode = regexprep(rawData.mode, "(\w)(\w+)", "${upper($1)}$2");
-        primaryFrequency = rawData.primaryFrequency;
-        secondaryFrequency = rawData.secondaryFrequency;
-        packetFrequency = rawData.packetFrequency;
+        primary.Data = ss.apply(primary.Data, primary.MetaData);
+        secondary.Data = ss.apply(secondary.Data, secondary.MetaData);
     end
 end
 

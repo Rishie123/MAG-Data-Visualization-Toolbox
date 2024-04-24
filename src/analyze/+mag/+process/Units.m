@@ -64,7 +64,7 @@ classdef Units < mag.process.Step
 
             arguments
                 this
-                data table
+                data tabular
                 metaData (1, 1) mag.meta.HK
             end
 

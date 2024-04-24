@@ -52,19 +52,19 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function x = get.X(this)
-            x = this.Data.(this.Settings.X);
+            x = double(this.Data.(this.Settings.X));
         end
 
         function y = get.Y(this)
-            y = this.Data.(this.Settings.Y);
+            y = double(this.Data.(this.Settings.Y));
         end
 
         function z = get.Z(this)
-            z = this.Data.(this.Settings.Z);
+            z = double(this.Data.(this.Settings.Z));
         end
 
         function xyz = get.XYZ(this)
-            xyz = this.Data{:, [this.Settings.X, this.Settings.Y, this.Settings.Z]};
+            xyz = double(this.Data{:, [this.Settings.X, this.Settings.Y, this.Settings.Z]});
         end
 
         function b = get.B(this)
@@ -84,7 +84,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function range = get.Range(this)
-            range = this.Data.(this.Settings.Range);
+            range = uint8(this.Data.(this.Settings.Range));
         end
 
         function sequence = get.Sequence(this)
@@ -92,7 +92,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
 
         function compression = get.Compression(this)
-            compression = this.Data.(this.Settings.Compression);
+            compression = logical(this.Data.(this.Settings.Compression));
         end
 
         function set.Quality(this, quality)
@@ -291,14 +291,80 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         end
     end
 
+    methods (Sealed)
+
+        function name = getName(this, primaryOrSecondary)
+        % GETNAME Return name of primary or secondary sensor.
+
+            arguments (Input)
+                this mag.Science {mustBeNonempty}
+                primaryOrSecondary (1, 1) string {mustBeMember(primaryOrSecondary, ["Primary", "Secondary"])} = "Primary"
+            end
+
+            arguments (Output)
+                name (1, 1) mag.meta.Sensor
+            end
+
+            % If no primary sensor is set, assume it's FOB.
+            metaData = [this.MetaData];
+            locPrimary = [metaData.Primary];
+
+            switch nnz(locPrimary)
+                case 0
+                    primarySensor = mag.meta.Sensor.FOB;
+                case 1
+
+                    sensors = [metaData.Sensor];
+                    primarySensor = sensors(locPrimary);
+                otherwise
+                    error("One and only one sensor can be primary.");
+            end
+
+            % Retrieve selected sensor.
+            supportedSensors = enumeration("mag.meta.Sensor");
+
+            switch primaryOrSecondary
+                case "Primary"
+                    locSelected = supportedSensors == primarySensor;
+                case "Secondary"
+                    locSelected = supportedSensors ~= primarySensor;
+            end
+
+            name = supportedSensors(locSelected);
+        end
+
+        function science = select(this, selected)
+        % SELECT Return primary or secondary sensor.
+
+            arguments (Input)
+                this mag.Science {mustBeNonempty}
+                selected (1, 1) string {mustBeMember(selected, ["Outboard", "Inboard", "Primary", "Secondary"])}
+            end
+
+            arguments (Output)
+                science mag.Science {mustBeScalarOrEmpty}
+            end
+
+            metaData = [this.MetaData];
+
+            if contains(selected, "board")
+                locSelected = [metaData.Sensor] == ("F" + extract(selected, regexpPattern("O|I")) + "B");
+            else
+                locSelected = [metaData.Primary] == isequal(selected, "Primary");
+            end
+
+            science = this(locSelected);
+        end
+    end
+
     methods (Access = protected)
 
         function header = getHeader(this)
 
             if isscalar(this) && ~isempty(this.MetaData)
 
-                if ~isempty(this.MetaData) && ~isempty(this.MetaData.Sensor) && ~isempty(this.MetaData.Model)
-                    tag = char(compose(" from %s (%s) in %s (%d)", this.MetaData.Sensor, this.MetaData.Model, this.MetaData.Mode, this.MetaData.DataFrequency));
+                if ~isempty(this.MetaData) && ~isempty(this.MetaData.Sensor) && ~isempty(this.MetaData.Setup) && ~isempty(this.MetaData.Setup.Model)
+                    tag = char(compose(" from %s (%s) in %s (%d)", this.MetaData.Sensor, this.MetaData.Setup.Model, this.MetaData.Mode, this.MetaData.DataFrequency));
                 elseif ~isempty(this.MetaData) && ~isempty(this.MetaData.Sensor)
                     tag = char(compose(" from %s in %s (%d)", this.MetaData.Sensor, this.MetaData.Mode, this.MetaData.DataFrequency));
                 else

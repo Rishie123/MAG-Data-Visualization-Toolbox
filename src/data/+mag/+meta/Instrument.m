@@ -4,8 +4,6 @@ classdef Instrument < mag.meta.Data
     properties
         % MODEL Instrument model type.
         Model string {mustBeScalarOrEmpty, mustBeMember(Model, ["LM", "EM", "FM"])}
-        % PRIMARY Primary sensor.
-        Primary (1, 1) mag.meta.Sensor = "FOB"
         % BSW Boot sowftware version.
         BSW string {mustBeScalarOrEmpty}
         % ASW App software version.

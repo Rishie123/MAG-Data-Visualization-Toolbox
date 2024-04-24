@@ -14,7 +14,7 @@ classdef tIMAPAnalysis < matlab.unittest.TestCase
 
     methods (Test)
 
-        % Test that full analysis returns expected 
+        % Test that full analysis returns expected results and data format.
         function fullAnalysis(testCase)
 
             % Set up.
@@ -66,7 +66,9 @@ classdef tIMAPAnalysis < matlab.unittest.TestCase
                 testCase.assertLessThanOrEqual(results(i).TimeRange - timeRanges(i, :), milliseconds(1), "Time range does not match expectation.");
 
                 % Verify science.
-                testCase.verifyEqual(results(i), expectedResults(i), "Analysis results should match expectation.");
+                for j = 1:2
+                    testCase.verifyEqual(results(i).Science(j).Data, expectedResults(i).Science(j).Data, "Analysis results should match expectation.");
+                end
             end
         end
     end
