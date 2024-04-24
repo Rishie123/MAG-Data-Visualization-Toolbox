@@ -117,14 +117,32 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             timePeriod = this.convertToTimeSubscript(timeFilter, this.Time);
             this.Data = this.Data(timePeriod, :);
 
+            % Filter events, but do not remove mode or range that are still
+            % ongoing.
             if ~isempty(this.Data.Properties.Events)
-                this.Data.Properties.Events = this.Data.Properties.Events(timePeriod, :);
+
+                % Crop events.
+                originalEvents = this.Events;
+                this.Data.Properties.Events = originalEvents(timePeriod, :);
+
+                croppedEvents = setdiff(originalEvents, this.Events);
+                croppedEvents(croppedEvents.Time >= max(this.Time), :) = [];
+
+                % Find the earliest previous mode and range changes.
+                lastModeChange = croppedEvents(find(contains(croppedEvents.Label, "(" | ")"), 1, "last"), :);
+                lastRangeChange = croppedEvents(find(contains(croppedEvents.Label, "Range"), 1, "last"), :);
+
+                lastEvents = [lastModeChange; lastRangeChange];
+                lastEvents.Time = repmat(min(this.Time), height(lastEvents), 1);
+
+                % Re-add events.
+                this.Data.Properties.Events = [lastEvents; this.Events];
             end
 
             if isempty(this.Time)
                 this.MetaData.Timestamp = NaT(TimeZone = mag.time.Constant.TimeZone);
             else
-                this.MetaData.Timestamp = this.Time(1);
+                this.MetaData.Timestamp = min(this.Time);
             end
         end
 
