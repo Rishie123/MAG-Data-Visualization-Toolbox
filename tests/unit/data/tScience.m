@@ -397,7 +397,7 @@ classdef tScience < matlab.unittest.TestCase
         end
 
         % Test that primary sensor data is selected correctly.
-        function select(testCase)
+        function select_primarySecondary(testCase)
 
             % Set up.
             science1 = testCase.createTestData();
@@ -411,6 +411,22 @@ classdef tScience < matlab.unittest.TestCase
 
             % Exercise and verify.
             testCase.verifyEqual(science.select("Primary"), science2, "Primary sensor should be returned when asked.");
+        end
+
+        % Test that outboard sensor data is selected correctly.
+        function select_outboardInboard(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Sensor = "FIB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Sensor = "FOB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.select("Outboard"), science2, "Outboard sensor should be returned when asked.");
         end
 
         % Test that displaying a single object displays the correct
