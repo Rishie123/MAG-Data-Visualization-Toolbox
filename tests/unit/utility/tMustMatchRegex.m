@@ -1,4 +1,4 @@
-classdef tMustMatchRegex < matlab.mock.TestCase
+classdef tMustMatchRegex < matlab.unittest.TestCase
 % TMUSTMATCHREGEX Unit tests for "mag.validator.mustMatchRegex" function.
 
     methods (Test)
