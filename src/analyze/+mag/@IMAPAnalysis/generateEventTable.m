@@ -11,7 +11,7 @@ function eventTable = generateEventTable(~, data, sensorEvents)
     end
 
     % Select sensor.
-    sensor = string(data.MetaData.Sensor);
+    sensorName = string(data.MetaData.Sensor);
 
     if data.MetaData.Primary
         primaryOrSecondary = "Primary";
@@ -22,7 +22,7 @@ function eventTable = generateEventTable(~, data, sensorEvents)
     % Adapt existing event properties.
     if contains("Sensor", sensorEvents.Properties.VariableNames)
 
-        sensorEvents = sensorEvents(ismissing([sensorEvents.Sensor]) | ([sensorEvents.Sensor] == sensor), :);
+        sensorEvents = sensorEvents(ismissing([sensorEvents.Sensor]) | ([sensorEvents.Sensor] == sensorName), :);
         sensorEvents = removevars(sensorEvents, "Sensor");
     end
 
@@ -55,7 +55,7 @@ function eventTable = generateEventTable(~, data, sensorEvents)
 
     if ~isempty(ranges)
 
-        [rangeTable, sensorEvents] = findRangeChanges(ranges, sensorEvents, primaryOrSecondary);
+        [rangeTable, sensorEvents] = findRangeChanges(ranges, sensorEvents, sensorName);
 
         if isempty(sensorEvents)
 
@@ -73,7 +73,7 @@ function eventTable = generateEventTable(~, data, sensorEvents)
 
     % Add sensor shutdown.
     shutDownTable = array2timetable(NaN(1, numel(eventTable.Properties.VariableNames)), RowTimes = max(data.Time) + eps(), VariableNames = eventTable.Properties.VariableNames);
-    shutDownTable.Label = primaryOrSecondary + " Shutdown";
+    shutDownTable.Label = sensorName + " Shutdown";
     shutDownTable.Reason = "Command";
 
     eventTable = [eventTable; shutDownTable];
@@ -189,7 +189,7 @@ function events = findModeChanges(data, events)
     end
 end
 
-function [rangeTable, events] = findRangeChanges(ranges, events, primaryOrSecondary)
+function [rangeTable, events] = findRangeChanges(ranges, events, sensorName)
 
     % Find range changes.
     locRange = diff(ranges.range) ~= 0;
@@ -224,7 +224,7 @@ function [rangeTable, events] = findRangeChanges(ranges, events, primaryOrSecond
     end
 
     % Complete automatic range changes.
-    rangeTable.Label = compose("%s Range %d", primaryOrSecondary, [rangeTable.Range]);
+    rangeTable.Label = compose("%s Range %d", sensorName, [rangeTable.Range]);
     rangeTable.Reason = repmat("Auto", size(rangeTable, 1), 1);
 
     rangeTable = sortrows(rangeTable, "Time");
