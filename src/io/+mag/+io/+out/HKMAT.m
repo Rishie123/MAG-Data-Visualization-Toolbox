@@ -3,21 +3,21 @@ classdef HKMAT < mag.io.out.MAT
 
     methods
 
-        function fileName = getExportFileName(~, data)
+        function fileName = getExportFileName(this, data)
 
             arguments
-                ~
+                this (1, 1) mag.io.out.HKMAT
                 data (1, :) mag.HK
             end
 
             metaData = [data.MetaData];
-            fileName = compose("%s HK", datestr(min([metaData.Timestamp]), "ddmmyy-hhMM")) + ".mat"; %#ok<DATST>
+            fileName = compose("%s HK", datestr(min([metaData.Timestamp]), "ddmmyy-hhMM")) + this.Extension; %#ok<DATST>
         end
 
         function exportData = convertToExportFormat(this, data)
 
             arguments
-                this
+                this (1, 1) mag.io.out.HKMAT
                 data (1, :) mag.HK
             end
 
