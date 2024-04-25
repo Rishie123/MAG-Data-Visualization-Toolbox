@@ -50,7 +50,7 @@ classdef tIALiRT < matlab.mock.TestCase
             % Set up.
             [iALiRT, primaryBehavior, secondaryBehavior] = testCase.createTestData();
 
-            timeFilter = timerange(datetime("-Inf"), datetime("Inf"));
+            timeFilter = timerange(datetime("-Inf", TimeZone = "UTC"), datetime("Inf", TimeZone = "UTC"));
 
             % Exercise.
             iALiRT.crop(timeFilter, timeFilter);
@@ -80,8 +80,11 @@ classdef tIALiRT < matlab.mock.TestCase
 
         function [iALiRT, primaryBehavior, secondaryBehavior] = createTestData(testCase)
 
-            [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {timetable.empty(), mag.meta.Science(Primary = true, Sensor = "FOB")}, Strict = true);
-            [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {timetable.empty(), mag.meta.Science(Sensor = "FIB")}, Strict = true);
+            emptyTimeTable = timetable.empty();
+            emptyTimeTable.Time.TimeZone = "UTC";
+
+            [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {emptyTimeTable, mag.meta.Science(Primary = true, Sensor = "FOB")}, Strict = true);
+            [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {emptyTimeTable, mag.meta.Science(Sensor = "FIB")}, Strict = true);
 
             iALiRT = mag.IALiRT(Science = [primary, secondary]);
         end

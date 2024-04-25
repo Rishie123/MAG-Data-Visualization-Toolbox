@@ -71,7 +71,7 @@ classdef tEvent < matlab.unittest.TestCase
 
             % Verify.
             testCase.assertClass(tt, "timetable", "Timetable should be of correct class.");
-            testCase.assertSize(tt, [3, 11], "Timetable should be of correct size.");
+            testCase.assertSize(tt, [3, 12], "Timetable should be of correct size.");
 
             for v = ["Mode", "PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency", "Duration"]
                 testCase.verifyEqual(tt.(v)', [events.(v)], compose("Timetable property ""%s"" should match event.", v));
@@ -87,6 +87,8 @@ classdef tEvent < matlab.unittest.TestCase
 
             testCase.verifyEqual(tt.Time', [events(1).CompleteTimestamp, events(2).AcknowledgeTimestamp, events(3).CommandTimestamp], ...
                 "Event timestamps should match expected ones.");
+
+            testCase.verifyEqual(tt.Reason, repmat("Command", 3, 1), "Reason of all events should be ""Command"".");
         end
 
         % Test that "RangeChange" events are converted to "timetable"
@@ -101,7 +103,7 @@ classdef tEvent < matlab.unittest.TestCase
 
             % Verify.
             testCase.assertClass(tt, "timetable", "Timetable should be of correct class.");
-            testCase.assertSize(tt, [3, 11], "Timetable should be of correct size.");
+            testCase.assertSize(tt, [3, 12], "Timetable should be of correct size.");
 
             for v = ["Range", "Sensor"]
                 testCase.verifyEqual(tt.(v)', [events.(v)], compose("Timetable property ""%s"" should match event.", v));
@@ -117,6 +119,8 @@ classdef tEvent < matlab.unittest.TestCase
 
             testCase.verifyEqual(tt.Time', [events(1).CompleteTimestamp, events(2).AcknowledgeTimestamp, events(3).CommandTimestamp], ...
                 "Event timestamps should match expected ones.");
+
+            testCase.verifyEqual(tt.Reason, repmat("Command", 3, 1), "Reason of all events should be ""Command"".");
         end
 
         % Test that "RampMode" events are converted to "timetable"
@@ -131,7 +135,7 @@ classdef tEvent < matlab.unittest.TestCase
 
             % Verify.
             testCase.assertClass(tt, "timetable", "Timetable should be of correct class.");
-            testCase.assertSize(tt, [3, 11], "Timetable should be of correct size.");
+            testCase.assertSize(tt, [3, 12], "Timetable should be of correct size.");
 
             for v = "Sensor"
                 testCase.verifyEqual(tt.(v)', [events.(v)], compose("Timetable property ""%s"" should match event.", v));
@@ -147,6 +151,8 @@ classdef tEvent < matlab.unittest.TestCase
 
             testCase.verifyEqual(tt.Time', [events(1).CompleteTimestamp, events(2).AcknowledgeTimestamp, events(3).CommandTimestamp], ...
                 "Event timestamps should match expected ones.");
+
+            testCase.verifyEqual(tt.Reason, repmat("Command", 3, 1), "Reason of all events should be ""Command"".");
         end
 
         % Test that "ModeChange" events are converted to "eventtable"

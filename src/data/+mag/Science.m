@@ -119,24 +119,30 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             % Filter events, but do not remove mode or range that are still
             % ongoing.
-            if ~isempty(this.Data.Properties.Events)
+            if isempty(this.Events) || isempty(this.Events(timePeriod, :))
+                this.Data.Properties.Events = mag.Science.generateEmptyEventtable();
+            else
 
                 % Crop events.
                 originalEvents = this.Events;
                 this.Data.Properties.Events = originalEvents(timePeriod, :);
 
-                croppedEvents = setdiff(originalEvents, this.Events);
-                croppedEvents(croppedEvents.Time >= max(this.Time), :) = [];
+                if min(this.Data.Properties.Events.Time) > min(this.Time)
 
-                % Find the earliest previous mode and range changes.
-                lastModeChange = croppedEvents(find(contains(croppedEvents.Label, "(" | ")"), 1, "last"), :);
-                lastRangeChange = croppedEvents(find(contains(croppedEvents.Label, "Range"), 1, "last"), :);
+                    croppedEvents = setdiff(originalEvents, this.Events);
+                    croppedEvents(croppedEvents.Time >= max(this.Time), :) = [];
 
-                lastEvents = [lastModeChange; lastRangeChange];
-                lastEvents.Time = repmat(min(this.Time), height(lastEvents), 1);
+                    % Find the earliest previous mode and range changes.
+                    lastModeChange = croppedEvents(find(contains(croppedEvents.Label, "(" | ")"), 1, "last"), :);
+                    lastRangeChange = croppedEvents(find(contains(croppedEvents.Label, "Range"), 1, "last"), :);
 
-                % Re-add events.
-                this.Data.Properties.Events = [lastEvents; this.Events];
+                    lastEvents = [lastModeChange; lastRangeChange];
+                    lastEvents.Time = repmat(min(this.Time), height(lastEvents), 1) + ...
+                        1e6 * cumsum(repmat(seconds(eps()), height(lastEvents), 1)); % add "eps" seconds so that they are not all the same
+
+                    % Re-add events.
+                    this.Data.Properties.Events = [lastEvents; this.Events];
+                end
             end
 
             if isempty(this.Time)
@@ -362,6 +368,29 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             science = this(locSelected);
+        end
+    end
+
+    methods (Static)
+
+        function emptyTable = generateEmptyEventtable()
+        % GENERATEEMPTYEVENTTABLE Generate empty timetable for describing
+        % science events.
+
+            emptyTime = datetime.empty();
+            emptyTime.TimeZone = "UTC";
+
+            emptyTable = struct2table(struct(Time = emptyTime, ...
+                Mode = categorical.empty(0, 1), ...
+                DataFrequency = double.empty(0, 1), ...
+                PacketFrequency = double.empty(0, 1), ...
+                Duration = double.empty(0, 1), ...
+                Range = double.empty(0, 1), ...
+                Label = string.empty(0, 1), ...
+                Reason = categorical.empty(0, 1)));
+            emptyTable = table2timetable(emptyTable, RowTimes = "Time");
+
+            emptyTable = eventtable(emptyTable, EventLabelsVariable = "Label");
         end
     end
 

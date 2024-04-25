@@ -139,6 +139,7 @@ classdef tInstrument < matlab.mock.TestCase
 
             % Set up.
             instrument = testCase.createTestData();
+            instrument.Events = mag.event.ModeChange();
 
             % Exercise.
             copiedInstrument = instrument.copy();
@@ -146,6 +147,7 @@ classdef tInstrument < matlab.mock.TestCase
             % Verify.
             testCase.verifyNotSameHandle(instrument, copiedInstrument, "Copied data should be different instance.");
             testCase.verifyNotSameHandle(instrument.MetaData, copiedInstrument.MetaData, "Copied data should be different instance.");
+            testCase.verifyNotSameHandle(instrument.Events, copiedInstrument.Events, "Copied data should be different instance.");
             testCase.verifyNotSameHandle(instrument.Primary, copiedInstrument.Primary, "Copied data should be different instance.");
             testCase.verifyNotSameHandle(instrument.Secondary, copiedInstrument.Secondary, "Copied data should be different instance.");
             testCase.verifyNotSameHandle(instrument.HK, copiedInstrument.HK, "Copied data should be different instance.");

@@ -57,5 +57,55 @@ classdef (Abstract, HandleCompatible) Croppable
                 timePeriod = timeFilter;
             end
         end
+
+        function [startTime, endTime] = convertToStartEndTime(timeFilter, time)
+        % CONVERTTOTIMESUBSCRIPT Convert to subscript that can be used for
+        % timetable cropping.
+
+            arguments (Input)
+                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
+                time datetime {mustBeVector(time, "allow-all-empties")}
+            end
+
+            arguments (Output)
+                startTime (1, 1) datetime
+                endTime (1, 1) datetime
+            end
+
+            warningStatus = warning("off", "MATLAB:structOnObject");
+            restoreWarning = onCleanup(@() warning(warningStatus));
+
+            if isduration(timeFilter)
+
+                if isscalar(timeFilter)
+
+                    if timeFilter >= 0
+
+                        startTime = min(time) + timeFilter;
+                        endTime = max(time);
+                    else
+
+                        startTime = min(time);
+                        endTime = max(time) + timeFilter;
+                    end
+                else
+
+                    startTime = min(time) + timeFilter(1);
+                    endTime = min(time) + timeFilter(2);
+                end
+            elseif isa(timeFilter, "timerange")
+
+                structTimeRange = struct(timeFilter);
+
+                startTime = structTimeRange.first;
+                endTime = structTimeRange.last;
+            elseif isa(timeFilter, "withtol")
+
+                structWithTol = struct(timeFilter);
+
+                startTime = structWithTol.subscriptTimes - structWithTol.tol;
+                endTime = structWithTol.subscriptTimes + structWithTol.tol;
+            end
+        end
     end
 end

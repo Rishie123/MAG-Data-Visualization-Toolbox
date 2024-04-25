@@ -1,4 +1,4 @@
-classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
+classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
 % EVENT Interface for MAG events.
 
     properties (Constant)
@@ -32,17 +32,85 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
             [~, idxSort] = sort([this.CompleteTimestamp], varargin{:});
             sortedThis = this(idxSort);
         end
+
+        function this = crop(this, timeFilter)
+
+            arguments
+                this mag.event.Event
+                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
+            end
+
+            % Crop events.
+            timestamps = this.getTimestamps();
+            [startTime, endTime] = this.convertToStartEndTime(timeFilter, timestamps);
+
+            % Find the earliest previous mode change.
+            originalEventTable = this.eventtable();
+
+            newEvents = originalEventTable(originalEventTable.Time >= startTime, :);
+            croppedEvents = originalEventTable(originalEventTable.Time < startTime, :);
+            lastModeChange = croppedEvents(find(contains(croppedEvents.Label, "(" | ")"), 1, "last"), :);
+
+            % Crop events.
+            eventTypes = unique([this.Type]);
+            locKeep = isbetween(timestamps, startTime, endTime, "closed");
+
+            croppedEvents = this(~locKeep);
+            this = this(locKeep);
+
+            % Find the earliest previous mode and range changes.
+            lastEvents = mag.event.Event.empty();
+
+            for i = eventTypes
+                lastEvents = [lastEvents, croppedEvents(find([croppedEvents.Type] == i, 1, "last"))]; %#ok<AGROW>
+            end
+
+            % Correct the mode change parameters, as they may be missing.
+            % Moreover, the duration will be incorrect.
+            locModeChange = isa(lastEvents, "mag.event.ModeChange");
+
+            if any(locModeChange)
+
+                e = lastEvents(locModeChange);
+
+                if ~isempty(lastModeChange)
+
+                    for p = ["Mode", "PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency"]
+                        e.(p) = lastModeChange.(p);
+                    end
+                end
+
+                if (e.Duration > 0) && isequal(e.Mode, "Burst")
+
+                    locNextMode = (newEvents.Time > e.getTimestamps()) & contains(newEvents.Label, "(" | ")");
+                    nextModeTime = newEvents.Time(find(locNextMode, 1, "first"));
+
+                    e.Duration = seconds(nextModeTime - startTime);
+                else
+                    e.Duration = 0;
+                end
+            end
+
+            % Adjust completion time.
+            for i = numel(lastEvents)
+                e.CompleteTimestamp = startTime + seconds(1e6 * i * eps()); % add "eps" seconds so that they are not all the same
+            end
+
+            % Re-add events.
+            this = [lastEvents, this];
+        end
     end
 
-    methods (Hidden, Sealed)
+    methods (Static)
 
-        function timetableThis = timetable(this)
-        % TIMETABLE Convert events to timetable.
+        function emptyTable = generateEmptyEventtable()
+        % GENERATEEMPTYEVENTTABLE Generate empty timetable for describing
+        % events.
 
             emptyTime = datetime.empty();
             emptyTime.TimeZone = "UTC";
 
-            timetableThis = struct2table(struct(Time = emptyTime, ...
+            emptyTable = struct2table(struct(Time = emptyTime, ...
                 Mode = string.empty(0, 1), ...
                 PrimaryNormalRate = double.empty(0, 1), ...
                 SecondaryNormalRate = double.empty(0, 1), ...
@@ -53,8 +121,18 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
                 Duration = double.empty(0, 1), ...
                 Range = double.empty(0, 1), ...
                 Sensor = string.empty(0, 1), ...
-                Label = string.empty(0, 1)));
-            timetableThis = table2timetable(timetableThis, RowTimes = "Time");
+                Label = string.empty(0, 1), ...
+                Reason = string.empty(0, 1)));
+            emptyTable = table2timetable(emptyTable, RowTimes = "Time");
+        end
+    end
+
+    methods (Hidden, Sealed)
+
+        function timetableThis = timetable(this)
+        % TIMETABLE Convert events to timetable.
+
+            timetableThis = this.generateEmptyEventtable();
 
             for t = 1:numel(this)
 
@@ -69,27 +147,23 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
 
             timetableThis{contains(timetableThis.Label, "Config"), ["PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency", "Duration"]} = missing();
             timetableThis{contains(timetableThis.Label, "Ramp"), "Range"} = missing();
+
+            timetableThis.Reason = repmat("Command", height(timetableThis), 1);
         end
 
         function eventtableThis = eventtable(this)
         % EVENTTABLE Convert evnets to eventtable.
 
             eventtableThis = this.timetable();
-            eventtableThis.Reason = repmat("Command", height(eventtableThis), 1);
 
             locTimedCommand = ~ismissing(eventtableThis.Duration) & (eventtableThis.Duration ~= 0);
-
             idxTimedCommand = find(locTimedCommand);
-            idxBaselineCommand = find(~locTimedCommand);
 
             for i = idxTimedCommand(:)'
 
-                idx = idxBaselineCommand(idxBaselineCommand < i);
-                assert(~isempty(idx), "Cannot determine initial event.");
-
                 autoEvent = eventtableThis(i, :);
                 autoEvent.Time = eventtableThis.Time(i) + seconds(eventtableThis.Duration(i));
-                autoEvent.Mode = eventtableThis.Mode(idx(end));
+                autoEvent.Mode = "Normal"; % only Burst commands can be timed
                 autoEvent.Duration = 0;
                 autoEvent.Reason = "Auto";
 
@@ -116,6 +190,9 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & mag.mixin.SetGet
     methods (Access = protected)
 
         function timestamps = getTimestamps(this)
+        % GETTIMESTAMPS Get timestamps of events, with following priority:
+        % if completion time is missing, use acknowledgement time, if that
+        % is also missing, use command time.
 
             timestamps = [this.CompleteTimestamp];
             locMissing = ismissing(timestamps);

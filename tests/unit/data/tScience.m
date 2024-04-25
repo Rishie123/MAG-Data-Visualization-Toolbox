@@ -161,14 +161,25 @@ classdef tScience < matlab.unittest.TestCase
 
             % Set up.
             science = testCase.createTestData();
-            science.Data.Properties.Events = eventtable(science.Data);
+
+            eventTable = struct2table(struct(Time = [science.Time(1); science.Time(2)], ...
+                Mode = categorical(["Normal"; "Burst"]), ...
+                DataFrequency = [4; 64], ...
+                PacketFrequency = [8; 4], ...
+                Duration = [0; 0], ...
+                Range = [3; 3], ...
+                Label = ["Normal (4, 1)"; "Burst (64, 64)"], ...
+                Reason = categorical(["Command"; "Command"])));
+            eventTable = table2timetable(eventTable, RowTimes = "Time");
+
+            science.Data.Properties.Events = eventtable(eventTable, EventLabelsVariable = "Label");
 
             % Exercise.
             science.crop(minutes(1));
 
             % Verify.
-            testCase.assertEqual(height(science.Events.Time), height(science.Time), "Data should be cropped as expected.");
-            testCase.verifyEqual(science.Events.Time, science.Time, "Data should be cropped as expected.");
+            testCase.assertEqual(height(science.Events.Time), 1, "Data should be cropped as expected.");
+            testCase.verifyEqual(science.Events.Time, eventTable.Time(2), "Data should be cropped as expected.");
         end
 
         % Test that "crop" method does not fail when no data is selected.
