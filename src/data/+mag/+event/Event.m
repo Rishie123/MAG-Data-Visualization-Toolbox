@@ -61,39 +61,42 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
             % Find the earliest previous mode and range changes.
             lastEvents = mag.event.Event.empty();
 
-            for i = eventTypes
-                lastEvents = [lastEvents, croppedEvents(find([croppedEvents.Type] == i, 1, "last"))]; %#ok<AGROW>
-            end
+            if min(this.getTimestamps()) > startTime
 
-            % Correct the mode change parameters, as they may be missing.
-            % Moreover, the duration will be incorrect.
-            locModeChange = isa(lastEvents, "mag.event.ModeChange");
+                for i = eventTypes
+                    lastEvents = [lastEvents, croppedEvents(find([croppedEvents.Type] == i, 1, "last"))]; %#ok<AGROW>
+                end
 
-            if any(locModeChange)
+                % Correct the mode change parameters, as they may be missing.
+                % Moreover, the duration will be incorrect.
+                locModeChange = isa(lastEvents, "mag.event.ModeChange");
 
-                e = lastEvents(locModeChange);
+                if any(locModeChange)
 
-                if ~isempty(lastModeChange)
+                    e = lastEvents(locModeChange);
 
-                    for p = ["Mode", "PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency"]
-                        e.(p) = lastModeChange.(p);
+                    if ~isempty(lastModeChange)
+
+                        for p = ["Mode", "PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency"]
+                            e.(p) = lastModeChange.(p);
+                        end
+                    end
+
+                    if (e.Duration > 0) && isequal(e.Mode, "Burst")
+
+                        locNextMode = (newEvents.Time > e.getTimestamps()) & contains(newEvents.Label, "(" | ")");
+                        nextModeTime = newEvents.Time(find(locNextMode, 1, "first"));
+
+                        e.Duration = seconds(nextModeTime - startTime);
+                    else
+                        e.Duration = 0;
                     end
                 end
 
-                if (e.Duration > 0) && isequal(e.Mode, "Burst")
-
-                    locNextMode = (newEvents.Time > e.getTimestamps()) & contains(newEvents.Label, "(" | ")");
-                    nextModeTime = newEvents.Time(find(locNextMode, 1, "first"));
-
-                    e.Duration = seconds(nextModeTime - startTime);
-                else
-                    e.Duration = 0;
+                % Adjust completion time.
+                for i = numel(lastEvents)
+                    e.CompleteTimestamp = startTime + seconds(1e6 * i * eps()); % add "eps" seconds so that they are not all the same
                 end
-            end
-
-            % Adjust completion time.
-            for i = numel(lastEvents)
-                e.CompleteTimestamp = startTime + seconds(1e6 * i * eps()); % add "eps" seconds so that they are not all the same
             end
 
             % Re-add events.
