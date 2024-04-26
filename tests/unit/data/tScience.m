@@ -1,8 +1,13 @@
 classdef tScience < matlab.unittest.TestCase
 % TSCIENCE Unit tests for "mag.Science" class.
 
+    properties (Constant, Access = private)
+        Time (:, 1) datetime = datetime("now", TimeZone = "UTC") + minutes(1:10)'
+    end
+
     properties (TestParameter)
         DerivativeVariable = {"dX", "dY", "dZ"}
+        ReplacementFilter = {minutes(3), timerange(tScience.Time(1), tScience.Time(4), "closed"), withtol(tScience.Time(2), minutes(2))}
     end
 
     methods (Test)
@@ -71,6 +76,16 @@ classdef tScience < matlab.unittest.TestCase
             % Verify.
             testCase.verifyEqual(actualDerivative(2:end), expectedDerivative, "Derivative should match expected value.");
             testCase.verifyTrue(ismissing(actualDerivative(1)), "First element in derivative should be missing.");
+        end
+
+        % Test that quality flag can be set.
+        function quality_set(testCase)
+
+            % Set up.
+            science = testCase.createTestData();
+
+            % Exercise and verify.
+            science.Quality(1) = mag.meta.Quality.Artificial;
         end
 
         % Test that "HasData" property returns "true" when data is present.
@@ -302,14 +317,14 @@ classdef tScience < matlab.unittest.TestCase
         end
 
         % Test that "replace" method replaces data with default filler.
-        function replaceMethod_default(testCase)
+        function replaceMethod_default(testCase, ReplacementFilter)
 
             % Set up.
             science = testCase.createTestData();
 
             % Exercise.
             modifiedScience = science.copy();
-            modifiedScience.replace(minutes(3));
+            modifiedScience.replace(ReplacementFilter);
 
             % Verify.
             testCase.assertSize(modifiedScience.IndependentVariable, size(science.Time), "Time should not be modified.");
@@ -405,6 +420,45 @@ classdef tScience < matlab.unittest.TestCase
 
             % Exercise and verify.
             testCase.verifyEqual(science.getName("Secondary"), mag.meta.Sensor.FOB, "Secondary sensor should be returned when asked.");
+        end
+
+        % Test that if no primary sensor is set, FOB is returned by
+        % default.
+        function getName_default(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Primary = false;
+            science1.MetaData.Sensor = "FOB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Primary = false;
+            science2.MetaData.Sensor = "FIB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyEqual(science.getName("Primary"), mag.meta.Sensor.FOB, "Default primary sensor should be FOB.");
+        end
+
+        % Test that error is thrown if more than 1 sensor is set as
+        % default.
+        function getName_tooMany(testCase)
+
+            % Set up.
+            science1 = testCase.createTestData();
+            science1.MetaData.Primary = true;
+            science1.MetaData.Sensor = "FOB";
+
+            science2 = testCase.createTestData();
+            science2.MetaData.Primary = true;
+            science2.MetaData.Sensor = "FIB";
+
+            science = [science1, science2];
+
+            % Exercise and verify.
+            testCase.verifyError(@() science.getName("Primary"), ?MException, ...
+                "Error should be thrown when more than 1 sensor is set as primary.");
         end
 
         % Test that primary sensor data is selected correctly.
@@ -566,7 +620,9 @@ classdef tScience < matlab.unittest.TestCase
 
         function [science, rawData] = createTestData()
 
-            rawData = timetable(datetime("now", TimeZone = "UTC") + minutes(1:10)', (1:10)', (11:20)', (21:30)', 3 * ones(10, 1), (1:10)', VariableNames = ["x", "y", "z", "range", "sequence"]);
+            rawData = timetable(tScience.Time, (1:10)', (11:20)', (21:30)', 3 * ones(10, 1), (1:10)', repmat(mag.meta.Quality.Regular, 10, 1), ...
+                VariableNames = ["x", "y", "z", "range", "sequence", "quality"]);
+
             science = mag.Science(rawData, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC")));
         end
 

@@ -175,11 +175,11 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 error("Calculated numerator (%.3f) and denominator (%.3f) must be integers.", numerator, denominator);
             end
 
-            xyz = resample(this.Data(:, ["x", "y", "z"]), numerator, denominator);
+            xyz = resample(this.Data(:, [this.Settings.X, this.Settings.Y, this.Settings.Z]), numerator, denominator);
             xyz = xyz(timerange(this.Time(1), this.Time(end), "closed"), :);
 
             resampledData = retime(this.Data, xyz.Time, "nearest");
-            resampledData(:, ["x", "y", "z"]) = xyz;
+            resampledData(:, [this.Settings.X, this.Settings.Y, this.Settings.Z]) = xyz;
 
             this.Data = resampledData;
             this.MetaData.DataFrequency = targetFrequency;
@@ -226,7 +226,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 arguments = {numeratorOrFilter, denominator};
             end
 
-            this.Data{:, ["x", "y", "z"]} = filter(arguments{:}, this.XYZ);
+            this.Data{:, [this.Settings.X, this.Settings.Y, this.Settings.Z]} = filter(arguments{:}, this.XYZ);
 
             if isa(numeratorOrFilter, "digitalFilter")
                 numCoefficients = numel(numeratorOrFilter.Coefficients);
@@ -238,7 +238,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 numCoefficients = height(this.Data);
             end
 
-            this.Data{1:numCoefficients, ["x", "y", "z"]} = missing();
+            this.Data{1:numCoefficients, [this.Settings.X, this.Settings.Y, this.Settings.Z]} = missing();
         end
 
         function replace(this, timeFilter, filler)
@@ -257,7 +257,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 timePeriod = timeFilter;
             end
 
-            this.Data{timePeriod, ["x", "y", "z"]} = filler;
+            this.Data{timePeriod, [this.Settings.X, this.Settings.Y, this.Settings.Z]} = filler;
         end
 
         function data = computePSD(this, options)
@@ -301,7 +301,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             [psd, f] = psdtsh(xyz, dt, options.FFTType, options.NW);
             psd = psd .^ 0.5;
 
-            data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", "x", "y", "z"]));
+            data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", this.Settings.X, this.Settings.Y, this.Settings.Z]));
         end
     end
 
