@@ -1,16 +1,6 @@
 classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
 % EVENT Interface for MAG events.
 
-    properties (Constant)
-        % COMMONFORMAT Common format for event details.
-        CommonFormat (1, 1) string = "(?:OPCODE=)?(?<opcode>\d+), (?:PUS_SECHDRFLAG=)?(?<header>\d+), (?:PUS_VERSION=)?(?<version>\d+), (?:PUS_ACK=)?(?<ack>\d+), (?:PUS_STYPE=)?(?<type>\d+), (?:PUS_SSUBTYPE=)?(?<subtype>\d+)"
-    end
-
-    properties (Abstract, Constant)
-        % SPECIFICFORMAT Specific format for event details.
-        SpecificFormat (1, 1) string
-    end
-
     properties
         % COMMANDTIMESTAMP Timestamp of command.
         CommandTimestamp (1, 1) datetime = NaT(TimeZone = "UTC")

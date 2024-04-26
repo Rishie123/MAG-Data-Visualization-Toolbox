@@ -1,10 +1,6 @@
 classdef RangeChange < mag.event.Event
 % RANGECHANGE Description of a range change event.
 
-    properties (Constant)
-        SpecificFormat = ", RANGE_ID=RANGE(?<range>\d+), RANGE_GAINX=GAIN(?<x>\d+), RANGE_GAINY=GAIN(?<y>\d+), RANGE_GAINZ=GAIN(?<z>\d+)"
-    end
-
     properties
         % RANGE Range being changed to.
         Range (1, 1) double {mustBeGreaterThanOrEqual(Range, 0), mustBeLessThanOrEqual(Range, 3)} = 0

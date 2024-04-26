@@ -1,10 +1,6 @@
 classdef RampMode < mag.event.Event
 % RAMPMODE Description of a ramp mode event.
 
-    properties (Constant)
-        SpecificFormat = ""
-    end
-
     properties
         % SENSOR Sensor going into ramp mode.
         Sensor (1, 1) mag.meta.Sensor = "FOB"

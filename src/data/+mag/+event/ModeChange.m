@@ -1,10 +1,6 @@
 classdef ModeChange < mag.event.Event
 % MODECHANGE Description of a mode change event.
 
-    properties (Constant)
-        SpecificFormat = ", NORMPRI_RATE=(?<primaryNormal>HZ_\d+|\w+), NORMSEC_RATE=(?<secondaryNormal>HZ_\d+|\w+), NORM_PKTSECS=(?<packetsNormal>SECS_\d+|\w+), BRSTPRI_RATE=(?<primaryBurst>HZ_\d+|\w+), BRSTSEC_RATE=(?<secondaryBurst>HZ_\d+|\w+), BRST_PKTSECS=(?<packetsBurst>SECS_\d+|\w+)"
-    end
-
     properties
         % MODE Mode being changed to.
         Mode (1, 1) mag.meta.Mode = "Normal"
@@ -89,16 +85,6 @@ classdef ModeChange < mag.event.Event
 
             tableThis = timetable(string([this.Mode]), [this.PrimaryNormalRate], [this.SecondaryNormalRate], [this.PacketNormalFrequency], [this.PrimaryBurstRate], [this.SecondaryBurstRate], [this.PacketBurstFrequency], [this.Duration], labels, ...
                 RowTimes = this.getTimestamps(), VariableNames = ["Mode", "PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency", "Duration", "Label"]);
-        end
-    end
-
-    methods (Static)
-
-        function eventDetails = processEventDetails(eventDetails)
-        % PROCESSEVENTDETAILS Process event details by removing extra
-        % information and converting values to MATLAB types.
-
-            eventDetails = structfun(@(x) replace(x, ["SECS_", "HZ_", "UNCHANGED"], ["", "", "NaN"]), eventDetails, UniformOutput = false);
         end
     end
 end

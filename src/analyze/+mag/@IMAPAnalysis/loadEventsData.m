@@ -1,6 +1,6 @@
 function loadEventsData(this)
     %% Load Event Files
-    
+
     rawEvents = string.empty();
 
     for ef = this.EventFileNames
@@ -16,6 +16,13 @@ function loadEventsData(this)
         return;
     end
 
+    %% Define Event Constants
+
+    commonFormat = "(?:OPCODE=)?(?<opcode>\d+), (?:PUS_SECHDRFLAG=)?(?<header>\d+), (?:PUS_VERSION=)?(?<version>\d+), (?:PUS_ACK=)?(?<ack>\d+), (?:PUS_STYPE=)?(?<type>\d+), (?:PUS_SSUBTYPE=)?(?<subtype>\d+)";
+    modeChangeFormat = ", NORMPRI_RATE=(?<primaryNormal>HZ_\d+|\w+), NORMSEC_RATE=(?<secondaryNormal>HZ_\d+|\w+), NORM_PKTSECS=(?<packetsNormal>SECS_\d+|\w+), BRSTPRI_RATE=(?<primaryBurst>HZ_\d+|\w+), BRSTSEC_RATE=(?<secondaryBurst>HZ_\d+|\w+), BRST_PKTSECS=(?<packetsBurst>SECS_\d+|\w+)";
+    rangeChangeFormat = ", RANGE_ID=RANGE(?<range>\d+), RANGE_GAINX=GAIN(?<x>\d+), RANGE_GAINY=GAIN(?<y>\d+), RANGE_GAINZ=GAIN(?<z>\d+)";
+    rampModeFormat = "";
+
     %% Convert Events
 
     events = mag.event.Event.empty();
@@ -25,7 +32,7 @@ function loadEventsData(this)
 
     for ce = rawEvents(locConfig)
 
-        eventDetails = regexp(ce.details, mag.event.Event.CommonFormat, "once", "names");
+        eventDetails = regexp(ce.details, commonFormat, "once", "names");
         events(end + 1) = mag.event.ModeChange( ...
             CommandTimestamp = datetime(ce.timestamp, Format = eventTimeFormat, TimeZone = "UTC"), ...
             Type = eventDetails.type, ...
@@ -45,8 +52,8 @@ function loadEventsData(this)
 
     for ne = rawEvents(locNormal)
 
-        eventDetails = regexp(ne.details, mag.event.Event.CommonFormat + mag.event.ModeChange.SpecificFormat, "once", "names");
-        eventDetails = mag.event.ModeChange.processEventDetails(eventDetails);
+        eventDetails = regexp(ne.details, commonFormat + modeChangeFormat, "once", "names");
+        eventDetails = processModeChangeDetails(eventDetails);
 
         events(end + 1) = mag.event.ModeChange( ...
             CommandTimestamp = datetime(ne.timestamp, Format = eventTimeFormat, TimeZone = "UTC"), ...
@@ -66,8 +73,8 @@ function loadEventsData(this)
 
     for be = rawEvents(locBurst)
 
-        eventDetails = regexp(be.details, mag.event.Event.CommonFormat + mag.event.ModeChange.SpecificFormat + ", BRST_DURATION=(?<duration>\d+)", "once", "names");
-        eventDetails = mag.event.ModeChange.processEventDetails(eventDetails);
+        eventDetails = regexp(be.details, commonFormat + modeChangeFormat + ", BRST_DURATION=(?<duration>\d+)", "once", "names");
+        eventDetails = processModeChangeDetails(eventDetails);
 
         events(end + 1) = mag.event.ModeChange( ...
             CommandTimestamp = datetime(be.timestamp, Format = eventTimeFormat, TimeZone = "UTC"), ...
@@ -88,7 +95,7 @@ function loadEventsData(this)
 
     for re = rawEvents(locRange)
 
-        eventDetails = regexp(re.details, mag.event.Event.CommonFormat + mag.event.RangeChange.SpecificFormat, "once", "names");
+        eventDetails = regexp(re.details, commonFormat + rangeChangeFormat, "once", "names");
         events(end + 1) = mag.event.RangeChange( ...
             CommandTimestamp = datetime(re.timestamp, Format = eventTimeFormat, TimeZone = "UTC"), ...
             Type = eventDetails.type, ...
@@ -102,7 +109,7 @@ function loadEventsData(this)
 
     for re = rawEvents(locRamp)
 
-        eventDetails = regexp(re.details, mag.event.Event.CommonFormat + mag.event.RampMode.SpecificFormat, "once", "names");
+        eventDetails = regexp(re.details, commonFormat + rampModeFormat, "once", "names");
         events(end + 1) = mag.event.RampMode( ...
             CommandTimestamp = datetime(re.timestamp, Format = eventTimeFormat, TimeZone = "UTC"), ...
             Type = eventDetails.type, ...
@@ -209,6 +216,10 @@ function loadEventsData(this)
     %% Assign Value
 
     this.Results.Events = sort(events);
+end
+
+function eventDetails = processModeChangeDetails(eventDetails)
+    eventDetails = structfun(@(x) replace(x, ["SECS_", "HZ_", "UNCHANGED"], ["", "", "NaN"]), eventDetails, UniformOutput = false);
 end
 
 function responsePattern = getResponsePattern(response)
