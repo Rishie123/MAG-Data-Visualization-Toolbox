@@ -46,6 +46,9 @@ function figures = sftPlots(analysis, options)
         views(end + 1) = mag.graphics.view.IALiRT(croppedAnalysis.Results);
     end
 
+    % Show timestamp analysis.
+    views(end + 1) = mag.graphics.view.Timestamp(croppedAnalysis.Results);
+
     % Show HK.
     views(end + 1) = mag.graphics.view.HK(analysis.Results);
 

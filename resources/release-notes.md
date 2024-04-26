@@ -1,5 +1,6 @@
 # Software
 
+- Add view (`mag.graphics.view.Timestamp`) for analyzing primary and secondary science timestamps
 - Improve handling of "croppable" data (inheriting from `mag.mixin.Croppable`) with utility methods `mustBeTimeFilter` and `convertToTimeSubscript`
 - Do not use "Primary" or "Secondary" in sensor event labels
 - Single-source definition of empty event and science event timetables
