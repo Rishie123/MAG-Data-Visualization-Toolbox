@@ -69,7 +69,7 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
 
                 % Correct the mode change parameters, as they may be missing.
                 % Moreover, the duration will be incorrect.
-                locModeChange = isa(lastEvents, "mag.event.ModeChange");
+                locModeChange = arrayfun(@(x) isa(x, "mag.event.ModeChange"), lastEvents);
 
                 if any(locModeChange)
 
@@ -94,8 +94,8 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
                 end
 
                 % Adjust completion time.
-                for i = numel(lastEvents)
-                    e.CompleteTimestamp = startTime + seconds(1e6 * i * eps()); % add "eps" seconds so that they are not all the same
+                for i = 1:numel(lastEvents)
+                    lastEvents(i).CompleteTimestamp = startTime + seconds(1e6 * i * eps()); % add "eps" seconds so that they are not all the same
                 end
             end
 
@@ -161,12 +161,21 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
 
             locTimedCommand = ~ismissing(eventtableThis.Duration) & (eventtableThis.Duration ~= 0);
             idxTimedCommand = find(locTimedCommand);
+            idxBaselineCommand = find(~locTimedCommand);
 
             for i = idxTimedCommand(:)'
 
+                idx = idxBaselineCommand(idxBaselineCommand < i);
+
+                if isempty(idx)
+                    previousMode = "Normal"; % assume the instrument was in Normal mode
+                else
+                    previousMode = eventtableThis.Mode(idx(end));
+                end
+
                 autoEvent = eventtableThis(i, :);
                 autoEvent.Time = eventtableThis.Time(i) + seconds(eventtableThis.Duration(i));
-                autoEvent.Mode = "Normal"; % only Burst commands can be timed
+                autoEvent.Mode = previousMode;
                 autoEvent.Duration = 0;
                 autoEvent.Reason = "Auto";
 
@@ -190,7 +199,7 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
         tableThis = convertToTimeTable(this)
     end
 
-    methods (Access = protected)
+    methods (Sealed)
 
         function timestamps = getTimestamps(this)
         % GETTIMESTAMPS Get timestamps of events, with following priority:

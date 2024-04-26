@@ -59,6 +59,68 @@ classdef tEvent < matlab.unittest.TestCase
             testCase.verifyEqual(sortedEvents, expectedEvents, "Sorting should return the expected order.");
         end
 
+        % Test that crop method filters out events that do not match
+        % time range, but leaves "active" events in, and corrects their
+        % start time.
+        function crop_adjustTimestamp(testCase)
+
+            % Set up.
+            [events, initialTimestamp] = testCase.createCroppableEvents();
+
+            startTime = initialTimestamp + seconds(0.5);
+            originalEvents = events.copy();
+
+            % Exercise.
+            events = events.crop(timerange(startTime, datetime("Inf", TimeZone = "UTC"), "closed"));
+
+            % Verify.
+            testCase.assertNumElements(events, 5, "Number of events should match expectation.");
+
+            for p = ["Mode", "PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency"]
+                testCase.verifyEqual(events(1).(p), originalEvents(1).(p), compose("""%s"" property of mode change event should match expectation.", p));
+            end
+
+            testCase.verifyLessThanOrEqual(events(1).CompleteTimestamp - startTime, milliseconds(1), "Event new start time should be within threshold.");
+            testCase.verifyEqual(events(1).Duration, 0, "Duration should not be adjusted if it is already 0.");
+
+            for i = 2:5
+                testCase.verifyEqual(events(i), originalEvents(i), "Event after time range should be unaffected.");
+            end
+        end
+
+        % Test that crop method filters out events that do not match
+        % time range, but leaves "active" events in, and corrects their
+        % start time and duration.
+        function crop_adjustDuration(testCase)
+
+            % Set up.
+            [events, initialTimestamp] = testCase.createCroppableEvents();
+
+            startTime = initialTimestamp + minutes(10);
+            originalEvents = events.copy();
+
+            % Exercise.
+            events = events.crop(timerange(startTime, datetime("Inf", TimeZone = "UTC"), "closed"));
+
+            % Verify.
+            testCase.assertNumElements(events, 3, "Number of events should match expectation.");
+
+            for i = 1:2
+                testCase.verifyLessThanOrEqual(events(i).CompleteTimestamp - startTime, milliseconds(1), "Event new start time should be within threshold.");
+            end
+
+            for p = ["Mode", "PrimaryNormalRate", "SecondaryNormalRate", "PacketNormalFrequency", "PrimaryBurstRate", "SecondaryBurstRate", "PacketBurstFrequency"]
+                testCase.verifyEqual(events(1).(p), originalEvents(4).(p), compose("""%s"" property of mode change event should match expectation.", p));
+            end
+
+            for p = ["Range", "Sensor"]
+                testCase.verifyEqual(events(2).(p), originalEvents(3).(p), compose("""%s"" property of range change event should match expectation.", p));
+            end
+
+            testCase.verifyEqual(events(1).Duration, seconds(hours(1) - minutes(9)), "Duration should be adjusted based on new start time.");
+            testCase.verifyEqual(events(end), originalEvents(end), "Event after time range should be unaffected.");
+        end
+
         % Test that "ModeChange" events are converted to "timetable"
         % correctly.
         function timetable_modeChange(testCase)
@@ -183,6 +245,22 @@ classdef tEvent < matlab.unittest.TestCase
             testCase.verifyEqual(et.Time(3), events(2).AcknowledgeTimestamp + seconds(events(2).Duration), "Auto event timestamps should match expectation.");
         end
 
+        % Test that when event is empty, it returns an empty timestamp.
+        function getTimestamps_empty(testCase)
+
+            % Set up.
+            event = mag.event.Event.empty();
+
+            % Exercise.
+            timestamp = event.getTimestamps();
+
+            % Verify.
+            testCase.assertClass(timestamp, "datetime", "Timestamp should be ""datetime"".");
+
+            testCase.verifyEmpty(timestamp, "Timestamp should be empty.");
+            testCase.verifyEqual(timestamp.TimeZone, char(mag.time.Constant.TimeZone), "Timestamp should have expected time zone.");
+        end
+
         % Test that dependent "active" properties of "ModeChange" select
         % correct active value.
         function modeChange_dependentProperties(testCase, ModeChangeEventData)
@@ -258,6 +336,50 @@ classdef tEvent < matlab.unittest.TestCase
             events(3) = mag.event.RampMode(CommandTimestamp = datetime("tomorrow", TimeZone = "UTC"), ...
                 Type = 5, SubType = 6, ...
                 Sensor = "FOB");
+        end
+
+        function [events, timestamp] = createCroppableEvents()
+
+            timestamp = datetime("now", TimeZone = "UTC");
+
+            events(1) = mag.event.ModeChange(CompleteTimestamp = timestamp, ...
+                Type = 226, SubType = 5, ...
+                Mode = "Normal", ...
+                PrimaryNormalRate = 4, ...
+                SecondaryNormalRate = 1, ...
+                PrimaryBurstRate = 128, ...
+                SecondaryBurstRate = 64, ...
+                PacketNormalFrequency = 8, ...
+                PacketBurstFrequency = 2);
+
+            events(2) = mag.event.RangeChange(CompleteTimestamp = timestamp + seconds(1), ...
+                Type = 227, SubType = 1, ...
+                Range = 2, Sensor = "FOB");
+
+            events(3) = mag.event.RangeChange(CompleteTimestamp = timestamp + seconds(2), ...
+                Type = 227, SubType = 2, ...
+                Range = 2, Sensor = "FIB");
+
+            events(4) = mag.event.ModeChange(AcknowledgeTimestamp = timestamp + minutes(1), ...
+                Type = 226, SubType = 6, ...
+                Mode = "Burst", ...
+                PrimaryNormalRate = 2, ...
+                SecondaryNormalRate = 2, ...
+                PrimaryBurstRate = 128, ...
+                SecondaryBurstRate = 128, ...
+                PacketNormalFrequency = 8, ...
+                PacketBurstFrequency = 2, ...
+                Duration = 3600);
+
+            events(5) = mag.event.ModeChange(AcknowledgeTimestamp = timestamp + hours(2), ...
+                Type = 226, SubType = 5, ...
+                Mode = "Normal", ...
+                PrimaryNormalRate = 2, ...
+                SecondaryNormalRate = 2, ...
+                PrimaryBurstRate = 64, ...
+                SecondaryBurstRate = 64, ...
+                PacketNormalFrequency = 8, ...
+                PacketBurstFrequency = 4);
         end
     end
 end
