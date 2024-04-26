@@ -2,7 +2,7 @@ classdef tScience < matlab.unittest.TestCase
 % TSCIENCE Unit tests for "mag.Science" class.
 
     properties (Constant, Access = private)
-        Time (:, 1) datetime = datetime("now", TimeZone = "UTC") + minutes(1:10)'
+        Time (:, 1) datetime = datetime("today", TimeZone = "UTC") + minutes(1:10)'
     end
 
     properties (TestParameter)
