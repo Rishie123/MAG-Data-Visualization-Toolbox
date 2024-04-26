@@ -5,6 +5,7 @@
 - Single-source definition of empty event and science event timetables
 - Fix [#43](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/issues/43)
 - Fix issue with `mag.Instrument/Events` not being part of deep copy
+- Fix hardcoded `x`, `y` and `z` strings in `mag.Science`
 
 # GitHub
 

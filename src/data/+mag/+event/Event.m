@@ -108,7 +108,7 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
         % events.
 
             emptyTime = datetime.empty();
-            emptyTime.TimeZone = "UTC";
+            emptyTime.TimeZone = mag.time.Constant.TimeZone;
 
             emptyTable = struct2table(struct(Time = emptyTime, ...
                 Mode = string.empty(0, 1), ...

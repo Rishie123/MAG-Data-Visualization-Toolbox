@@ -378,7 +378,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
         % science events.
 
             emptyTime = datetime.empty();
-            emptyTime.TimeZone = "UTC";
+            emptyTime.TimeZone = mag.time.Constant.TimeZone;
 
             emptyTable = struct2table(struct(Time = emptyTime, ...
                 Mode = categorical.empty(0, 1), ...
@@ -388,8 +388,8 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 Range = double.empty(0, 1), ...
                 Label = string.empty(0, 1), ...
                 Reason = categorical.empty(0, 1)));
-            emptyTable = table2timetable(emptyTable, RowTimes = "Time");
 
+            emptyTable = table2timetable(emptyTable, RowTimes = "Time");
             emptyTable = eventtable(emptyTable, EventLabelsVariable = "Label");
         end
     end
