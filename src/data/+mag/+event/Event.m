@@ -61,7 +61,7 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
             % Find the earliest previous mode and range changes.
             lastEvents = mag.event.Event.empty();
 
-            if min(this.getTimestamps()) > startTime
+            if isempty(this) | (min(this.getTimestamps()) > startTime)
 
                 for i = eventTypes
                     lastEvents = [lastEvents, croppedEvents(find([croppedEvents.Type] == i, 1, "last"))]; %#ok<AGROW>
@@ -155,7 +155,7 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
         end
 
         function eventtableThis = eventtable(this)
-        % EVENTTABLE Convert evnets to eventtable.
+        % EVENTTABLE Convert events to eventtable.
 
             eventtableThis = this.timetable();
 
@@ -194,7 +194,7 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
 
         function timestamps = getTimestamps(this)
         % GETTIMESTAMPS Get timestamps of events, with following priority:
-        % if completion time is missing, use acknowledgement time, if that
+        % if completion time is missing, use acknowledgment time, if that
         % is also missing, use command time.
 
             timestamps = [this.CompleteTimestamp];
@@ -208,6 +208,12 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
                 if any(locMissing)
                     timestamps(locMissing) = this(locMissing).CommandTimestamp;
                 end
+            end
+
+            if isempty(timestamps)
+
+                timestamps = datetime.empty();
+                timestamps.TimeZone = mag.time.Constant.TimeZone;
             end
         end
     end
