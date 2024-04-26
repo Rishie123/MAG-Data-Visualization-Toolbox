@@ -38,7 +38,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: test
     env:
-      VERSION: "4.0.0"
+      VERSION: "4.1.0"
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -61,4 +61,4 @@ jobs:
         with:
           tag: v${{ env.VERSION }}
           artifacts: 'artifacts/MAG Data Visualization.mltbx'
-          bodyFile: 'resources/ReleaseNotes.md'
+          bodyFile: 'resources/release-notes.md'

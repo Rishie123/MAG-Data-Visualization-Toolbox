@@ -36,4 +36,4 @@ The `DataVisualization` app provides an interface to the `mag.IMAPAnalysis` obje
 When developing new features or fixing issues, create a new branch. After finishing development, make sure to write tests to cover any new changes. 
 
 To change the version of the toolbox, modify the `VERSION` variable in `.github/workflows/matlab.yml`. This will automatically updated the toolbox version and create a new release with the correct tag.
-Also, update the contents of the `resources/ReleaseNotes.md` file by detailing what has changed in the new version.
+Also, update the contents of the `resources/release-notes.md` file by detailing what has changed in the new version.

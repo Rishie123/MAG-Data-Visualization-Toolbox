@@ -69,32 +69,6 @@ classdef IALiRT < mag.graphics.view.Science
                 LinkXAxes = true, ...
                 TileIndexing = "columnmajor", ...
                 WindowState = "maximized");
-
-            % Plot difference in timestamp.
-            if numel(primaryIALiRT.Time) == numel(secondaryIALiRT.Time)
-
-                [primarySensor, secondarySensor] = this.getSensorNames();
-
-                primaryScienceTime = this.retrieveMatchingTimestamps(primaryIALiRT.Time, primaryScience.Time);
-                secondaryScienceTime = this.retrieveMatchingTimestamps(secondaryIALiRT.Time, secondaryScience.Time);
-
-                timestampComparison = table(primaryScienceTime, primaryIALiRT.Time, secondaryScienceTime, secondaryIALiRT.Time, ...
-                    VariableNames = ["ps", "pi", "ss", "si"]);
-
-                this.Figures(4) = mag.graphics.visualize( ...
-                    timestampComparison, ...
-                    [mag.graphics.style.Default(Title = "I-ALiRT FOB vs. FIB", YLabel = "\Deltat [ms]", Layout = [2, 1], Charts = mag.graphics.chart.Plot(XVariable = "pi", YVariables = this.getTimingOperation("pi", "si"))), ...
-                    mag.graphics.style.Default(Title = "Primary Science vs. I-ALiRT", YLabel = "\Deltat [ms]", Layout = [2, 1], Charts = mag.graphics.chart.Plot(XVariable = "ps", YVariables = this.getTimingOperation("ps", "pi"))), ...
-                    mag.graphics.style.Default(Title = "Secondary Science vs. I-ALiRT", YLabel = "\Deltat [ms]", Layout = [2, 1], Charts = mag.graphics.chart.Plot(XVariable = "ss", YVariables = this.getTimingOperation("ss", "si")))], ...
-                    primaryScience.Events, mag.graphics.style.Default(Title = compose("%s Modes", primarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency", EndTime = primaryScience.Time(end))), ...
-                    secondaryScience.Events, mag.graphics.style.Default(Title = compose("%s Modes", secondarySensor), YLabel = "mode [-]", YLimits = "manual", Charts = mag.graphics.chart.custom.Event(EventOfInterest = "DataFrequency", EndTime = secondaryScience.Time(end))), ...
-                    Name = "I-ALiRT Timestamp Analysis", ...
-                    Arrangement = [8, 1], ...
-                    LinkXAxes = true, ...
-                    WindowState = "maximized");
-            else
-                warning("FOB and FIB I-ALiRT do not have the same size.");
-            end
         end
     end
 
@@ -120,47 +94,6 @@ classdef IALiRT < mag.graphics.view.Science
                 mag.graphics.style.Default(YLabel = "\Deltay [nT]", Charts = mag.graphics.chart.Plot(YVariables = mag.graphics.operation.Subtract(Minuend = "ys", Subtrahend = "yi"), Colors = defaultColors(3, :), Filter = comparisonData.qs & comparisonData.qi)), ...
                 mag.graphics.style.Default(YLabel = "z [nT]", Layout = [2, 1], Charts = [mag.graphics.chart.Plot(YVariables = "zs", Marker = "o", Filter = comparisonData.qs), mag.graphics.chart.Plot(YVariables = "zi", Marker = "x", Filter = comparisonData.qi)]), ...
                 mag.graphics.style.Default(YLabel = "\Deltaz [nT]", Charts = mag.graphics.chart.Plot(YVariables = mag.graphics.operation.Subtract(Minuend = "zs", Subtrahend = "zi"), Colors = defaultColors(3, :), Filter = comparisonData.qs & comparisonData.qi))];
-        end
-    end
-
-    methods (Static, Access = private)
-
-        function matchedScienceTime = retrieveMatchingTimestamps(iALiRTTime, scienceTime)
-
-            % Pre-allocate array.
-            matchedScienceTime = repmat(datetime("Inf", TimeZone = "UTC"), [numel(iALiRTTime), 1]);
-
-            % Find location of first match.
-            [~, idxMin] = min(abs(iALiRTTime(1) - scienceTime));
-            matchedScienceTime(1) = scienceTime(idxMin);
-
-            % Loop over all subsequent matches, now that we know the first
-            % one.
-            for i = 2:numel(iALiRTTime)
-
-                idxStart = idxMin - 1e3;
-                idxEnd = idxMin + 1e3;
-
-                if idxStart < 1
-                    idxStart = 1;
-                end
-
-                if idxEnd > numel(scienceTime)
-                    idxEnd = numel(scienceTime);
-                end
-
-                [~, idxMin] = min(abs(iALiRTTime(i) - scienceTime(idxStart:idxEnd)));
-                idxMin = idxMin + idxStart - 1;
-
-                matchedScienceTime(i) = scienceTime(idxMin);
-            end
-        end
-
-        function action = getTimingOperation(y1, y2)
-
-            action = mag.graphics.operation.Composition(Operations = [ ...
-                mag.graphics.operation.Subtract(Minuend = y1, Subtrahend = y2), ...
-                mag.graphics.operation.Convert(Conversion = @milliseconds)]);
         end
     end
 end

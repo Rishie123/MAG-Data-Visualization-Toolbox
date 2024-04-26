@@ -45,12 +45,13 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             arguments
                 this mag.HK
-                timeFilter (1, 1) timerange
+                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
             end
 
             for i = 1:numel(this)
 
-                this(i).Data = this(i).Data(timeFilter, :);
+                timePeriod = this.convertToTimeSubscript(timeFilter, this(i).Time);
+                this(i).Data = this(i).Data(timePeriod, :);
 
                 if isempty(this(i).Time)
                     this(i).MetaData.Timestamp = NaT(TimeZone = mag.time.Constant.TimeZone);

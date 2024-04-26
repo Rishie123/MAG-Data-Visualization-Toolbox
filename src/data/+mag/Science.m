@@ -111,30 +111,44 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             arguments
                 this (1, 1) mag.Science
-                timeFilter (1, 1) {mustBeA(timeFilter, ["duration", "timerange", "withtol"])}
+                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
             end
 
-            if isa(timeFilter, "duration")
-
-                if timeFilter >= 0
-                    timePeriod = timerange(this.Time(1) + timeFilter, this.Time(end), "closed");
-                else
-                    timePeriod = timerange(this.Time(1), this.Time(end) + timeFilter, "closed");
-                end
-            elseif isa(timeFilter, "timerange") || isa(timeFilter, "withtol")
-                timePeriod = timeFilter;
-            end
-
+            timePeriod = this.convertToTimeSubscript(timeFilter, this.Time);
             this.Data = this.Data(timePeriod, :);
 
-            if ~isempty(this.Data.Properties.Events)
-                this.Data.Properties.Events = this.Data.Properties.Events(timePeriod, :);
+            % Filter events, but do not remove mode or range that are still
+            % ongoing.
+            if isempty(this.Events) || isempty(this.Events(timePeriod, :))
+                this.Data.Properties.Events = mag.Science.generateEmptyEventtable();
+            else
+
+                % Crop events.
+                originalEvents = this.Events;
+                this.Data.Properties.Events = originalEvents(timePeriod, :);
+
+                if min(this.Data.Properties.Events.Time) > min(this.Time)
+
+                    croppedEvents = setdiff(originalEvents, this.Events);
+                    croppedEvents(croppedEvents.Time >= max(this.Time), :) = [];
+
+                    % Find the earliest previous mode and range changes.
+                    lastModeChange = croppedEvents(find(contains(croppedEvents.Label, "(" | ")"), 1, "last"), :);
+                    lastRangeChange = croppedEvents(find(contains(croppedEvents.Label, "Range"), 1, "last"), :);
+
+                    lastEvents = [lastModeChange; lastRangeChange];
+                    lastEvents.Time = repmat(min(this.Time), height(lastEvents), 1) + ...
+                        1e6 * cumsum(repmat(seconds(eps()), height(lastEvents), 1)); % add "eps" seconds so that they are not all the same
+
+                    % Re-add events.
+                    this.Data.Properties.Events = [lastEvents; this.Events];
+                end
             end
 
             if isempty(this.Time)
                 this.MetaData.Timestamp = NaT(TimeZone = mag.time.Constant.TimeZone);
             else
-                this.MetaData.Timestamp = this.Time(1);
+                this.MetaData.Timestamp = min(this.Time);
             end
         end
 
@@ -161,11 +175,11 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 error("Calculated numerator (%.3f) and denominator (%.3f) must be integers.", numerator, denominator);
             end
 
-            xyz = resample(this.Data(:, ["x", "y", "z"]), numerator, denominator);
+            xyz = resample(this.Data(:, [this.Settings.X, this.Settings.Y, this.Settings.Z]), numerator, denominator);
             xyz = xyz(timerange(this.Time(1), this.Time(end), "closed"), :);
 
             resampledData = retime(this.Data, xyz.Time, "nearest");
-            resampledData(:, ["x", "y", "z"]) = xyz;
+            resampledData(:, [this.Settings.X, this.Settings.Y, this.Settings.Z]) = xyz;
 
             this.Data = resampledData;
             this.MetaData.DataFrequency = targetFrequency;
@@ -212,7 +226,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 arguments = {numeratorOrFilter, denominator};
             end
 
-            this.Data{:, ["x", "y", "z"]} = filter(arguments{:}, this.XYZ);
+            this.Data{:, [this.Settings.X, this.Settings.Y, this.Settings.Z]} = filter(arguments{:}, this.XYZ);
 
             if isa(numeratorOrFilter, "digitalFilter")
                 numCoefficients = numel(numeratorOrFilter.Coefficients);
@@ -224,7 +238,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 numCoefficients = height(this.Data);
             end
 
-            this.Data{1:numCoefficients, ["x", "y", "z"]} = missing();
+            this.Data{1:numCoefficients, [this.Settings.X, this.Settings.Y, this.Settings.Z]} = missing();
         end
 
         function replace(this, timeFilter, filler)
@@ -243,7 +257,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 timePeriod = timeFilter;
             end
 
-            this.Data{timePeriod, ["x", "y", "z"]} = filler;
+            this.Data{timePeriod, [this.Settings.X, this.Settings.Y, this.Settings.Z]} = filler;
         end
 
         function data = computePSD(this, options)
@@ -287,7 +301,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             [psd, f] = psdtsh(xyz, dt, options.FFTType, options.NW);
             psd = psd .^ 0.5;
 
-            data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", "x", "y", "z"]));
+            data = mag.PSD(table(f, psd(:, 1), psd(:, 2), psd(:, 3), VariableNames = ["f", this.Settings.X, this.Settings.Y, this.Settings.Z]));
         end
     end
 
@@ -354,6 +368,29 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
             end
 
             science = this(locSelected);
+        end
+    end
+
+    methods (Static)
+
+        function emptyTable = generateEmptyEventtable()
+        % GENERATEEMPTYEVENTTABLE Generate empty timetable for describing
+        % science events.
+
+            emptyTime = datetime.empty();
+            emptyTime.TimeZone = mag.time.Constant.TimeZone;
+
+            emptyTable = struct2table(struct(Time = emptyTime, ...
+                Mode = categorical.empty(0, 1), ...
+                DataFrequency = double.empty(0, 1), ...
+                PacketFrequency = double.empty(0, 1), ...
+                Duration = double.empty(0, 1), ...
+                Range = double.empty(0, 1), ...
+                Label = string.empty(0, 1), ...
+                Reason = categorical.empty(0, 1)));
+
+            emptyTable = table2timetable(emptyTable, RowTimes = "Time");
+            emptyTable = eventtable(emptyTable, EventLabelsVariable = "Label");
         end
     end
 

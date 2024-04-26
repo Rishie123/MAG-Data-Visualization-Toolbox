@@ -1,4 +1,4 @@
-classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & mag.mixin.SetGet
+classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & mag.mixin.SetGet & mag.mixin.Croppable
 % INSTRUMENT Class containing MAG instrument data.
 
     properties
@@ -132,8 +132,8 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
 
             arguments
                 this (1, 1) mag.Instrument
-                primaryFilter (1, 1) {mustBeA(primaryFilter, ["duration", "timerange", "withtol"])}
-                secondaryFilter (1, 1) {mustBeA(secondaryFilter, ["duration", "timerange", "withtol"])} = primaryFilter
+                primaryFilter
+                secondaryFilter = primaryFilter
             end
 
             % Filter science.
@@ -156,13 +156,15 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
                 endTime (1, 1) datetime = this.TimeRange(2)
             end
 
+            timePeriod = timerange(startTime, endTime, "closed");
+
             % Filter events.
             if ~isempty(this.Events)
-                this.Events = this.Events(isbetween([this.Events.CommandTimestamp], startTime, endTime, "closed"));
+                this.Events = this.Events.crop(timePeriod);
             end
 
             % Filter HK.
-            this.HK.crop(timerange(startTime, endTime, "closed"));
+            this.HK.crop(timePeriod);
 
             % Adjust meta data.
             this.MetaData.Timestamp = startTime;
@@ -232,6 +234,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
             copiedThis = copyElement@matlab.mixin.Copyable(this);
 
             copiedThis.MetaData = copy(this.MetaData);
+            copiedThis.Events = copy(this.Events);
             copiedThis.Science = copy(this.Science);
             copiedThis.IALiRT = copy(this.IALiRT);
             copiedThis.HK = copy(this.HK);

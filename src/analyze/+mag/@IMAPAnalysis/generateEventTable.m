@@ -10,8 +10,11 @@ function eventTable = generateEventTable(~, data, sensorEvents)
         eventTable eventtable
     end
 
+    sensorEvents.Mode = categorical(sensorEvents.Mode);
+    sensorEvents.Reason = categorical(sensorEvents.Reason);
+
     % Select sensor.
-    sensor = string(data.MetaData.Sensor);
+    sensorName = string(data.MetaData.Sensor);
 
     if data.MetaData.Primary
         primaryOrSecondary = "Primary";
@@ -22,7 +25,7 @@ function eventTable = generateEventTable(~, data, sensorEvents)
     % Adapt existing event properties.
     if contains("Sensor", sensorEvents.Properties.VariableNames)
 
-        sensorEvents = sensorEvents(ismissing([sensorEvents.Sensor]) | ([sensorEvents.Sensor] == sensor), :);
+        sensorEvents = sensorEvents(ismissing([sensorEvents.Sensor]) | ([sensorEvents.Sensor] == sensorName), :);
         sensorEvents = removevars(sensorEvents, "Sensor");
     end
 
@@ -35,18 +38,7 @@ function eventTable = generateEventTable(~, data, sensorEvents)
     sensorEvents = findModeChanges(data.Data, sensorEvents);
 
     % Basic structure for events table.
-    emptyTime = datetime.empty();
-    emptyTime.TimeZone = "UTC";
-
-    eventTable = struct2table(struct(Time = emptyTime, ...
-        Mode = string.empty(0, 1), ...
-        DataFrequency = double.empty(0, 1), ...
-        PacketFrequency = double.empty(0, 1), ...
-        Duration = double.empty(0, 1), ...
-        Range = double.empty(0, 1), ...
-        Label = string.empty(0, 1), ...
-        Reason = string.empty(0, 1)));
-    eventTable = table2timetable(eventTable, RowTimes = "Time");
+    eventTable = mag.Science.generateEmptyEventtable();
 
     % Process range changes.
     % Range changes can be automatic, so add automatic transitions. If they
@@ -55,12 +47,12 @@ function eventTable = generateEventTable(~, data, sensorEvents)
 
     if ~isempty(ranges)
 
-        [rangeTable, sensorEvents] = findRangeChanges(ranges, sensorEvents, primaryOrSecondary);
+        [rangeTable, sensorEvents] = findRangeChanges(ranges, sensorEvents, sensorName);
 
         if isempty(sensorEvents)
 
             eventTable = joinEventTables(eventTable, rangeTable);
-            eventTable{:, "Mode"} = string(missing());
+            eventTable{:, "Mode"} = categorical(missing());
             eventTable{:, ["DataFrequency", "PacketFrequency"]} = double(missing());
         else
             eventTable = joinEventTables(sensorEvents, rangeTable);
@@ -73,17 +65,15 @@ function eventTable = generateEventTable(~, data, sensorEvents)
 
     % Add sensor shutdown.
     shutDownTable = array2timetable(NaN(1, numel(eventTable.Properties.VariableNames)), RowTimes = max(data.Time) + eps(), VariableNames = eventTable.Properties.VariableNames);
-    shutDownTable.Label = primaryOrSecondary + " Shutdown";
-    shutDownTable.Reason = "Command";
+    shutDownTable.Mode = categorical(shutDownTable.Mode);
+    shutDownTable.Label = sensorName + " Shutdown";
+    shutDownTable.Reason = categorical("Command");
 
     eventTable = [eventTable; shutDownTable];
 
     % Process variables.
     fillVariables = ["Mode", "DataFrequency", "PacketFrequency", "Range"];
     eventTable(:, fillVariables) = fillmissing(eventTable(:, fillVariables), "previous");
-
-    eventTable.Mode = categorical(eventTable.Mode);
-    eventTable.Reason = categorical(eventTable.Reason);
 
     eventTable{contains(eventTable.Label, "Config"), ["DataFrequency", "PacketFrequency", "Duration"]} = missing();
     eventTable{contains(eventTable.Label, "Ramp"), "Range"} = NaN();
@@ -189,7 +179,7 @@ function events = findModeChanges(data, events)
     end
 end
 
-function [rangeTable, events] = findRangeChanges(ranges, events, primaryOrSecondary)
+function [rangeTable, events] = findRangeChanges(ranges, events, sensorName)
 
     % Find range changes.
     locRange = diff(ranges.range) ~= 0;
@@ -224,8 +214,8 @@ function [rangeTable, events] = findRangeChanges(ranges, events, primaryOrSecond
     end
 
     % Complete automatic range changes.
-    rangeTable.Label = compose("%s Range %d", primaryOrSecondary, [rangeTable.Range]);
-    rangeTable.Reason = repmat("Auto", size(rangeTable, 1), 1);
+    rangeTable.Label = compose("%s Range %d", sensorName, [rangeTable.Range]);
+    rangeTable.Reason = categorical(repmat("Auto", size(rangeTable, 1), 1));
 
     rangeTable = sortrows(rangeTable, "Time");
 end
