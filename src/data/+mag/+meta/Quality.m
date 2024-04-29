@@ -4,7 +4,7 @@ classdef Quality < uint8
     enumeration
         % BAD Data point of bad quality (do not plot).
         Bad (0)
-        % ARTIFICIAL Artificial data point.
+        % ARTIFICIAL Artificial data point, added during processing.
         Artificial (1)
         % REGULAR Regular data point quality.
         Regular (2)
