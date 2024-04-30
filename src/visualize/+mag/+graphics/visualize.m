@@ -16,6 +16,7 @@ function f = visualize(data, styles, options)
         options.LinkYAxes (1, 1) logical = false
         options.TileIndexing (1, 1) string {mustBeMember(options.TileIndexing, ["columnmajor", "rowmajor"])} = "rowmajor"
         options.WindowState (1, 1) string {mustBeMember(options.WindowState, ["normal", "maximized", "minimized", "fullscreen"])} = "normal"
+        options.ShowVersion (1, 1) logical = false
         options.Visible (1, 1) logical = true
     end
 
@@ -67,6 +68,10 @@ function f = visualize(data, styles, options)
 
     if options.LinkYAxes
         linkaxes(axes, "y");
+    end
+
+    if options.ShowVersion
+        annotation(f, "textbox", String = compose("v%s", mag.version()), LineStyle = "none", Units = "pixels", Position = [0, 25, 0, 0]);
     end
 end
 
