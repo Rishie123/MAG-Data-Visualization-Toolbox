@@ -1,4 +1,4 @@
-classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
+classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Crop
 % TIMESERIES Abstract base class for MAG time series.
 
     properties

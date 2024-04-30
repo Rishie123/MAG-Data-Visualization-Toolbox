@@ -1,4 +1,4 @@
-classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
+classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Crop
 % EVENT Interface for MAG events.
 
     properties
@@ -27,7 +27,7 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
 
             arguments
                 this mag.event.Event
-                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
+                timeFilter {mag.mixin.Crop.mustBeTimeFilter}
             end
 
             % Crop events.

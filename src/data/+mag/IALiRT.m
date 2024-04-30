@@ -1,4 +1,4 @@
-classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Croppable
+classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Crop
 % IALIRT Class containing MAG I-ALiRT data.
 
     properties

@@ -1,4 +1,4 @@
-classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & mag.mixin.SetGet & mag.mixin.Croppable
+classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & mag.mixin.SetGet & mag.mixin.Crop
 % INSTRUMENT Class containing MAG instrument data.
 
     properties

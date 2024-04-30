@@ -111,7 +111,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             arguments
                 this (1, 1) mag.Science
-                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
+                timeFilter {mag.mixin.Crop.mustBeTimeFilter}
             end
 
             timePeriod = this.convertToTimeSubscript(timeFilter, this.Time);

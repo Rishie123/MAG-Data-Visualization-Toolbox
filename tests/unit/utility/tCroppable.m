@@ -1,5 +1,5 @@
 classdef tCroppable < matlab.mock.TestCase
-% TCROPPABLE Unit tests for "mag.mixin.Croppable" class.
+% TCROPPABLE Unit tests for "mag.mixin.Crop" class.
 
     properties (Constant, Access = private)
         Time (1, :) datetime = datetime(2024, 3, 14, 15, 9, 27:36, TimeZone = "UTC")
@@ -43,20 +43,20 @@ classdef tCroppable < matlab.mock.TestCase
         function mustBeTimeFilter_valid(testCase, ValidValue)
 
             % Set up.
-            croppable = testCase.createMock(?mag.mixin.Croppable, Strict = true);
+            crop = testCase.createMock(?mag.mixin.Crop, Strict = true);
 
             % Exercise and verify.
-            croppable.mustBeTimeFilter(ValidValue);
+            crop.mustBeTimeFilter(ValidValue);
         end
 
         % Test that "mustBeTimeFilter" errors on invalid values.
         function mustBeTimeFilter_invalid(testCase, InvalidValue)
 
             % Set up.
-            croppable = testCase.createMock(?mag.mixin.Croppable, Strict = true);
+            crop = testCase.createMock(?mag.mixin.Crop, Strict = true);
 
             % Exercise and verify.
-            testCase.verifyError(@() croppable.mustBeTimeFilter(InvalidValue), ?MException, ...
+            testCase.verifyError(@() crop.mustBeTimeFilter(InvalidValue), ?MException, ...
                 "Error should be thrown on invalid value.");
         end
 
@@ -65,10 +65,10 @@ classdef tCroppable < matlab.mock.TestCase
         function convertToTimeSubscript(testCase, SubscriptTime)
 
             % Set up.
-            croppable = testCase.createMock(?mag.mixin.Croppable, Strict = true);
+            crop = testCase.createMock(?mag.mixin.Crop, Strict = true);
 
             % Exercise.
-            timePeriod = croppable.convertToTimeSubscript(SubscriptTime.Filter, testCase.Time);
+            timePeriod = crop.convertToTimeSubscript(SubscriptTime.Filter, testCase.Time);
 
             % Verify.
             testCase.verifyEqual(timePeriod, SubscriptTime.Period, "Time period should match expectation.");
@@ -79,10 +79,10 @@ classdef tCroppable < matlab.mock.TestCase
         function convertToStartEndTime(testCase, StartEndTime)
 
             % Set up.
-            croppable = testCase.createMock(?mag.mixin.Croppable, Strict = true);
+            crop = testCase.createMock(?mag.mixin.Crop, Strict = true);
 
             % Exercise.
-            [startTime, endTime] = croppable.convertToStartEndTime(StartEndTime.Filter, testCase.Time);
+            [startTime, endTime] = crop.convertToStartEndTime(StartEndTime.Filter, testCase.Time);
 
             % Verify.
             testCase.verifyEqual(startTime, StartEndTime.Start, "Start time should match expectation.");
