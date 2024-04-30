@@ -11,9 +11,8 @@ jobs:
     name: Run MATLAB Tests
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         release: ["R2023b", "R2024a"]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

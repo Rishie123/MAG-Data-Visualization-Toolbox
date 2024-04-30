@@ -7,6 +7,5 @@
 # GitHub
 
 - If a job is already running on a development branch, kill it and start a new one
-- Run on all supported hardware
-- Run on all supported MATLAB releases
+- Run tests on all supported MATLAB releases
 - Update third-party dependencies
