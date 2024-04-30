@@ -5,3 +5,7 @@
 - Add check for constant rate in `mag.Science/downsample`
 - Do not resample or downsample if target frequency is equal to actual frequency
 - Rename `mag.mixin.Croppable` to `mag.mixin.Crop`
+
+# Workspace
+
+- Add VS Code settings file
