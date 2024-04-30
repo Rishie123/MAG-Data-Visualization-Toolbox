@@ -1,5 +1,5 @@
 function v = version()
-% VERSION Get MAG software version, compliant with Semanting Versioning
+% VERSION Get MAG software version, compliant with Semantic Versioning
 % 2.0.0.
 
     arguments (Output)
