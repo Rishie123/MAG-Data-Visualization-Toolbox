@@ -1,4 +1,4 @@
-classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Crop
+classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Crop & mag.mixin.Signal
 % IALIRT Class containing MAG I-ALiRT data.
 
     properties
@@ -54,6 +54,30 @@ classdef IALiRT < matlab.mixin.Copyable & mag.mixin.SetGet & mag.mixin.Crop
 
             this.Primary.crop(primaryFilter);
             this.Secondary.crop(secondaryFilter);
+        end
+
+        function resample(this, targetFrequency)
+
+            arguments
+                this (1, 1) mag.IALiRT
+                targetFrequency (1, 1) double
+            end
+
+            for s = this.Science
+                s.resample(targetFrequency);
+            end
+        end
+
+        function downsample(this, targetFrequency)
+
+            arguments
+                this (1, 1) mag.IALiRT
+                targetFrequency (1, 1) double
+            end
+
+            for s = this.Science
+                s.downsample(targetFrequency);
+            end
         end
     end
 
