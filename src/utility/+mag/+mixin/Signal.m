@@ -9,4 +9,15 @@ classdef (Abstract, HandleCompatible) Signal
         % DOWNSAMPLE Downsample data to the specified frequency.
         downsample(this, targetFrequency)
     end
+
+    methods (Hidden, Sealed, Static)
+
+        function mustBeConstantRate(value)
+        % MUSTBECONSTANTRATE Validate that input value has constant rate.
+
+            if ~all(ismembertol(value, mode(value)))
+                throwAsCaller(MException("", "Data rate must be constant."));
+            end
+        end
+    end
 end
