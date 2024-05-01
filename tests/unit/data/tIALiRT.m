@@ -102,7 +102,7 @@ classdef tIALiRT < matlab.mock.TestCase
 
         function [iALiRT, primaryBehavior, secondaryBehavior] = createTestData(testCase)
 
-            scienceTT = timetable(datetime("now", TimeZone = "UTC") + minutes(1:10)', (1:10)', (11:20)', (21:30)', 3 * ones(10, 1), (1:10)', VariableNames = ["x", "y", "z", "range", "sequence"]);
+            scienceTT = mag.test.DataTestUtilities.getScienceTimetable();
 
             [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Primary = true, Sensor = "FOB")}, Strict = true);
             [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Sensor = "FIB")}, Strict = true);

@@ -1,13 +1,9 @@
 classdef tScience < matlab.unittest.TestCase
 % TSCIENCE Unit tests for "mag.Science" class.
 
-    properties (Constant, Access = private)
-        Time (:, 1) datetime = datetime("today", TimeZone = "UTC") + minutes(1:10)'
-    end
-
     properties (TestParameter)
         DerivativeVariable = {"dX", "dY", "dZ"}
-        ReplacementFilter = {minutes(3), timerange(tScience.Time(1), tScience.Time(4), "closed"), withtol(tScience.Time(2), minutes(2))}
+        ReplacementFilter = {minutes(3), timerange(mag.test.DataTestUtilities.Time(1), mag.test.DataTestUtilities.Time(4), "closed"), withtol(mag.test.DataTestUtilities.Time(2), minutes(2))}
     end
 
     methods (Test)
@@ -283,9 +279,21 @@ classdef tScience < matlab.unittest.TestCase
             testCase.verifyTrue(any(ismissing(downsampledData.XYZ), "all"), "Initial data should be replaced with missing values to account for filter warm-up.");
         end
 
+        % Test that "downsample" method throws when initial frequency is
+        % not uniform.
+        function downsampleMethod_errorInitialFrequency(testCase)
+
+            % Set up.
+            science = testCase.createTestData();
+            science.Data.Time(end) = datetime("tomorrow", TimeZone = "UTC");
+
+            % Exercise and verify.
+            testCase.verifyError(@() science.downsample(0.12345), "", "Resampling should error when frequencies do not match.");
+        end
+
         % Test that "downsample" method throws when target frequency is not
         % compatible with initial frequency.
-        function downsampleMethod_error(testCase)
+        function downsampleMethod_errorTargetFrequency(testCase)
 
             % Set up.
             science = testCase.createTestData();
@@ -618,12 +626,10 @@ classdef tScience < matlab.unittest.TestCase
             science = mag.Science(rawData, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC")));
         end
 
-        function [science, rawData] = createTestData()
+        function [science, scienceTT] = createTestData()
 
-            rawData = timetable(tScience.Time, (1:10)', (11:20)', (21:30)', 3 * ones(10, 1), (1:10)', repmat(mag.meta.Quality.Regular, 10, 1), ...
-                VariableNames = ["x", "y", "z", "range", "sequence", "quality"]);
-
-            science = mag.Science(rawData, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC")));
+            scienceTT = mag.test.DataTestUtilities.getScienceTimetable();
+            science = mag.Science(scienceTT, mag.meta.Science(Timestamp = datetime("now", TimeZone = "UTC")));
         end
 
         function [science, rawData] = createSineWaveTestData()

@@ -187,7 +187,8 @@ classdef tInstrument < matlab.mock.TestCase
 
         function [instrument, primaryBehavior, secondaryBehavior, iALiRTBehavior, hkBehavior] = createTestData(testCase)
 
-            scienceTT = timetable(datetime("now", TimeZone = "UTC") + minutes(1:10)', (1:10)', (11:20)', (21:30)', 3 * ones(10, 1), (1:10)', VariableNames = ["x", "y", "z", "range", "sequence"]);
+            scienceTT = mag.test.DataTestUtilities.getScienceTimetable();
+            hkTT = timetable(datetime("now", TimeZone = "UTC") + minutes(1:10)', (1:10)', (11:20)', (21:30)', VariableNames = ["a", "b", "c"]);
 
             [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Primary = true, Sensor = "FOB", Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
             [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Sensor = "FIB", Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
@@ -196,7 +197,7 @@ classdef tInstrument < matlab.mock.TestCase
             iALiRTSecondaryScience = mag.Science(scienceTT, mag.meta.Science(Sensor = "FIB", Timestamp = datetime("now", TimeZone = "UTC")));
             [iALiRT, iALiRTBehavior] = testCase.createMock(?mag.IALiRT, ConstructorInputs = {"Science", [iALiRTPrimaryScience, iALiRTSecondaryScience]}, Strict = true);
 
-            [hk, hkBehavior] = testCase.createMock(?mag.HK, ConstructorInputs = {scienceTT, mag.meta.HK(Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
+            [hk, hkBehavior] = testCase.createMock(?mag.HK, ConstructorInputs = {hkTT, mag.meta.HK(Timestamp = datetime("now", TimeZone = "UTC"))}, Strict = true);
 
             instrument = mag.Instrument(MetaData = mag.meta.Instrument(), ...
                 Science = [primary, secondary], ...
