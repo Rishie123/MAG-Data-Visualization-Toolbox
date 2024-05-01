@@ -39,3 +39,12 @@ When developing new features or fixing issues, create a new branch. After finish
 
 To change the version of the toolbox, modify the `VERSION` variable in `.github/workflows/matlab.yml`. This will automatically updated the toolbox version and create a new release with the correct tag.
 Also, update the contents of the `resources/release-notes.md` file by detailing what has changed in the new version.
+
+## License
+
+MAG Data Visualization Toolbox is released under the [MIT license][license].
+
+[license]: LICENSE.md
+[repo]: https://github.com/ImperialCollegeLondon/MAG-Current-Source-Scripts
+[sml]: http://www.imperial.ac.uk/space-and-atmospheric-physics/research/areas/space-magnetometer-laboratory/
+[new-issue]: https://github.com/ImperialCollegeLondon/MAG-Current-Source-Scripts/issues
