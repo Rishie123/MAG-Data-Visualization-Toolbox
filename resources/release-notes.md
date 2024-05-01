@@ -10,4 +10,5 @@
 
 # Workspace
 
+- Add license file
 - Add VS Code settings file
