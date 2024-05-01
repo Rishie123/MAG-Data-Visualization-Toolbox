@@ -45,6 +45,4 @@ Also, update the contents of the `resources/release-notes.md` file by detailing 
 MAG Data Visualization Toolbox is released under the [MIT license][license].
 
 [license]: LICENSE.md
-[repo]: https://github.com/ImperialCollegeLondon/MAG-Current-Source-Scripts
 [sml]: http://www.imperial.ac.uk/space-and-atmospheric-physics/research/areas/space-magnetometer-laboratory/
-[new-issue]: https://github.com/ImperialCollegeLondon/MAG-Current-Source-Scripts/issues
