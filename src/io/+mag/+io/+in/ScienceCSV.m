@@ -109,7 +109,7 @@ classdef ScienceCSV < mag.io.in.CSV
             % Property order:
             %     sequence, x, y, z, range, coarse, fine, compression,
             %     quality, t
-            rawData.Properties.VariableContinuity = ["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "step", "continuous"];
+            rawData.Properties.VariableContinuity = ["step", "continuous", "continuous", "continuous", "step", "continuous", "continuous", "step", "event", "continuous"];
 
             % Convert to mag.Science.
             data = mag.Science(table2timetable(rawData, RowTimes = "t"), metaData);
