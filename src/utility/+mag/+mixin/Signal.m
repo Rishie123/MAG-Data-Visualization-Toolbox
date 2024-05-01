@@ -15,6 +15,8 @@ classdef (Abstract, HandleCompatible) Signal
         function mustBeConstantRate(value)
         % MUSTBECONSTANTRATE Validate that input value has constant rate.
 
+            value(ismissing(value)) = [];
+
             if ~all(ismembertol(value, mode(value)))
                 throwAsCaller(MException("", "Data rate must be constant."));
             end

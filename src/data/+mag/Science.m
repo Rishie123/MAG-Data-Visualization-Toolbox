@@ -194,8 +194,8 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 targetFrequency (1, 1) double
             end
 
-            dt = milliseconds(this.dT(this.Quality.isScience()));
-            this.mustBeConstantRate(dt);
+            dt = this.dT(this.Quality.isScience());
+            this.mustBeConstantRate(milliseconds(dt));
 
             actualFrequency = 1 / seconds(mode(dt));
             decimationFactor = actualFrequency / targetFrequency;
