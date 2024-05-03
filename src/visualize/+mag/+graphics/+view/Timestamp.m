@@ -1,4 +1,4 @@
-classdef Timestamp < mag.graphics.view.Science
+classdef Timestamp < mag.graphics.view.View
 % TIMESTAMP Show analysis of science and I-ALiRT timestamps.
 
     methods
