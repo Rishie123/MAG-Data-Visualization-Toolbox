@@ -3,10 +3,10 @@ classdef DefaultFactory < mag.graphics.factory.Factory
 
     methods
 
-        function f = visualize(~, data, styles, options)
+        function f = visualize(this, data, styles, options)
 
             arguments (Input)
-                ~
+                this (1, 1) mag.graphics.factory.DefaultFactory
             end
 
             arguments (Input, Repeating)
@@ -21,6 +21,9 @@ classdef DefaultFactory < mag.graphics.factory.Factory
             arguments (Output)
                 f (1, 1) matlab.ui.Figure
             end
+
+            args = namedargs2cell(options);
+            options = mag.graphics.factory.Settings(args{:});
 
             % Force MATLAB to finish opening any previous figure.
             drawnow();
@@ -50,7 +53,7 @@ classdef DefaultFactory < mag.graphics.factory.Factory
 
             for i = 1:numel(data)
 
-                ax = doVisualize(t, data{i}, styles{i});
+                ax = this.doVisualize(t, data{i}, styles{i});
                 axes = horzcat(axes, ax); %#ok<AGROW>
             end
 
@@ -74,7 +77,7 @@ classdef DefaultFactory < mag.graphics.factory.Factory
         end
     end
 
-    methods (Access = private)
+    methods (Static, Access = private)
 
         function axes = doVisualize(t, data, styles)
         % DOVISUALIZE Internal plotting function to handle different chart

@@ -11,7 +11,7 @@ classdef Settings < mag.mixin.SetGet
         TileIndexing (1, 1) string {mustBeMember(TileIndexing, ["columnmajor", "rowmajor"])} = "rowmajor"
         WindowState (1, 1) string {mustBeMember(WindowState, ["normal", "maximized", "minimized", "fullscreen"])} = "normal"
         ShowVersion (1, 1) logical = false
-        Visible (1, 1) logical = get(groot(), "DefaultFigureVisible")
+        Visible (1, 1) logical = true
     end
 
     methods
@@ -22,7 +22,10 @@ classdef Settings < mag.mixin.SetGet
                 options.?mag.graphics.factory.Settings
             end
 
-            this.assignProperties(options)
+            % Make sure to update visibility value using default setting.
+            options.Visible = get(groot(), "DefaultFigureVisible");
+
+            this.assignProperties(options);
         end
     end
 end
