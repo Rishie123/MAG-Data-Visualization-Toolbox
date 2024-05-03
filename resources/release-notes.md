@@ -7,6 +7,7 @@
 - Default `Visible` value in `mag.graphics.visualize` now comes from `matlab.ui.Root/DefaultFigureVisible`
 - Rename `mag.graphics.getAllAxes` to `mag.test.getAllAxes`
 - Fix issue with views not handling `NaT`
+- Add tests for `mag.graphics.view.Field`
 
 ## Other
 
