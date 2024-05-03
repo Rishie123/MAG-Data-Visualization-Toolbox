@@ -64,14 +64,14 @@ classdef Frequency < mag.graphics.view.View
         end
     end
 
-    methods (Static, Access = private)
+    methods (Access = private)
 
-        function value = getFigureTitle(primary, secondary, psdStart, psdDuration)
-            value = compose("Start: %s - Duration: %s - (%d, %d)", psdStart, psdDuration, primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"));
+        function value = getFigureTitle(this, primary, secondary, psdStart, psdDuration)
+            value = compose("Start: %s - Duration: %s - (%d, %d)", this.date2str(psdStart), psdDuration, primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"));
         end
 
-        function value = getFigureName(primary, secondary, psdStart)
-            value = compose("%s (%d, %d) Frequency (%s)", primary.MetaData.getDisplay("Mode"), primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"), datestr(psdStart, "dd-mmm-yyyy HHMMSS")); %#ok<DATST>
+        function value = getFigureName(this, primary, secondary, psdStart)
+            value = compose("%s (%d, %d) Frequency (%s)", primary.MetaData.getDisplay("Mode"), primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"), this.date2str(psdStart));
         end
     end
 end

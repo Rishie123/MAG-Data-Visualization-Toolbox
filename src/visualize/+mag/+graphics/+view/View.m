@@ -60,4 +60,18 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
             hkType = this.Results.HK.getHKType(type);
         end
     end
+
+    methods (Static, Access = protected)
+
+        function date = date2str(date, format)
+        % DATE2STR Convert datetime to string.
+
+            arguments
+                date (1, 1) datetime
+                format (1, 1) string = "dd-MMM-yyyy HHmmss"
+            end
+
+            date.Format = format;
+        end
+    end
 end
