@@ -19,5 +19,10 @@ classdef tVisualize < MAGViewTestCase
 
             testCase.verifyEmpty(tl.Children, "Tiled layout should have no children.");
         end
+
+        % Test that errors are re-thrown.
+        function error(testCase)
+            testCase.verifyError(@() mag.graphics.visualize(1), "MATLAB:functionValidation:RepeatingInputsNotInGroups", "Error should be re-thrown.");
+        end
     end
 end
