@@ -3,7 +3,7 @@ classdef (Abstract) Factory
 
     methods (Abstract)
 
-        % VISUALIZE Plot data with specified styles and options.
-        f = visualize(this, data, style, options)
+        % ASSEMBLE Plot data with specified styles and options.
+        f = assemble(this, data, style, options)
     end
 end

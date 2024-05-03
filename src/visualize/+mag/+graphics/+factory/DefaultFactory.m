@@ -3,7 +3,7 @@ classdef DefaultFactory < mag.graphics.factory.Factory
 
     methods
 
-        function f = visualize(this, data, styles, options)
+        function f = assemble(this, data, styles, options)
 
             arguments (Input)
                 this (1, 1) mag.graphics.factory.DefaultFactory
