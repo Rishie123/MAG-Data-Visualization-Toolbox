@@ -43,6 +43,10 @@ classdef MAGViewTestCase < mag.test.GraphicsTestCase & matlab.mock.TestCase
 
         function instrument = createTestInstrument(options)
 
+            arguments
+                options.AddHK (1, 1) logical = false
+            end
+
             % Create instrument meta data.
             metaInstrument = mag.meta.Instrument(ASW = "5.01", BSW = "0.02", GSE = "10.5.4", Model = "FM", Timestamp = datetime("now", TimeZone = "UTC"));
 
@@ -60,6 +64,15 @@ classdef MAGViewTestCase < mag.test.GraphicsTestCase & matlab.mock.TestCase
 
             % Assemble instrument data.
             instrument = mag.Instrument(Science = [science1, science2], MetaData = metaInstrument);
+
+            % Create HK.
+            if options.AddHK
+
+                pwrHK = mag.hk.Power(mag.test.DataTestUtilities.getPowerTimetable(), mag.meta.HK(Type = "PW", Timestamp = datetime("now", TimeZone = "UTC")));
+                procstatHK = mag.hk.Processor(mag.test.DataTestUtilities.getProcessorTimetable(), mag.meta.HK(Type = "PROCSTAT", Timestamp = datetime("now", TimeZone = "UTC")));
+
+                instrument.HK = [pwrHK, procstatHK];
+            end
         end
     end
 end

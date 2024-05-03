@@ -15,5 +15,19 @@ classdef DataTestUtilities
                 VariableNames = ["x", "y", "z", "range", "sequence", "quality"]);
             scienceTT.Properties.VariableContinuity = ["continuous", "continuous", "continuous", "step", "step", "event"];
         end
+
+        function pwrTT = getPowerTimetable()
+        % GETPOWERTIMETABLE Get timetable of power HK data.
+
+            pwrTT = timetable(mag.test.DataTestUtilities.Time, (21:30)', (22:31)', (23:32)', ...
+                VariableNames = ["ICU_TEMP", "FOB_TEMP", "FIB_TEMP"]);
+        end
+
+        function procstatTT = getProcessorTimetable()
+        % GETPROCESSORTIMETABLE Get timetable of processor HK data.
+
+            procstatTT = timetable(mag.test.DataTestUtilities.Time, (0:9)', (9:-1:0)', ...
+                VariableNames = ["OBNQ_NUM_MSG", "IBNQ_NUM_MSG"]);
+        end
     end
 end
