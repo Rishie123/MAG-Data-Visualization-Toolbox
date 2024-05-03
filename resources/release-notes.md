@@ -1,6 +1,13 @@
 # Software
 
+## Graphics
+
 - Add plot for science timestamp Δt in `mag.graphics.view.Timestamp`
+- Default `Visible` value in `mag.graphics.visualize` now comes from `matlab.ui.Root/DefaultFigureVisible`
+- Fix issue with views not handling `NaT`
+
+## Other
+
 - Add `mag.mixin.Signal` as interface for signal-like classes
 - Add `resample` and `downsample` methods to `mag.IALiRT`
 - Add check for constant rate in `mag.Science/downsample`
