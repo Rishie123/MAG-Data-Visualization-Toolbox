@@ -3,9 +3,10 @@
 ## Graphics
 
 - Add plot for science timestamp Δt in `mag.graphics.view.Timestamp`
+- Replace use of `mag.graphics.visualize` in views with abstract factory pattern
 - Default `Visible` value in `mag.graphics.visualize` now comes from `matlab.ui.Root/DefaultFigureVisible`
-- Fix issue with views not handling `NaT`
 - Rename `mag.graphics.getAllAxes` to `mag.test.getAllAxes`
+- Fix issue with views not handling `NaT`
 
 ## Other
 

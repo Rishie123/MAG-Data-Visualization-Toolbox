@@ -12,6 +12,11 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
         TLabel (1, 1) string = "T [" + char(176) + "C]"
     end
 
+    properties
+        % FACTORY Graphics factory.
+        Factory (1, 1) mag.graphics.factory.Factory = mag.graphics.factory.DefaultFactory()
+    end
+
     properties (SetAccess = protected)
         % RESULTS Data to visualize.
         Results (1, 1) mag.Instrument
