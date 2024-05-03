@@ -35,15 +35,15 @@ classdef tHKMATOut < MAGIOTestCase
 
             % Verify.
             testCase.assertClass(exportData, "struct", "Export data should be a ""struct"".");
-            testCase.assertThat(exportData, mag.test.IsField("HK"), """HK"" field should exist.");
+            testCase.assertThat(exportData, mag.test.constraint.IsField("HK"), """HK"" field should exist.");
 
             hk = exportData.HK;
-            testCase.assertThat(hk, mag.test.IsField("SID15"), """SID15"" field should exist.");
+            testCase.assertThat(hk, mag.test.constraint.IsField("SID15"), """SID15"" field should exist.");
 
             sid15 = hk.SID15;
-            testCase.assertThat(sid15, mag.test.IsField("Time"), """Time"" field should exist.");
-            testCase.assertThat(sid15, mag.test.IsField("A"), """A"" field should exist.");
-            testCase.assertThat(sid15, mag.test.IsField("B"), """B"" field should exist.");
+            testCase.assertThat(sid15, mag.test.constraint.IsField("Time"), """Time"" field should exist.");
+            testCase.assertThat(sid15, mag.test.constraint.IsField("A"), """A"" field should exist.");
+            testCase.assertThat(sid15, mag.test.constraint.IsField("B"), """B"" field should exist.");
 
             testCase.verifyEqual(sid15.Time, [datetime("yesterday"); datetime("today")], """Time"" value should match expectation.");
             testCase.verifyEqual(sid15.A, [1; 2], """A"" value should match expectation.");
