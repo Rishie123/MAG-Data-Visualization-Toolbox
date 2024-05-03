@@ -1,4 +1,4 @@
-classdef MAGViewTestCase < matlab.mock.TestCase
+classdef MAGViewTestCase < mag.test.GraphicsTestCase & matlab.mock.TestCase
 % MAGVIEWTESTCASE Base class for all MAG view tests.
 
     methods (Access = protected)
@@ -41,7 +41,7 @@ classdef MAGViewTestCase < matlab.mock.TestCase
 
     methods (Static, Access = protected)
 
-        function instrument = createTestInstrument()
+        function instrument = createTestInstrument(options)
 
             % Create instrument meta data.
             metaInstrument = mag.meta.Instrument(ASW = "5.01", BSW = "0.02", GSE = "10.5.4", Model = "FM", Timestamp = datetime("now", TimeZone = "UTC"));

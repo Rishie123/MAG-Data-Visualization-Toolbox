@@ -1,4 +1,4 @@
-classdef (Abstract) MAGStyleTestCase < matlab.unittest.TestCase
+classdef (Abstract) MAGStyleTestCase < mag.test.GraphicsTestCase
 % MAGSTYLETESTCASE Base class for all axes styles that support extra
 % properties.
 
