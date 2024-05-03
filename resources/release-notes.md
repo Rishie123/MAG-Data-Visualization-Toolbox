@@ -8,7 +8,7 @@
 - Rename `mag.graphics.getAllAxes` to `mag.test.getAllAxes`
 - Fix issue with views not handling `NaT`
 - Add cleanup to all graphics tests, to close any figures opened during the test
-- Add tests for `mag.graphics.view.Field`
+- Add tests for `mag.graphics.view.Field` and `mag.graphics.visualize`
 
 ## Other
 
