@@ -27,7 +27,7 @@ classdef tStackedplot < MarkerSupportTestCase
             testCase.verifyClass(assembledGraph, "matlab.graphics.chart.primitive.Line", "Graph type should match expectation.");
             testCase.verifyNumElements(assembledGraph, 3, "Number of graphs should match expectation.");
 
-            axes = unique([ax; mag.graphics.getAllAxes(tl)]);
+            axes = unique([ax; mag.test.getAllAxes(tl)]);
             graph = [axes.Children];
 
             testCase.assertSize(graph, [3, 3], "Number of graphs should match expectation.");
@@ -59,7 +59,7 @@ classdef tStackedplot < MarkerSupportTestCase
             testCase.verifyClass(assembledGraph, "matlab.graphics.chart.primitive.Line", "Graph type should match expectation.");
             testCase.verifyNumElements(assembledGraph, 3, "Number of graphs should match expectation.");
 
-            axes = unique([ax; mag.graphics.getAllAxes(tl)]);
+            axes = unique([ax; mag.test.getAllAxes(tl)]);
             graph = [axes.Children];
 
             testCase.assertSize(graph, [5, 3], "Number of graphs should match expectation.");
@@ -94,7 +94,7 @@ classdef tStackedplot < MarkerSupportTestCase
             testCase.verifyClass(assembledGraph, "matlab.graphics.chart.primitive.Line", "Graph type should match expectation.");
             testCase.verifyNumElements(assembledGraph, 3, "Number of graphs should match expectation.");
 
-            axes = unique([ax; mag.graphics.getAllAxes(tl)]);
+            axes = unique([ax; mag.test.getAllAxes(tl)]);
             graph = [axes.Children];
 
             testCase.assertSize(graph, [5, 3], "Number of graphs should match expectation.");

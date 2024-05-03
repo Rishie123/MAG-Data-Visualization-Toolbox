@@ -28,9 +28,9 @@ classdef GraphicsTestUtilities
             end
 
             if isvalid(axes)
-                axes = unique([axes; mag.graphics.getAllAxes(layout)]);
+                axes = unique([axes; mag.test.getAllAxes(layout)]);
             else
-                axes = unique(mag.graphics.getAllAxes(layout));
+                axes = unique(mag.test.getAllAxes(layout));
             end
 
             graph = vertcat(axes.Children);

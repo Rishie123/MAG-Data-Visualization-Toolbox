@@ -23,7 +23,7 @@ classdef tScatterhistogram < MAGChartTestCase
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 
             % Verify.
-            axes = unique(mag.graphics.getAllAxes(tl));
+            axes = unique(mag.test.getAllAxes(tl));
             graph = vertcat(axes.Children);
 
             testCase.assertNumElements(graph, 3, "Scatter-histogram should create 3 objects.");
@@ -47,7 +47,7 @@ classdef tScatterhistogram < MAGChartTestCase
             assembledGraph = chart.plot(testCase.Data, ax, tl);
 
             % Verify.
-            axes = unique(mag.graphics.getAllAxes(tl));
+            axes = unique(mag.test.getAllAxes(tl));
             graph = vertcat(axes.Children);
 
             testCase.assertNumElements(graph, 40, "Scatter-histogram should create 21 objects.");
