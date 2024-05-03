@@ -19,6 +19,7 @@
 - Do not resample or downsample if target frequency is equal to actual frequency
 - Rename `mag.mixin.Croppable` to `mag.mixin.Crop`
 - Fix issue with `mag.meta.Quality` not being compatible with `NaN`s
+- Fix issue with `mag.Instrument/HasHK` erroring with multiple HK instances
 
 # Workspace
 
