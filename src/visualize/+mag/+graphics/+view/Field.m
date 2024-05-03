@@ -32,7 +32,7 @@ classdef Field < mag.graphics.view.Science
 
             [numEvents, eventData] = this.getEventData(primary, secondary, primarySensor, secondarySensor);
 
-            if isempty(hk) || isempty(hk.Data)
+            if isempty(hk) || ~hk.HasData
 
                 this.Figures = this.Factory.assemble( ...
                     primary, mag.graphics.style.Stackedplot(Title = this.getFieldTitle(primary), YLabels = ["x [nT]", "y [nT]", "z [nT]", "|B| [nT]"], Layout = [3, 1], Charts = mag.graphics.chart.Stackedplot(YVariables = ["X", "Y", "Z", "B"], Filter = primary.Quality.isPlottable())), ...
