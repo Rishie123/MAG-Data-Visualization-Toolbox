@@ -1,4 +1,4 @@
-classdef Quality < uint8
+classdef Quality < double
 % QUALITY Enumeration for quality type. Used to remove data for plotting.
 
     enumeration
@@ -8,6 +8,8 @@ classdef Quality < uint8
         Artificial (1)
         % REGULAR Regular data point quality.
         Regular (2)
+        % NAN Missing value.
+        NaN (NaN)
     end
 
     methods

@@ -1,5 +1,5 @@
-classdef (Abstract, HandleCompatible) Croppable
-% CROPPABLE Interface adding support for cropping of data.
+classdef (Abstract, HandleCompatible) Crop
+% CROP Interface adding support for cropping of data.
 
     methods (Abstract)
 
@@ -33,7 +33,7 @@ classdef (Abstract, HandleCompatible) Croppable
         % timetable cropping.
 
             arguments (Input)
-                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
+                timeFilter {mag.mixin.Crop.mustBeTimeFilter}
                 time datetime {mustBeVector(time, "allow-all-empties")}
             end
 
@@ -63,7 +63,7 @@ classdef (Abstract, HandleCompatible) Croppable
         % timetable cropping.
 
             arguments (Input)
-                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
+                timeFilter {mag.mixin.Crop.mustBeTimeFilter}
                 time datetime {mustBeVector(time, "allow-all-empties")}
             end
 

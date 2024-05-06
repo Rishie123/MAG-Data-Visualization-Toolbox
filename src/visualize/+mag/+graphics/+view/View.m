@@ -12,6 +12,11 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
         TLabel (1, 1) string = "T [" + char(176) + "C]"
     end
 
+    properties
+        % FACTORY Graphics factory.
+        Factory (1, 1) mag.graphics.factory.Factory = mag.graphics.factory.DefaultFactory()
+    end
+
     properties (SetAccess = protected)
         % RESULTS Data to visualize.
         Results (1, 1) mag.Instrument
@@ -58,6 +63,20 @@ classdef (Abstract) View < matlab.mixin.Heterogeneous & mag.mixin.SetGet
             end
 
             hkType = this.Results.HK.getHKType(type);
+        end
+    end
+
+    methods (Static, Access = protected)
+
+        function date = date2str(date, format)
+        % DATE2STR Convert datetime to string.
+
+            arguments
+                date (1, 1) datetime
+                format (1, 1) string = "dd-MMM-yyyy HHmmss"
+            end
+
+            date.Format = format;
         end
     end
 end

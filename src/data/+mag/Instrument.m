@@ -1,4 +1,5 @@
-classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & mag.mixin.SetGet & mag.mixin.Croppable
+classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.CustomDisplay & ...
+        mag.mixin.SetGet & mag.mixin.Crop & mag.mixin.Signal
 % INSTRUMENT Class containing MAG instrument data.
 
     properties
@@ -65,7 +66,7 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function hasHK = get.HasHK(this)
-            hasHK = ~isempty(this.HK) && this.HK.HasData;
+            hasHK = ~isempty(this.HK) && any(this.HK.HasData);
         end
 
         function timeRange = get.TimeRange(this)
@@ -171,7 +172,6 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function resample(this, targetFrequency)
-        % RESAMPLE Resample science and HK data to the specified frequency.
 
             arguments
                 this (1, 1) mag.Instrument
@@ -188,8 +188,6 @@ classdef (Sealed) Instrument < handle & matlab.mixin.Copyable & matlab.mixin.Cus
         end
 
         function downsample(this, targetFrequency)
-        % DOWNSAMPLE Downsample science and HK data to the specified
-        % frequency.
 
             arguments
                 this (1, 1) mag.Instrument

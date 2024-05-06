@@ -22,7 +22,7 @@ classdef (Abstract, Hidden) Science < mag.graphics.view.View
         function value = getFigureName(this, primary, secondary)
 
             if ismissing(this.Name)
-                value = compose("%s (%s, %s) Time Series (%s)", primary.MetaData.getDisplay("Mode"), this.getDataFrequency(primary.MetaData), this.getDataFrequency(secondary.MetaData), datestr(primary.MetaData.Timestamp, "dd-mmm-yyyy HHMMSS")); %#ok<DATST>
+                value = compose("%s (%s, %s) Time Series (%s)", primary.MetaData.getDisplay("Mode"), this.getDataFrequency(primary.MetaData), this.getDataFrequency(secondary.MetaData), this.date2str(primary.MetaData.Timestamp));
             else
                 value = this.Name;
             end

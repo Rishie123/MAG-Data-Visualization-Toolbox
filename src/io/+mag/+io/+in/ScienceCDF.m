@@ -53,7 +53,7 @@ classdef ScienceCDF < mag.io.in.CDF
             % Add continuity information, for simpler interpolation.
             % Property order:
             %     sequence, x, y, z, range, compression, quality
-            timedData.Properties.VariableContinuity = ["step", "continuous", "continuous", "continuous", "step", "step", "step"];
+            timedData.Properties.VariableContinuity = ["step", "continuous", "continuous", "continuous", "step", "step", "event"];
 
             % Create mag.Science object with meta data.
             metaData = mag.meta.Science(Mode = mode, Primary = isequal(sensor, mag.meta.Sensor.FOB), Sensor = sensor, ...

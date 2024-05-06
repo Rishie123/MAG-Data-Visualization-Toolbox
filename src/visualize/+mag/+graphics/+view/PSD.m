@@ -31,7 +31,7 @@ classdef PSD < mag.graphics.view.View
             charts(:, 1:2:end) = reshape(primaryData, 2, []);
             charts(:, 2:2:end) = reshape(secondaryData, 2, []);
 
-            this.Figures = mag.graphics.visualize( ...
+            this.Figures = this.Factory.assemble( ...
                 charts{:}, ...
                 Name = this.getFigureName(), ...
                 LinkXAxes = false, ...
@@ -93,10 +93,10 @@ classdef PSD < mag.graphics.view.View
         end
     end
 
-    methods (Static, Access = private)
+    methods (Access = private)
 
-        function value = getFigureTitle(metaData, label, startTime, duration)
-            value = compose("%s %s (%s, %s)", metaData.getDisplay("Sensor"), label, datestr(startTime, "dd-mmm-yy HH:MM"), duration); %#ok<DATST>
+        function value = getFigureTitle(this, metaData, label, startTime, duration)
+            value = compose("%s %s (%s, %s)", metaData.getDisplay("Sensor"), label, this.date2str(startTime, "dd-MMM-yy HH:mm"), duration);
         end
     end
 end

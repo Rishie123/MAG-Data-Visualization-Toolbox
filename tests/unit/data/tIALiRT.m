@@ -1,6 +1,10 @@
 classdef tIALiRT < matlab.mock.TestCase
 % TIALIRT Unit tests for "mag.IALiRT" class.
 
+    properties (TestParameter)
+        SignalMethod = {"resample", "downsample"}
+    end
+
     methods (Test)
 
         % Test that "HasData" property returns "true" when data is present.
@@ -50,14 +54,32 @@ classdef tIALiRT < matlab.mock.TestCase
             % Set up.
             [iALiRT, primaryBehavior, secondaryBehavior] = testCase.createTestData();
 
-            timeFilter = timerange(datetime("-Inf", TimeZone = "UTC"), datetime("Inf", TimeZone = "UTC"));
+            timeFilter1 = timerange(datetime("-Inf", TimeZone = "UTC"), datetime("now", TimeZone = "UTC"));
+            timeFilter2 = timerange(datetime("now", TimeZone = "UTC"), datetime("Inf", TimeZone = "UTC"));
 
             % Exercise.
-            iALiRT.crop(timeFilter, timeFilter);
+            iALiRT.crop(timeFilter1, timeFilter2);
 
             % Verify.
-            testCase.verifyCalled(primaryBehavior.crop(timeFilter), "Primary data should be cropped with same filter.");
-            testCase.verifyCalled(secondaryBehavior.crop(timeFilter), "Secondary data should be cropped with same filter.");
+            testCase.verifyCalled(primaryBehavior.crop(timeFilter1), "Primary data should be cropped with primary filter.");
+            testCase.verifyCalled(secondaryBehavior.crop(timeFilter2), "Secondary data should be cropped with secondary filter.");
+        end
+
+        % Test that signal modification methods call method of underlying
+        % science data.
+        function signalMethods(testCase, SignalMethod)
+
+            % Set up.
+            [iALiRT, primaryBehavior, secondaryBehavior] = testCase.createTestData();
+
+            targetFrequency = 1 / 120;
+
+            % Exercise.
+            feval(SignalMethod, iALiRT, targetFrequency);
+
+            % Verify.
+            testCase.verifyCalled(primaryBehavior.(SignalMethod)(targetFrequency), "Primary data signal modification method should be called.");
+            testCase.verifyCalled(secondaryBehavior.(SignalMethod)(targetFrequency), "Secondary data signal modification method should be called.");
         end
 
         % Test that "copy" method performs a deep copy of all data.
@@ -80,11 +102,10 @@ classdef tIALiRT < matlab.mock.TestCase
 
         function [iALiRT, primaryBehavior, secondaryBehavior] = createTestData(testCase)
 
-            emptyTimeTable = timetable.empty();
-            emptyTimeTable.Time.TimeZone = "UTC";
+            scienceTT = mag.test.DataTestUtilities.getScienceTimetable();
 
-            [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {emptyTimeTable, mag.meta.Science(Primary = true, Sensor = "FOB")}, Strict = true);
-            [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {emptyTimeTable, mag.meta.Science(Sensor = "FIB")}, Strict = true);
+            [primary, primaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Primary = true, Sensor = "FOB")}, Strict = true);
+            [secondary, secondaryBehavior] = testCase.createMock(?mag.Science, ConstructorInputs = {scienceTT, mag.meta.Science(Sensor = "FIB")}, Strict = true);
 
             iALiRT = mag.IALiRT(Science = [primary, secondary]);
         end

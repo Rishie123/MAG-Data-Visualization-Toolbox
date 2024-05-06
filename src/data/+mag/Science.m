@@ -111,7 +111,7 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             arguments
                 this (1, 1) mag.Science
-                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
+                timeFilter {mag.mixin.Crop.mustBeTimeFilter}
             end
 
             timePeriod = this.convertToTimeSubscript(timeFilter, this.Time);
@@ -161,7 +161,9 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             actualFrequency = 1 / seconds(mode(this.dT));
 
-            if actualFrequency > targetFrequency
+            if actualFrequency == targetFrequency
+                return;
+            elseif actualFrequency > targetFrequency
 
                 numerator = 1;
                 denominator = actualFrequency / targetFrequency;
@@ -192,10 +194,15 @@ classdef Science < mag.TimeSeries & matlab.mixin.CustomDisplay
                 targetFrequency (1, 1) double
             end
 
-            actualFrequency = 1 / seconds(mode(this.dT));
+            dt = this.dT(this.Quality.isScience());
+            this.mustBeConstantRate(milliseconds(dt));
+
+            actualFrequency = 1 / seconds(mode(dt));
             decimationFactor = actualFrequency / targetFrequency;
 
-            if round(decimationFactor) ~= decimationFactor
+            if actualFrequency == targetFrequency
+                return;
+            elseif round(decimationFactor) ~= decimationFactor
                 error("Calculated decimation factor (%.3f) must be an integer.", decimationFactor);
             end
 

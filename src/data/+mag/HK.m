@@ -45,7 +45,7 @@ classdef (Abstract) HK < mag.TimeSeries & matlab.mixin.CustomDisplay
 
             arguments
                 this mag.HK
-                timeFilter {mag.mixin.Croppable.mustBeTimeFilter}
+                timeFilter {mag.mixin.Crop.mustBeTimeFilter}
             end
 
             for i = 1:numel(this)

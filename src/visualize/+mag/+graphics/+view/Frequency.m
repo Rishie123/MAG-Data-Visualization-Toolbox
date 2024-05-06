@@ -46,7 +46,7 @@ classdef Frequency < mag.graphics.view.View
 
             yLine = mag.graphics.chart.Line(Axis = "y", Value = 0.01, Style = "--", Label = "10pT");
 
-            this.Figures = mag.graphics.visualize( ...
+            this.Figures = this.Factory.assemble( ...
                 psdPrimary, mag.graphics.style.Default(Title = compose("%s PSD", primarySensor) , XLabel = this.FLabel, YLabel = this.PSDLabel, XScale = "log", YScale = "log", Legend = ["x", "y", "z"], Layout = [2, 3], Charts = [mag.graphics.chart.Plot(XVariable = "Frequency", YVariables = ["X", "Y", "Z"]), yLine]), ...
                 psdSecondary, mag.graphics.style.Default(Title = compose("%s PSD", secondarySensor), XLabel = this.FLabel, YLabel = this.PSDLabel, XScale = "log", YScale = "log", YAxisLocation = "right", Legend = ["x", "y", "z"], Layout = [2, 3], Charts = [mag.graphics.chart.Plot(XVariable = "Frequency", YVariables = ["X", "Y", "Z"]), yLine]), ...
                 primary, ...
@@ -64,14 +64,14 @@ classdef Frequency < mag.graphics.view.View
         end
     end
 
-    methods (Static, Access = private)
+    methods (Access = private)
 
-        function value = getFigureTitle(primary, secondary, psdStart, psdDuration)
-            value = compose("Start: %s - Duration: %s - (%d, %d)", psdStart, psdDuration, primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"));
+        function value = getFigureTitle(this, primary, secondary, psdStart, psdDuration)
+            value = compose("Start: %s - Duration: %s - (%d, %d)", this.date2str(psdStart), psdDuration, primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"));
         end
 
-        function value = getFigureName(primary, secondary, psdStart)
-            value = compose("%s (%d, %d) Frequency (%s)", primary.MetaData.getDisplay("Mode"), primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"), datestr(psdStart, "dd-mmm-yyyy HHMMSS")); %#ok<DATST>
+        function value = getFigureName(this, primary, secondary, psdStart)
+            value = compose("%s (%d, %d) Frequency (%s)", primary.MetaData.getDisplay("Mode"), primary.MetaData.getDisplay("DataFrequency"), secondary.MetaData.getDisplay("DataFrequency"), this.date2str(psdStart));
         end
     end
 end

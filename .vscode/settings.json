@@ -1,0 +1,17 @@
+{
+    "files.exclude": {
+        "**/._*": true,
+        "**/*.*~": true,
+        "**/*.asv": true,
+        "**/*~": true
+    },
+    "search.exclude": {
+        "**/._*": true,
+        "**/*.*~": true,
+        "**/*.asv": true,
+        "**/*~": true
+    },
+    "cSpell.words": [
+        "downsample"
+    ]
+}

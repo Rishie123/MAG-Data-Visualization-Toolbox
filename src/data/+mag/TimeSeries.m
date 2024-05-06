@@ -1,4 +1,4 @@
-classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
+classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Crop & mag.mixin.Signal
 % TIMESERIES Abstract base class for MAG time series.
 
     properties
@@ -38,15 +38,6 @@ classdef (Abstract) TimeSeries < mag.Data & mag.mixin.Croppable
         function dependentVariables = get.DependentVariables(this)
             dependentVariables = timetable2table(this.Data, ConvertRowTimes = false);
         end
-    end
-
-    methods (Abstract)
-
-        % RESAMPLE Resample data to the specified frequency.
-        resample(this, targetFrequency)
-
-        % DOWNSAMPLE Downsample data to the specified frequency.
-        downsample(this, targetFrequency)
     end
 
     methods (Static, Access = protected)

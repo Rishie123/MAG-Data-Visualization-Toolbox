@@ -1,5 +1,7 @@
 # MAG Data Visualization Toolbox
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)][license]
+[![](https://img.shields.io/badge/Author-Space%20Magnetometer%20Laboratory-ff69b4.svg)][sml]
 [![MATLAB Tests](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/actions/workflows/matlab.yml/badge.svg)](https://github.com/ImperialCollegeLondon/MAG-Data-Visualization-Toolbox/actions/workflows/matlab.yml)
 
 This repository contains utilities for processing and visualizing MAG science and HK data. The supported MATLAB releases are MATLAB R2023b and later. The following MATLAB toolboxes are required to use the toolbox:
@@ -37,3 +39,10 @@ When developing new features or fixing issues, create a new branch. After finish
 
 To change the version of the toolbox, modify the `VERSION` variable in `.github/workflows/matlab.yml`. This will automatically updated the toolbox version and create a new release with the correct tag.
 Also, update the contents of the `resources/release-notes.md` file by detailing what has changed in the new version.
+
+## License
+
+MAG Data Visualization Toolbox is released under the [MIT license][license].
+
+[license]: LICENSE.md
+[sml]: http://www.imperial.ac.uk/space-and-atmospheric-physics/research/areas/space-magnetometer-laboratory/

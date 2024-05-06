@@ -70,11 +70,11 @@ classdef tScienceMATOut < MAGIOTestCase & matlab.mock.TestCase
             exportData = format.convertToExportFormat(data);
 
             % Verify.
-            testCase.assertThat(exportData, mag.test.IsField("B"), """B"" field should exist.");
+            testCase.assertThat(exportData, mag.test.constraint.IsField("B"), """B"" field should exist.");
 
             B = exportData.B;
-            testCase.assertThat(B, mag.test.IsField("P"), """P"" field should exist.");
-            testCase.assertThat(B, mag.test.IsField("S"), """S"" field should exist.");
+            testCase.assertThat(B, mag.test.constraint.IsField("P"), """P"" field should exist.");
+            testCase.assertThat(B, mag.test.constraint.IsField("S"), """S"" field should exist.");
 
             for v = ["Primary", "Secondary"]
 
@@ -117,10 +117,10 @@ classdef tScienceMATOut < MAGIOTestCase & matlab.mock.TestCase
 
             actualExportData = load(fileName, "-mat");
 
-            testCase.assertThat(actualExportData, mag.test.IsField("A"), """A"" field should exist.");
+            testCase.assertThat(actualExportData, mag.test.constraint.IsField("A"), """A"" field should exist.");
             testCase.verifyEqual(actualExportData.A, expectedExportData.A, """A"" value should match expectation.");
 
-            testCase.assertThat(actualExportData, mag.test.IsField("B"), """B"" field should exist.");
+            testCase.assertThat(actualExportData, mag.test.constraint.IsField("B"), """B"" field should exist.");
             testCase.verifyEqual(actualExportData.B, expectedExportData.B, """B"" value should match expectation.");
         end
 
@@ -146,7 +146,7 @@ classdef tScienceMATOut < MAGIOTestCase & matlab.mock.TestCase
             actualExportData = load(fileName, "-mat");
 
             for f = ["A", "B", "C"]
-                testCase.assertThat(actualExportData, mag.test.IsField(f), compose("""%s"" field should exist.", f));
+                testCase.assertThat(actualExportData, mag.test.constraint.IsField(f), compose("""%s"" field should exist.", f));
             end
 
             testCase.verifyEqual(actualExportData.C, expectedExportData2.C, """C"" value should match expectation.");
