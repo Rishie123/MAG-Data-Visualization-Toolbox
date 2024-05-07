@@ -1,7 +1,7 @@
 function loadHKData(this)
     %% Initialize
 
-    if isempty(this.IALiRTFileNames)
+    if isempty(this.HKFileNames)
         return;
     end
 
