@@ -197,7 +197,9 @@ function [rangeTable, events] = findRangeChanges(ranges, events, sensorName)
 
         if any(e.Range == rangeTable.Range(i))
 
-            events.Time(events.Time == e.Time) = rangeTable.Time(i);
+            [~, idxMin] = min(abs(events.Time - rangeTable.Time(i)));
+
+            events.Time(idxMin) = rangeTable.Time(i);
             idxDelete(end + 1) = i; %#ok<AGROW>
         end
     end
