@@ -91,7 +91,7 @@ classdef Frequency < mag.graphics.view.View
         end
 
         function value = getFrequencyFigureName(this, primary, secondary)
-            value = this.getFrequencyFigureTitle(primary, secondary) + " Frequency";
+            value = this.getFrequencyFigureTitle(primary, secondary) + compose(" Frequency (%s)", this.date2str(primary.MetaData.Timestamp));
         end
 
         function value = getPSDFigureTitle(this, primary, secondary, psdStart, psdDuration)
