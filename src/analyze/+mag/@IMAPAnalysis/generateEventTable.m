@@ -158,23 +158,42 @@ end
 
 function events = findModeChanges(data, events)
 
-    searchWindow = seconds(5);
-    data = sortrows(data);
+    % If there no events were detected, find mode changes by looking at
+    % timestamp cadence.
+    if isempty(events)
 
-    % Update timestamps for mode changes.
-    idxMode = find(diff(events.DataFrequency) ~= 0) + 1;
+        dt = milliseconds(diff(data.t));
 
-    for i = idxMode'
+        locRemove = ismissing(dt) | (dt < 1);
+        dt(locRemove) = [];
 
-        % Find window around event and compute actual timestamp difference.
-        t = events.Time(i);
-        eventWindow = data(withtol(t, searchWindow), :);
+        idxChange = findchangepts(dt, MinThreshold = 1);
 
-        dt = seconds(diff(eventWindow.t));
-        [~, idxChange] = max(diff(dt), [], ComparisonMethod = "abs");
+        for i = find(locRemove)'
 
-        if ~isempty(eventWindow)
-            events.Time(i) = eventWindow.t(idxChange + 1);
+            locUpdate = idxChange >= i;
+            idxChange(locUpdate) = idxChange(locUpdate) + 1;
+        end
+    else
+
+        searchWindow = seconds(5);
+        data = sortrows(data);
+
+        % Update timestamps for mode changes.
+        idxMode = find(diff(events.DataFrequency) ~= 0) + 1;
+
+        for i = idxMode'
+
+            % Find window around event and compute actual timestamp difference.
+            t = events.Time(i);
+            eventWindow = data(withtol(t, searchWindow), :);
+
+            dt = seconds(diff(eventWindow.t));
+            [~, idxChange] = max(diff(dt), [], ComparisonMethod = "abs");
+
+            if ~isempty(eventWindow)
+                events.Time(i) = eventWindow.t(idxChange + 1);
+            end
         end
     end
 end
