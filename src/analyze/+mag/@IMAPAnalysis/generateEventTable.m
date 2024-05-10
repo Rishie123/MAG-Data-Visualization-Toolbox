@@ -64,12 +64,16 @@ function eventTable = generateEventTable(~, data, sensorEvents)
     end
 
     % Add sensor shutdown.
-    shutDownTable = array2timetable(NaN(1, numel(eventTable.Properties.VariableNames)), RowTimes = max(data.Time) + eps(), VariableNames = eventTable.Properties.VariableNames);
+    shutDownTable = array2timetable(NaN(1, numel(eventTable.Properties.VariableNames)), RowTimes = max(data.Time) + mag.time.Constant.Eps, VariableNames = eventTable.Properties.VariableNames);
     shutDownTable.Mode = categorical(shutDownTable.Mode);
     shutDownTable.Label = sensorName + " Shutdown";
     shutDownTable.Reason = categorical("Command");
 
     eventTable = [eventTable; shutDownTable];
+
+    % Ensure no duplicate times.
+    locDuplicate = diff(eventTable.Time) == 0;
+    eventTable.Time(locDuplicate) = eventTable.Time(locDuplicate) - mag.time.Constant.Eps;
 
     % Process variables.
     fillVariables = ["Mode", "DataFrequency", "PacketFrequency", "Range"];
@@ -162,28 +166,37 @@ function events = findModeChanges(data, events, name)
     % timestamp cadence.
     if isempty(events)
 
-        dt = milliseconds(diff(data.t));
+        data = sortrows(data);
 
-        locRemove = ismissing(dt) | (dt < 1) | (dt > 1000);
-        dt(locRemove) = [];
+        % Find changes in timestamp cadence.
+        t = data.t;
+        dt = milliseconds(diff(t));
+
+        idxRemove = find(ismissing(dt) | (dt < 1) | (dt > 1000)) + 1;
+        idxRemove(idxRemove > height(data)) = height(data);
+        
+        t(idxRemove) = [];
+        dt = milliseconds(diff(t));
 
         idxChange = findchangepts(dt, MinThreshold = 1);
         idxChange(diff(idxChange) == 1) = [];
 
-        for i = find(locRemove)'
+        % Correct for data that was filtered out.
+        for i = idxRemove'
 
             locUpdate = idxChange >= i;
             idxChange(locUpdate) = idxChange(locUpdate) + 1;
         end
 
+        % Create event details.
         idxChange = [1; idxChange; height(data) + 1];
 
         for i = 1:(numel(idxChange) - 1)
 
             d = data(idxChange(i):(idxChange(i+1) - 1), :);
-            f = 1 / seconds(mode(diff(d.t)));
+            f = round(1 / seconds(mode(diff(d.t))));
 
-            if f > 1/8
+            if f < 8
                 m = "Normal";
             else
                 m = "Burst";
@@ -200,6 +213,9 @@ function events = findModeChanges(data, events, name)
 
             events = [events; eventtable(t, EventLabelsVariable = "Label")]; %#ok<AGROW>
         end
+
+        % Remove duplicate events.
+        events(find(diff(events.DataFrequency) == 0) + 1, :) = [];
     else
 
         searchWindow = seconds(5);
