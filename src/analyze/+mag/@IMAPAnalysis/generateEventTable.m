@@ -222,7 +222,7 @@ function events = findModeChanges(data, events, name)
         data = sortrows(data);
 
         % Update timestamps for mode changes.
-        idxMode = find(diff(events.DataFrequency) ~= 0) + 1;
+        idxMode = find([true; diff(events.DataFrequency) ~= 0] & ~ismissing(events.DataFrequency));
 
         for i = idxMode'
 
