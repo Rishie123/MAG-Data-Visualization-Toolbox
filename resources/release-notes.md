@@ -8,4 +8,3 @@
 - Rename `mag.computeSpectrogram` to `mag.spectrogram`
 - Update `mag.spectrogram` to compute spectrogram for all different time periods separately
 - Do not improve event time estimates for Config mode
-- Fix issue with Burst mode auto-exit setting mode to previous, instead of forcing Normal mode
