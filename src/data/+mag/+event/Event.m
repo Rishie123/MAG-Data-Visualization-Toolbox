@@ -85,7 +85,7 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
 
                 % Adjust completion time.
                 for i = 1:numel(lastEvents)
-                    lastEvents(i).CompleteTimestamp = startTime + seconds(1e6 * i * eps()); % add "eps" seconds so that they are not all the same
+                    lastEvents(i).CompleteTimestamp = startTime + (i * mag.time.Constant.Eps); % add "eps" seconds so that they are not all the same
                 end
             end
 

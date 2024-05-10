@@ -60,7 +60,7 @@ classdef Separate < mag.process.Step
 
             finalRow = data(end, :);
 
-            finalRow.(this.DiscriminationVariable) = finalRow.(this.DiscriminationVariable) + eps();
+            finalRow.(this.DiscriminationVariable) = finalRow.(this.DiscriminationVariable) + mag.time.Constant.Eps;
             finalRow{:, variables} = missing();
 
             if ~isempty(this.QualityVariable)
