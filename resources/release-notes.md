@@ -5,6 +5,7 @@
 - Rename `resources/ToolboxTemplate.xml` to `resources/toolbox-template.xml`
 - Fix issue preventing to load HK if no I-ALiRT is present
 - Fix issue when range changes occur close to one another
+- Fix issue with `"` preventing from saving figures
 - Update system test `tIMAPAnalysis` to cover range changing
 
 # Project
