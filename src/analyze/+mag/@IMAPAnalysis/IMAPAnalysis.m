@@ -243,42 +243,34 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
             end
         end
 
-        function modeCycling = getModeCycling(this)
+        function modeCycling = getModeCycling(this, options)
         % GETMODECYCLING Get mode cycling data.
 
             arguments (Input)
                 this (1, 1) mag.IMAPAnalysis
+                options.PrimaryCycle (1, :) double = [128, 2, 64, 4, 64, 4]
+                options.SecondaryCycle (1, :) double = [128, 2, 8, 1, 64, 4]
             end
 
             arguments (Output)
                 modeCycling mag.Instrument {mustBeScalarOrEmpty}
             end
 
-            function period = findModeCyclingPeriod(events)
+            function period = findModeCyclingPeriod(events, pattern)
 
                 modeEvents = events((events.Reason == "Command") & ~ismissing(events.Duration), :);
+                idxMode = strfind(modeEvents.DataFrequency', pattern);
 
-                idxFirst = find(modeEvents.Mode == "Normal", 1);
-                idxLast = find(diff(modeEvents.Mode == "Normal") == 0, 1);
-
-                if isempty(modeEvents) && isempty(idxFirst) && isempty(idxLast)
+                if isempty(idxMode)
                     period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
                 else
-
-                    finalTime = events(find([events.Time] == modeEvents.Time(idxLast), 1) + 1, :).Time;
-                    modeEvents = modeEvents(idxFirst:idxLast, :);
-
-                    if isempty(modeEvents)
-                        period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
-                    else
-                        period = timerange(modeEvents.Time(1), finalTime, "closedleft");
-                    end
+                    period = timerange(events.Time(idxMode), events.Time(idxMode + numel(pattern) + 1), "closedleft");
                 end
             end
 
             modeCycling = this.applyTimeRangeToInstrument( ...
-                findModeCyclingPeriod(this.Results.Primary.Events), ...
-                findModeCyclingPeriod(this.Results.Secondary.Events));
+                findModeCyclingPeriod(this.Results.Primary.Events, options.PrimaryCycle), ...
+                findModeCyclingPeriod(this.Results.Secondary.Events, options.SecondaryCycle));
         end
 
         function rangeCycling = getRangeCycling(this)
