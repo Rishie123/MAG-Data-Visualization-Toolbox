@@ -35,7 +35,7 @@ function eventTable = generateEventTable(~, data, sensorEvents)
     sensorEvents = updateRampModeTimestamps(sensorEvents, data.Data);
 
     % Improve estimates of mode changes.
-    sensorEvents = findModeChanges(data.Data, sensorEvents);
+    sensorEvents = findModeChanges(data.Data, sensorEvents, sensorName);
 
     % Basic structure for events table.
     eventTable = mag.Science.generateEmptyEventtable();
@@ -156,7 +156,7 @@ function events = updateRampModeTimestamps(events, data)
     end
 end
 
-function events = findModeChanges(data, events)
+function events = findModeChanges(data, events, name)
 
     % If there no events were detected, find mode changes by looking at
     % timestamp cadence.
@@ -164,15 +164,41 @@ function events = findModeChanges(data, events)
 
         dt = milliseconds(diff(data.t));
 
-        locRemove = ismissing(dt) | (dt < 1);
+        locRemove = ismissing(dt) | (dt < 1) | (dt > 1000);
         dt(locRemove) = [];
 
         idxChange = findchangepts(dt, MinThreshold = 1);
+        idxChange(diff(idxChange) == 1) = [];
 
         for i = find(locRemove)'
 
             locUpdate = idxChange >= i;
             idxChange(locUpdate) = idxChange(locUpdate) + 1;
+        end
+
+        idxChange = [1; idxChange; height(data) + 1];
+
+        for i = 1:(numel(idxChange) - 1)
+
+            d = data(idxChange(i):(idxChange(i+1) - 1), :);
+            f = 1 / seconds(mode(diff(d.t)));
+
+            if f > 1/8
+                m = "Normal";
+            else
+                m = "Burst";
+            end
+
+            e = struct2table(struct(Mode = m, ...
+                DataFrequency = f, ...
+                PacketFrequency = NaN, ...
+                Duration = 0, ...
+                Range = NaN, ...
+                Label = compose("%s %s (%d)", name, m, f), ...
+                Reason = "Command"));
+            t = table2timetable(e, RowTimes = d.t(1));
+
+            events = [events; eventtable(t, EventLabelsVariable = "Label")]; %#ok<AGROW>
         end
     else
 
