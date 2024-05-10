@@ -151,21 +151,12 @@ classdef (Abstract) Event < matlab.mixin.Heterogeneous & matlab.mixin.Copyable &
 
             locTimedCommand = ~ismissing(eventtableThis.Duration) & (eventtableThis.Duration ~= 0);
             idxTimedCommand = find(locTimedCommand);
-            idxBaselineCommand = find(~locTimedCommand);
 
             for i = idxTimedCommand(:)'
 
-                idx = idxBaselineCommand(idxBaselineCommand < i);
-
-                if isempty(idx)
-                    previousMode = "Normal"; % assume the instrument was in Normal mode
-                else
-                    previousMode = eventtableThis.Mode(idx(end));
-                end
-
                 autoEvent = eventtableThis(i, :);
                 autoEvent.Time = eventtableThis.Time(i) + seconds(eventtableThis.Duration(i));
-                autoEvent.Mode = previousMode;
+                autoEvent.Mode = "Normal"; % auto-exit sends instrument to Normal
                 autoEvent.Duration = 0;
                 autoEvent.Reason = "Auto";
 

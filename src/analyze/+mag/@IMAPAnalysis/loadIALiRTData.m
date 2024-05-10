@@ -33,13 +33,6 @@ function loadIALiRTData(this, primarySetup, secondarySetup)
     primary.MetaData.Timestamp = startTime;
     secondary.MetaData.Timestamp = startTime;
 
-    %% Add Mode and Range Change Events
-
-    sensorEvents = mag.event.Event.generateEmptyEventtable();
-
-    primary.Data.Properties.Events = this.generateEventTable(primary, sensorEvents);
-    secondary.Data.Properties.Events = this.generateEventTable(secondary, sensorEvents);
-
     %% Process Data as a Whole
 
     for ps = this.WholeDataProcessing
@@ -47,6 +40,13 @@ function loadIALiRTData(this, primarySetup, secondarySetup)
         primary.Data = ps.apply(primary.Data, primary.MetaData);
         secondary.Data = ps.apply(secondary.Data, secondary.MetaData);
     end
+
+    %% Add Mode and Range Change Events
+
+    sensorEvents = mag.event.Event.generateEmptyEventtable();
+
+    primary.Data.Properties.Events = this.generateEventTable(primary, sensorEvents);
+    secondary.Data.Properties.Events = this.generateEventTable(secondary, sensorEvents);
 
     %% Remove Ramp Mode (If Any)
 

@@ -197,7 +197,9 @@ function [rangeTable, events] = findRangeChanges(ranges, events, sensorName)
 
         if any(e.Range == rangeTable.Range(i))
 
-            events.Time(events.Time == e.Time) = rangeTable.Time(i);
+            [~, idxMin] = min(abs(events.Time - rangeTable.Time(i)));
+
+            events.Time(idxMin) = rangeTable.Time(i);
             idxDelete(end + 1) = i; %#ok<AGROW>
         end
     end
@@ -207,10 +209,13 @@ function [rangeTable, events] = findRangeChanges(ranges, events, sensorName)
 
     % If the first range change is after the first event (and they are
     % close to each other) update its range.
-    firstRange = events(withtol(rangeTable.Time(1), seconds(0.5)), :);
+    if ~isempty(rangeTable)
 
-    if ~isempty(firstRange) && ismissing(firstRange.Range) && ~contains(firstRange.Label, "Range")
-        events{withtol(rangeTable.Time(1), seconds(0.5)), "Range"} = rangeTable.Range(1);
+        firstRange = events(withtol(rangeTable.Time(1), seconds(0.5)), :);
+
+        if ~isempty(firstRange) && ismissing(firstRange.Range) && ~contains(firstRange.Label, "Range")
+            events{withtol(rangeTable.Time(1), seconds(0.5)), "Range"} = rangeTable.Range(1);
+        end
     end
 
     % Complete automatic range changes.

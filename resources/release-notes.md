@@ -1,27 +1,14 @@
 # Software
 
-## Graphics
+- Add support for `IMAP-OPS-TE-ICL-002` files in `mag.meta.log.Word`
+- Move processing of I-ALiRT before mode/range change event detection
+- Rename `resources/ToolboxTemplate.xml` to `resources/toolbox-template.xml`
+- Fix issue preventing to load HK if no I-ALiRT is present
+- Fix issue with Burst mode auto-exit setting mode to previous, instead of forcing Normal mode
+- Fix issue when range changes occur close to one another
+- Fix issue with `"` preventing from saving figures
+- Update system test `tIMAPAnalysis` to cover range changing
 
-- Add plot for science timestamp Δt in `mag.graphics.view.Timestamp`
-- Replace use of `mag.graphics.visualize` in views with abstract factory pattern
-- Default `Visible` value in `mag.graphics.visualize` now comes from `matlab.ui.Root/DefaultFigureVisible`
-- Rename `mag.graphics.getAllAxes` to `mag.test.getAllAxes`
-- Fix issue with views not handling `NaT`
-- Add cleanup to all graphics tests, to close any figures opened during the test
-- Add tests for `mag.graphics.view.Field` and `mag.graphics.visualize`
+# Project
 
-## Other
-
-- Add `mag.mixin.Signal` as interface for signal-like classes
-- Add `resample` and `downsample` methods to `mag.IALiRT`
-- Add check for constant rate in `mag.Science/downsample`
-- Use `event` continuity variable for `mag.Science/Quality` property
-- Do not resample or downsample if target frequency is equal to actual frequency
-- Rename `mag.mixin.Croppable` to `mag.mixin.Crop`
-- Fix issue with `mag.meta.Quality` not being compatible with `NaN`s
-- Fix issue with `mag.Instrument/HasHK` erroring with multiple HK instances
-
-# Workspace
-
-- Add license file
-- Add VS Code settings file
+- Add MATLAB Test support

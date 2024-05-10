@@ -4,6 +4,6 @@ function varargout = visualize(varargin)
     try
         [varargout{1:nargout}] = mag.graphics.factory.DefaultFactory().assemble(varargin{:});
     catch exception
-        throwAsCaller(exception);
+        rethrow(exception);
     end
 end

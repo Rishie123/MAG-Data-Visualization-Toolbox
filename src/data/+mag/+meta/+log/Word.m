@@ -49,7 +49,7 @@ classdef Word < mag.meta.log.Type
                 secondaryFEE = "FEE2";
 
             % Check if it is for FM.
-            elseif (width(rawData) == 15) && contains(this.FileName, "IMAP-MAG-TE-ICL-071")
+            elseif (width(rawData) == 15) && contains(this.FileName, "IMAP-MAG-TE-ICL-071" | "IMAP-OPS-TE-ICL-002")
 
                 rawData = renamevars(rawData, 2:15, ["Operator", "Controller", "Date", "Time", "Name", "BSW", "ASW", "GSE", "FOBModel", "FOBHarness", "FOBCan", "FIBModel", "FIBHarness", "FIBCan"]);
 

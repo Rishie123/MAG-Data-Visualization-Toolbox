@@ -27,7 +27,7 @@ function loadEventsData(this)
 
     events = mag.event.Event.empty();
 
-    % Identify config mode events.
+    % Identify Config mode events.
     locConfig = [rawEvents.command] == "MAG_M_CONF";
 
     for ce = rawEvents(locConfig)
@@ -163,7 +163,7 @@ function loadEventsData(this)
         end
     end
 
-    % Assign acknowlegdement and completion times.
+    % Assign acknowledgment and completion times.
     for e = events
 
         correction = duration.empty();
@@ -180,7 +180,7 @@ function loadEventsData(this)
             ce = ce([ce.timestamp] < similarSubsequentEvents(1).CommandTimestamp);
         end
 
-        % Find acknoledgement time.
+        % Find acknowledgment time.
         if isfield(ae, "type") && isfield(ae, "subtype")
 
             ae = ae((str2double([ae.type]) == e.Type) & (str2double([ae.subtype]) == e.SubType));
