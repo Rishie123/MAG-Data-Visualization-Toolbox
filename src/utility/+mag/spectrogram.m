@@ -14,7 +14,7 @@ function [f, t, p] = spectrogram(x, y, options)
 
     arguments (Output)
         f (:, 1) double
-        t (:, 1) double
+        t (:, 1) datetime
         p (:, :) double
     end
 
@@ -30,26 +30,57 @@ function [f, t, p] = spectrogram(x, y, options)
         end
     end
 
-    % Compute spectrogram coefficients.
-    rate = round(1 / mode(seconds(diff(x))));
+    % Filter invalid data.
+    locRemove = ismissing(y) | isinf(y);
 
-    if ~ismissing(options.Window)
-        w = options.Window;
-    elseif rate > 100
-        w = 25;
-    else
-        w = 5;
+    x(locRemove) = [];
+    y(locRemove) = [];
+
+    % Find non-contiguous time-periods.
+    idxChange = find(diff(x) > seconds(1)) + 1;
+    idxChange = [1; idxChange; numel(x) + 1];
+
+    [f, t, p] = deal([]);
+
+    % Loop over each time period, and compute individual
+    % spectrogram.
+    for i = 1:(numel(idxChange) - 1)
+
+        idxPeriod = idxChange(i):(idxChange(i + 1) - 1);
+        x_ = x(idxPeriod);
+        y_ = y(idxPeriod);
+
+        % Compute spectrogram coefficients.
+        rate = round(1 / mode(seconds(diff(x_))));
+
+        if ~ismissing(options.Window)
+            w = options.Window;
+        elseif rate > 100
+            w = 25;
+        else
+            w = 5;
+        end
+
+        window = rate * w;
+        overlap = round(window * options.Overlap);
+
+        if window > numel(y_)
+            window = [];
+        end
+
+        if overlap >= numel(y_)
+            overlap = [];
+        end
+
+        % Spectrogram.
+        [~, f_, t_, p_] = spectrogram(y_, window, overlap, 2 * options.FrequencyPoints, rate);
+        t_ = x_(1) + seconds(t_);
+
+        f = f_;
+        t = [t, t_(1) - mag.time.Constant.Eps, t_]; %#ok<AGROW>
+        p = [p, NaN(numel(f), 1), p_]; %#ok<AGROW>
     end
 
-    window = rate * w;
-    overlap = round(window * options.Overlap);
-
-    % Spectrogram.
-    y(ismissing(y) | isinf(y)) = 0;
-
-    [~, f, t, p] = spectrogram(y, window, overlap, 2 * options.FrequencyPoints, rate);
-
-    % Filter frequencies outside bands.
     if ~any(ismissing(options.FrequencyLimits))
 
         locF = (f >= options.FrequencyLimits(1)) & (f <= options.FrequencyLimits(2));
