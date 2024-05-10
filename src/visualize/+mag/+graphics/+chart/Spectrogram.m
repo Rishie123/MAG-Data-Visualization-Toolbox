@@ -56,7 +56,7 @@ classdef Spectrogram < mag.graphics.chart.Chart
             end
 
             % Spectrogram.
-            [f, t, p] = mag.computeSpectrogram(xData, yData, FrequencyLimits = this.FrequencyLimits, FrequencyPoints = this.FrequencyPoints, ...
+            [f, t, p] = mag.spectrogram(xData, yData, FrequencyLimits = this.FrequencyLimits, FrequencyPoints = this.FrequencyPoints, ...
                 Normalize = this.Normalize, Window = this.Window, Overlap = overlap);
 
             % Plot.

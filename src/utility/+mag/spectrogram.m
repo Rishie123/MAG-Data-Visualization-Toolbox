@@ -1,6 +1,6 @@
-function [f, t, p] = computeSpectrogram(x, y, options)
-% COMPUTESPECTROGRAM Calculate spectrogram for given signal, as a function
-% of time and frequency.
+function [f, t, p] = spectrogram(x, y, options)
+% SPECTROGRAM Calculate spectrogram for given signal, as a function of time
+% and frequency.
 
     arguments (Input)
         x (:, 1) datetime
