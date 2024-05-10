@@ -248,8 +248,8 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
 
             arguments (Input)
                 this (1, 1) mag.IMAPAnalysis
-                options.PrimaryCycle (1, :) double = [128, 2, 64, 4, 64, 4]
-                options.SecondaryCycle (1, :) double = [128, 2, 8, 1, 64, 4]
+                options.PrimaryCycle (1, :) double = [2, 64, 4, 64, 4, 128]
+                options.SecondaryCycle (1, :) double = [2, 8, 1, 64, 4, 128]
             end
 
             arguments (Output)
@@ -264,7 +264,7 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
                 if isempty(idxMode)
                     period = timerange(NaT(TimeZone = "UTC"), NaT(TimeZone = "UTC"));
                 else
-                    period = timerange(events.Time(idxMode), events.Time(idxMode + numel(pattern) + 1), "closedleft");
+                    period = timerange(modeEvents.Time(idxMode), modeEvents.Time(idxMode + numel(pattern)), "closedleft");
                 end
             end
 
@@ -285,8 +285,6 @@ classdef (Sealed) IMAPAnalysis < matlab.mixin.Copyable & mag.mixin.SetGet & mag.
             end
 
             function period = findRangeCyclingPeriod(events)
-
-                events = events(events.Reason == "Command", :);
 
                 pattern = [3, 2, 1, 0];
                 idxRange = strfind(events.Range', pattern);
