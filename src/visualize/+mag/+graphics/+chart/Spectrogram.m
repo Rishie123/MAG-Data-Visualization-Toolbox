@@ -7,6 +7,8 @@ classdef Spectrogram < mag.graphics.chart.Chart
         Normalize (1, 1) logical = true
         % FREQUENCYLIMITS Specifies the frequency band limits.
         FrequencyLimits (1, 2) double = [missing(), missing()]
+        % FREQUENCYPOINTS Number of frequency samples.
+        FrequencyPoints (1, 1) double = 256
         % WINDOW Length of window.
         Window (1, 1) double = missing()
         % OVERLAP Number of overlapped samples.
@@ -54,10 +56,11 @@ classdef Spectrogram < mag.graphics.chart.Chart
             end
 
             % Spectrogram.
-            [f, t, p] = mag.computeSpectrogram(xData, yData, FrequencyLimits = this.FrequencyLimits, Normalize = this.Normalize, Window = this.Window, Overlap = overlap);
+            [f, t, p] = mag.computeSpectrogram(xData, yData, FrequencyLimits = this.FrequencyLimits, FrequencyPoints = this.FrequencyPoints, ...
+                Normalize = this.Normalize, Window = this.Window, Overlap = overlap);
 
             % Plot.
-            graph = surf(axes, xData(1) + seconds(t), f, pow2db(abs(p)), EdgeColor = "none");
+            graph = surf(axes, t, f, pow2db(abs(p)), EdgeColor = "none");
 
             axes.XLimitMethod = "tight";
             axes.YLimitMethod = "tight";
